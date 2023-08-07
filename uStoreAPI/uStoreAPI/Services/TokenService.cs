@@ -1,0 +1,43 @@
+﻿using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using uStoreAPI.ModelsAzureDB;
+
+namespace uStoreAPI.Services
+{
+    public class TokenService
+    {
+        public string TokenGeneratorAdmin(CuentaAdministrador cuentaAdmin, Dato adminData, bool remember)
+        {
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.Name, adminData.PrimerNombre!),
+                new Claim(ClaimTypes.Email, cuentaAdmin.Email!),
+                new Claim(ClaimTypes.NameIdentifier, cuentaAdmin.IdAdministrador.ToString()!)
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.GetSection("Jwt:Key").Value!));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+
+            if (remember == true)
+            {
+                var token = new JwtSecurityToken(
+                         claims: claims,
+                         expires: DateTime.UtcNow.AddMinutes(1),
+                         signingCredentials: creds);
+
+                return new JwtSecurityTokenHandler().WriteToken(token);
+            }
+            else
+            {
+                var token = new JwtSecurityToken(
+                         claims: claims,
+                         expires: DateTime.UtcNow.AddSeconds(20),
+                         signingCredentials: creds);
+
+                return new JwtSecurityTokenHandler().WriteToken(token);
+            }
+        }
+    }
+}

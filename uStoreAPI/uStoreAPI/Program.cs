@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using uStoreAPI;
 using uStoreAPI.ModelsAzureDB;
+using uStoreAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,10 +22,24 @@ builder.Services.AddDbContext<UstoreContext>(options =>
 
 builder.Services.AddAutoMapper(typeof(MappingConfig));
 
-var app = builder.Build();
+builder.Services.AddScoped<AdminService>();
+builder.Services.AddScoped<LoginService>();
+builder.Services.AddScoped<TokenService>();
 
-app.UseAuthentication();
-app.UseAuthorization();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)),
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -35,6 +50,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
