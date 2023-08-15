@@ -54,6 +54,34 @@ namespace uStoreAPI.Controllers
             return Ok(tiendas);
         }
 
+        [HttpGet("GetImagenesTienda")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<IEnumerable<TiendaDto>>> GetImagenesTienda(int idTienda)
+        {
+            var user = HttpContext.User;
+            var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+            var tienda = await tiendasService.GetOneTienda(idTienda);
+            if (tienda is null)
+            {
+                return BadRequest("No hay una tienda registrada con ese id");
+            }
+            else if(tienda.IdAdministrador != idUser)
+            {
+                return Unauthorized("Tienda no autorizada");
+            }
+
+            var imagenesTienda = await tiendasService.GetImagenesTienda(idTienda);
+
+            if (imagenesTienda.IsNullOrEmpty())
+            {
+                return NotFound("No hay imagenes registradas en esta tienda");
+            }
+            return Ok(imagenesTienda);
+        }
+
         [HttpGet(Name = "GetTienda")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

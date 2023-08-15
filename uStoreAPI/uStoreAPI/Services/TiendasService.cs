@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.Configuration.Conventions;
 using Microsoft.EntityFrameworkCore;
 using uStoreAPI.Dtos;
 using uStoreAPI.ModelsAzureDB;
@@ -24,6 +25,11 @@ namespace uStoreAPI.Services
                                                 .AsNoTracking()
                                                 .ToListAsync());
             return tiendas;
+        }
+
+        public async Task<IEnumerable<ImagenesTienda>> GetImagenesTienda(int idTienda)
+        {
+            return await context.ImagenesTiendas.Where(p => p.IdTienda == idTienda).AsNoTracking().ToListAsync();
         }
 
         public async Task<Tiendum?> GetOneTienda(int? idTienda)
