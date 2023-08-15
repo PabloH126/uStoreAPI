@@ -121,11 +121,11 @@ namespace uStoreAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<ImagenesTienda>> CreateImagenesNewTienda(int idTienda, IFormFile primera, IFormFile segunda, IFormFile tercera)
+        public async Task<ActionResult<ImagenesTienda>> CreateImagenesNewTienda(int idTienda, IFormFile? primera, IFormFile? segunda, IFormFile? tercera)
         {
-            if (primera is null || primera.Length == 0 || segunda is null || segunda.Length == 0 || tercera is null || tercera.Length == 0)
+            if ((primera is null || primera.Length == 0) && (segunda is null || segunda.Length == 0) && (tercera is null || tercera.Length == 0))
             {
-                return BadRequest("Imagen invalida");
+                return BadRequest("Imagenes invalidas");
             }
             else
             {
@@ -135,10 +135,20 @@ namespace uStoreAPI.Controllers
                     return NotFound("Ninguna tienda registrada con ese id");
                 }
 
-                
-                await tiendasService.CreateImagenesTienda(await CreateImagenTienda(tienda.IdTienda, primera, $"{tienda.IdTienda}/{primera.Name}"));
-                await tiendasService.CreateImagenesTienda(await CreateImagenTienda(tienda.IdTienda, segunda, $"{tienda.IdTienda}/{segunda.Name}"));
-                await tiendasService.CreateImagenesTienda(await CreateImagenTienda(tienda.IdTienda, tercera, $"{tienda.IdTienda}/{tercera.Name}"));
+                if(!(primera is null || primera.Length == 0))
+                {
+                    await tiendasService.CreateImagenesTienda(await CreateImagenTienda(tienda.IdTienda, primera, $"{tienda.IdTienda}/{primera.Name}"));
+                }
+
+                if(!(segunda is null || segunda.Length == 0))
+                {
+                    await tiendasService.CreateImagenesTienda(await CreateImagenTienda(tienda.IdTienda, segunda, $"{tienda.IdTienda}/{segunda.Name}"));
+                }
+
+                if(!(tercera is null || tercera.Length == 0))
+                {
+                    await tiendasService.CreateImagenesTienda(await CreateImagenTienda(tienda.IdTienda, tercera, $"{tienda.IdTienda}/{tercera.Name}"));
+                }
 
                 return Ok();
             }
