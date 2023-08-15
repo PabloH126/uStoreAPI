@@ -11,6 +11,14 @@
       "type": "mssql.azure",
       "connectionId": "DefaultConnection",
       "dynamicId": null
+    },
+    "storage1": {
+      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourcegroups/[parameters('resourceGroupName')]/providers/Microsoft.Web/sites/uStoreAPI/providers/Microsoft.ServiceLinker/linkers/AzureBlobStorageConnection_593012F0EA, /subscriptions/78bd8741-5ab0-4ce0-8bd5-c0f80620a48f/resourcegroups/uStore/providers/Microsoft.Web/sites/uStoreAPI/providers/Microsoft.ServiceLinker/linkers/AzureBlobStorageConnection_AA5C3F34D9",
+      "secretStore": "AzureAppSettings",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Storage/storageAccounts/ustoredata",
+      "type": "storage.azure",
+      "connectionId": "AzureBlobStorageConnection",
+      "dynamicId": null
     }
   }
 }

@@ -13,6 +13,14 @@ namespace uStoreAPI
             CreateMap<CuentaAdministrador, CuentaAdministradorDto>().ReverseMap();
             CreateMap<CuentaAdministrador, AdminLoggedDto>().ReverseMap();
             CreateMap<Dato, AdminLoggedDto>().ReverseMap();
+            CreateMap<CentroComercial, CentroComercialDto>().ReverseMap();
+            CreateMap<Tiendum, TiendaDto>().ReverseMap();
+            CreateMap<Horario, HorarioDto>().ReverseMap();
+            CreateMap<Categoria, CategoriaDto>().ReverseMap();
+            CreateMap<CategoriasTienda, CategoriasTiendaDto>().ReverseMap();
+            CreateMap<CategoriasProducto, CategoriasProductoDto>().ReverseMap();
+            CreateMap<PeriodosPredeterminado, PeriodosPredeterminadosDto>().ReverseMap();
+            CreateMap<Producto, ProductoDto>().ReverseMap();
         }
     }
 }

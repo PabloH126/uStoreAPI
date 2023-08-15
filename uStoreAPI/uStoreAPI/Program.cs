@@ -5,6 +5,7 @@ using System.Text;
 using uStoreAPI;
 using uStoreAPI.ModelsAzureDB;
 using uStoreAPI.Services;
+using Microsoft.Extensions.Azure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +26,13 @@ builder.Services.AddAutoMapper(typeof(MappingConfig));
 builder.Services.AddScoped<AdminService>();
 builder.Services.AddScoped<LoginService>();
 builder.Services.AddScoped<TokenService>();
+builder.Services.AddScoped<UploadService>();
+builder.Services.AddScoped<PlazasService>();
+builder.Services.AddScoped<TiendasService>();
+builder.Services.AddScoped<HorariosService>();
+builder.Services.AddScoped<CategoriasService>();
+builder.Services.AddScoped<ProductosService>();
+builder.Services.AddScoped<PeriodosPredeterminadosService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -39,6 +47,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ClockSkew = TimeSpan.Zero
         };
     });
+builder.Services.AddAzureClients(clientBuilder =>
+{
+    clientBuilder.AddBlobServiceClient(builder.Configuration["AzureBlobStorageConnection:blob"], preferMsi: true);
+    clientBuilder.AddQueueServiceClient(builder.Configuration["AzureBlobStorageConnection:queue"], preferMsi: true);
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

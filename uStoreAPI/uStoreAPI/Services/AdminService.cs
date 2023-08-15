@@ -3,6 +3,9 @@ using uStoreAPI.Dtos;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
+using Azure;
+using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace uStoreAPI.Services
 {
@@ -69,7 +72,7 @@ namespace uStoreAPI.Services
 
             ImagenPerfil imgPerfil = new ImagenPerfil
             {
-                IconoPerfil = "test",
+                IconoPerfil = "https://ustoredata.blob.core.windows.net/admins/profile_icon.png"
             };
 
             await context.ImagenPerfils.AddAsync(imgPerfil);
@@ -96,6 +99,22 @@ namespace uStoreAPI.Services
             await context.SaveChangesAsync();
 
             return cuentaAdmin;
+        }
+
+        public async Task PatchAdminPassword(CuentaAdministrador admin)
+        {
+           context.CuentaAdministradors.Update(admin);
+           await context.SaveChangesAsync();
+        }
+
+        public async Task PatchAdminImage(string adminImageUrl, int id)
+        {
+            var admin = await context.CuentaAdministradors.FirstOrDefaultAsync(p => p.IdAdministrador == id);
+            var detallesAdmin = await context.DetallesCuentaAdministradors.FindAsync(admin!.IdDetallesCuentaAdministrador);
+            var imageAdmin = await context.ImagenPerfils.FindAsync(detallesAdmin!.IdImagenPerfil);
+
+            imageAdmin!.IconoPerfil = adminImageUrl;
+            await context.SaveChangesAsync();
         }
 
         public async Task DeleteAccountAdmin(
@@ -130,15 +149,9 @@ namespace uStoreAPI.Services
             await context.SaveChangesAsync();
         }
 
-
-
-        public async Task<bool> VerifyEmail(string email)
+        public async Task<CuentaAdministrador?> VerifyEmail(string email)
         {
-            if(await context.CuentaAdministradors.FirstOrDefaultAsync(p => p.Email == email) is not null)
-            {
-                return true;
-            }
-            return false;
+            return await context.CuentaAdministradors.FirstOrDefaultAsync(p => p.Email == email);
         }
     }
 }

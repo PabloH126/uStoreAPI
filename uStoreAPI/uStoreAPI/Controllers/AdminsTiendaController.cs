@@ -10,39 +10,32 @@ using System.Security.Cryptography;
 using uStoreAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.OpenApi.Validations;
 
 namespace uStoreAPI.Controllers
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class AdminsTiendaController : ControllerBase
     {
         private readonly ILogger<AdminsTiendaController> logger;
         private readonly AdminService service;
+        private readonly UploadService uploadService;
         private readonly IMapper mapper;
-        public AdminsTiendaController(ILogger<AdminsTiendaController> _logger, AdminService _service, IMapper _mapper)
+        public AdminsTiendaController(ILogger<AdminsTiendaController> _logger, AdminService _service, UploadService _uploadService, IMapper _mapper)
         {
             logger = _logger;
             service = _service;
             mapper = _mapper;
+            uploadService = _uploadService;
         }
-
+        [Authorize]
         [HttpGet("Key")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult getKey()
         {
-            var accessToken = Request.Headers["Authorization"].ToString().Split(" ")[1];
-
-            // Extrayendo las credenciales del token
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var jwtToken = tokenHandler.ReadJwtToken(accessToken);
-
-            // Verificar si el token ha expirado
-            if (jwtToken.ValidTo < DateTime.UtcNow)
-            {
-                return Unauthorized("Token has expired.");
-            }
             byte[] secretKey = new byte[32]; // 256 bits para una clave secreta
             using (var generator = RandomNumberGenerator.Create())
             {
@@ -54,6 +47,7 @@ namespace uStoreAPI.Controllers
             return Ok(secretKeyString);
         }
 
+        [Authorize]
         //Get cuenta de administrador de tienda por medio de Id
         [HttpGet("Account", Name = "GetCuentaAdminTienda")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -75,6 +69,8 @@ namespace uStoreAPI.Controllers
 
             return Ok(mapper.Map<CuentaAdministradorDto>(CuentaAdminTienda));
         }
+
+        [Authorize]
         //Get Administradores de tienda especifico por Id
         [HttpGet("Admin", Name = "GetAdminTienda")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -97,6 +93,78 @@ namespace uStoreAPI.Controllers
             return Ok(mapper.Map<AdministradorTiendaDto>(AdminTienda));
         }
 
+        [Authorize]
+        [HttpPost("UpdateProfileImage")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> PatchAdminImage(IFormFile image)
+        {
+            if (image is null || image.Length == 0)
+            {
+                return BadRequest("La imagen no es valida");
+            }
+
+            var user = HttpContext.User;
+            var idUser = user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier);
+
+            var imageUrl = await uploadService.UploadImageAdmin(image, $"{idUser!.Value}.png");
+
+            await service.PatchAdminImage(imageUrl, int.Parse(idUser!.Value));
+
+            return Ok(new { ImageUrl = imageUrl });
+        }
+
+        [Authorize]
+        [HttpPatch("UpdatePass")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> PatchAdminPassword([FromBody] JsonPatchDocument<CuentaAdministrador> patchDoc)
+        {
+            if(patchDoc is null)
+            {
+                return BadRequest("Patch no valido");
+            }
+
+            var user = HttpContext.User;
+
+            var idUser = user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier);
+            if (idUser is not null)
+            {
+                var admin = await service.GetCuentaAdminTienda(int.Parse(idUser.Value));
+                if(admin is null)
+                {
+                    return NotFound("No se encontro el administrador");
+                }
+
+                try
+                {
+                    patchDoc.ApplyTo(admin, ModelState);
+                    if(!ModelState.IsValid)
+                    {
+                        return BadRequest(ModelState);
+                    }
+                    await service.PatchAdminPassword(admin);
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, ex.Message);
+                }
+                
+                return NoContent();
+            }
+            else
+            {
+                return BadRequest("Id no encontrado en los claims");
+            }
+
+        }
+
+
+        [Authorize]
         [HttpDelete("DeleteAccount")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -130,10 +198,14 @@ namespace uStoreAPI.Controllers
             if (datosAdmin == null) return NotFound("No se encontro datosAdmin");
 
             await service.DeleteAccountAdmin(cuentaAdmin, detallesCuentaAdmin, imgPerfilAdmin, adminTienda, detallesAdmin, datosAdmin);
+            await uploadService.DeleteImageAdmins(idAdmin.ToString());
 
             return NoContent();
         }
 
+
+        [Authorize]
+        //Delete Administradores sin cuenta
         [HttpDelete("DeleteAdmin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

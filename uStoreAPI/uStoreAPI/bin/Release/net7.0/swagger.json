@@ -17,62 +17,6 @@
         }
       }
     },
-    "/api/AdminsTienda/Login": {
-      "post": {
-        "tags": [
-          "AdminsTienda"
-        ],
-        "consumes": [
-          "application/json-patch+json",
-          "application/json",
-          "text/json",
-          "application/*+json"
-        ],
-        "produces": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "schema": {
-              "$ref": "#/definitions/LoginDto"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "schema": {
-              "$ref": "#/definitions/AdminLoggedDto"
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "schema": {
-              "$ref": "#/definitions/ProblemDetails"
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "schema": {
-              "$ref": "#/definitions/ProblemDetails"
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "schema": {
-              "$ref": "#/definitions/ProblemDetails"
-            }
-          },
-          "500": {
-            "description": "Server Error"
-          }
-        }
-      }
-    },
     "/api/AdminsTienda/Account": {
       "get": {
         "tags": [
@@ -157,16 +101,13 @@
         }
       }
     },
-    "/api/AdminsTienda/Register": {
+    "/api/AdminsTienda/UpdateProfileImage": {
       "post": {
         "tags": [
           "AdminsTienda"
         ],
         "consumes": [
-          "application/json-patch+json",
-          "application/json",
-          "text/json",
-          "application/*+json"
+          "multipart/form-data"
         ],
         "produces": [
           "text/plain",
@@ -175,84 +116,79 @@
         ],
         "parameters": [
           {
-            "in": "body",
-            "name": "body",
-            "schema": {
-              "$ref": "#/definitions/RegisterDto"
-            }
+            "in": "formData",
+            "name": "image",
+            "type": "file"
           }
         ],
         "responses": {
-          "201": {
-            "description": "Created",
-            "schema": {
-              "$ref": "#/definitions/CuentaAdministradorDto"
-            }
+          "204": {
+            "description": "No Content"
           },
           "400": {
             "description": "Bad Request",
             "schema": {
               "$ref": "#/definitions/ProblemDetails"
             }
-          },
-          "500": {
-            "description": "Server Error"
-          },
-          "409": {
-            "description": "Conflict",
-            "schema": {
-              "$ref": "#/definitions/ProblemDetails"
-            }
-          }
-        }
-      }
-    },
-    "/api/AdminsTienda/CreateAccount": {
-      "post": {
-        "tags": [
-          "AdminsTienda"
-        ],
-        "consumes": [
-          "application/json-patch+json",
-          "application/json",
-          "text/json",
-          "application/*+json"
-        ],
-        "produces": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "schema": {
-              "$ref": "#/definitions/CuentaAdministradorDto"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created",
-            "schema": {
-              "$ref": "#/definitions/CuentaAdministradorDto"
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "schema": {
-              "$ref": "#/definitions/ProblemDetails"
-            }
-          },
-          "500": {
-            "description": "Server Error"
           },
           "404": {
             "description": "Not Found",
             "schema": {
               "$ref": "#/definitions/ProblemDetails"
             }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/AdminsTienda/UpdatePass": {
+      "patch": {
+        "tags": [
+          "AdminsTienda"
+        ],
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Operation"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
           }
         }
       }
@@ -333,6 +269,2031 @@
         }
       }
     },
+    "/api/Categorias/GetCategorias": {
+      "get": {
+        "tags": [
+          "Categorias"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CategoriaDto"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Categorias/GetCategoriasTienda": {
+      "get": {
+        "tags": [
+          "Categorias"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "idTienda",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CategoriaDto"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Categorias/GetCategoriasProducto": {
+      "get": {
+        "tags": [
+          "Categorias"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "idProducto",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CategoriaDto"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Categorias": {
+      "get": {
+        "tags": [
+          "Categorias"
+        ],
+        "operationId": "GetCategoria",
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/CategoriaDto"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Categorias/GetCategoriaTienda": {
+      "get": {
+        "tags": [
+          "Categorias"
+        ],
+        "operationId": "GetCategoriaTienda",
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/CategoriasTiendaDto"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Categorias/GetCategoriaProducto": {
+      "get": {
+        "tags": [
+          "Categorias"
+        ],
+        "operationId": "GetCategoriaProducto",
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/CategoriasProductoDto"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Categorias/CreateCategoria": {
+      "post": {
+        "tags": [
+          "Categorias"
+        ],
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/CategoriaDto"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/CategoriaDto"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Categorias/CreateCategoriaTienda": {
+      "post": {
+        "tags": [
+          "Categorias"
+        ],
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CategoriasTiendaDto"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CategoriasTiendaDto"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Categorias/CreateCategoriaProducto": {
+      "post": {
+        "tags": [
+          "Categorias"
+        ],
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CategoriasProductoDto"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/CategoriasProductoDto"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Categorias/DeleteCategoria": {
+      "delete": {
+        "tags": [
+          "Categorias"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Categorias/UpdateCategoria": {
+      "put": {
+        "tags": [
+          "Categorias"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "catego",
+            "type": "string",
+            "collectionFormat": "multi"
+          },
+          {
+            "in": "query",
+            "name": "idCategoria",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Horarios/GetHorarios": {
+      "get": {
+        "tags": [
+          "Horarios"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "idTienda",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/HorarioDto"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Horarios": {
+      "get": {
+        "tags": [
+          "Horarios"
+        ],
+        "operationId": "GetHorario",
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/HorarioDto"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Horarios/CreateHorario": {
+      "post": {
+        "tags": [
+          "Horarios"
+        ],
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/HorarioDto"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/HorarioDto"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Horarios/DeleteHorarios": {
+      "delete": {
+        "tags": [
+          "Horarios"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "idTienda",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Horarios/UpdateHorario": {
+      "put": {
+        "tags": [
+          "Horarios"
+        ],
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/HorarioDto"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Login/AdminAuthenticate": {
+      "post": {
+        "tags": [
+          "Login"
+        ],
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/LoginDto"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Login/getClaims": {
+      "post": {
+        "tags": [
+          "Login"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          }
+        }
+      }
+    },
+    "/api/Malls/GetAllMalls": {
+      "get": {
+        "tags": [
+          "Malls"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CentroComercialDto"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          }
+        }
+      }
+    },
+    "/api/Malls": {
+      "get": {
+        "tags": [
+          "Malls"
+        ],
+        "operationId": "GetMall",
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/CentroComercialDto"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Malls/CreateMall": {
+      "post": {
+        "tags": [
+          "Malls"
+        ],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "IdCentroComercial",
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "formData",
+            "name": "IconoCentroComercial",
+            "type": "string"
+          },
+          {
+            "in": "formData",
+            "name": "ImagenCentroComercial",
+            "type": "string"
+          },
+          {
+            "in": "formData",
+            "name": "NombreCentroComercial",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "formData",
+            "name": "HorarioCentroComercial",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "formData",
+            "name": "DireccionCentroComercial",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "formData",
+            "name": "iconoMall",
+            "type": "file"
+          },
+          {
+            "in": "formData",
+            "name": "imagenMall",
+            "type": "file"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/CentroComercialDto"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Malls/DeleteMall": {
+      "delete": {
+        "tags": [
+          "Malls"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/PeriodosPredeterminados/GetPeriodos": {
+      "get": {
+        "tags": [
+          "PeriodosPredeterminados"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "idTienda",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PeriodosPredeterminadosDto"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/PeriodosPredeterminados": {
+      "get": {
+        "tags": [
+          "PeriodosPredeterminados"
+        ],
+        "operationId": "GetPeriodo",
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/PeriodosPredeterminadosDto"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/PeriodosPredeterminados/CreatePeriodos": {
+      "post": {
+        "tags": [
+          "PeriodosPredeterminados"
+        ],
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PeriodosPredeterminadosDto"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PeriodosPredeterminadosDto"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/PeriodosPredeterminados/DeletePeriodo": {
+      "delete": {
+        "tags": [
+          "PeriodosPredeterminados"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/PeriodosPredeterminados/UpdatePeriodo": {
+      "put": {
+        "tags": [
+          "PeriodosPredeterminados"
+        ],
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/PeriodosPredeterminadosDto"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Productos/GetProductos": {
+      "get": {
+        "tags": [
+          "Productos"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "idTienda",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ProductoDto"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Productos": {
+      "get": {
+        "tags": [
+          "Productos"
+        ],
+        "operationId": "GetProducto",
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/ProductoDto"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Productos/CreateProducto": {
+      "post": {
+        "tags": [
+          "Productos"
+        ],
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/ProductoDto"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/ProductoDto"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Productos/UpdateProducto": {
+      "put": {
+        "tags": [
+          "Productos"
+        ],
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/ProductoDto"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Productos/DeleteProducto": {
+      "delete": {
+        "tags": [
+          "Productos"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Register/RegisterAdmin": {
+      "post": {
+        "tags": [
+          "Register"
+        ],
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/RegisterDto"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/CuentaAdministradorDto"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          },
+          "409": {
+            "description": "Conflict",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          }
+        }
+      }
+    },
+    "/api/Register/Recover": {
+      "post": {
+        "tags": [
+          "Register"
+        ],
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/RecoverDto"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          }
+        }
+      }
+    },
+    "/api/Tiendas/GetTiendas": {
+      "get": {
+        "tags": [
+          "Tiendas"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "idCentroComercial",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/TiendaDto"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Tiendas": {
+      "get": {
+        "tags": [
+          "Tiendas"
+        ],
+        "operationId": "GetTienda",
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/TiendaDto"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Tiendas/CreateTienda": {
+      "post": {
+        "tags": [
+          "Tiendas"
+        ],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "IdTienda",
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "formData",
+            "name": "NombreTienda",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "formData",
+            "name": "RangoPrecio",
+            "type": "string"
+          },
+          {
+            "in": "formData",
+            "name": "IdCentroComercial",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "formData",
+            "name": "IdAdministrador",
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "formData",
+            "name": "Apartados",
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "formData",
+            "name": "Vistas",
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "formData",
+            "name": "LogoTienda",
+            "type": "string"
+          },
+          {
+            "in": "formData",
+            "name": "logoTienda",
+            "type": "file"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/TiendaDto"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Tiendas/CreateImagenNewTienda": {
+      "post": {
+        "tags": [
+          "Tiendas"
+        ],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "idTienda",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          },
+          {
+            "in": "formData",
+            "name": "primera",
+            "type": "file"
+          },
+          {
+            "in": "formData",
+            "name": "segunda",
+            "type": "file"
+          },
+          {
+            "in": "formData",
+            "name": "tercera",
+            "type": "file"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/ImagenesTienda"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Tiendas/CreateImagenTienda": {
+      "post": {
+        "tags": [
+          "Tiendas"
+        ],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "idTienda",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          },
+          {
+            "in": "formData",
+            "name": "imagen",
+            "type": "file"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/ImagenesTienda"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Tiendas/UpdateTienda": {
+      "put": {
+        "tags": [
+          "Tiendas"
+        ],
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/TiendaDto"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Tiendas/DeleteTienda": {
+      "delete": {
+        "tags": [
+          "Tiendas"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
     "/WeatherForecast": {
       "get": {
         "tags": [
@@ -359,23 +2320,6 @@
     }
   },
   "definitions": {
-    "AdminLoggedDto": {
-      "type": "object",
-      "properties": {
-        "idCuentaAdministrador": {
-          "format": "int32",
-          "type": "integer"
-        },
-        "idAdministrador": {
-          "format": "int32",
-          "type": "integer"
-        },
-        "primerNombre": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false
-    },
     "AdministradorTiendaDto": {
       "type": "object",
       "properties": {
@@ -386,6 +2330,457 @@
         "idDetallesAdministrador": {
           "format": "int32",
           "type": "integer"
+        }
+      },
+      "additionalProperties": false
+    },
+    "AdministradorTiendum": {
+      "type": "object",
+      "properties": {
+        "idAdministrador": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idDetallesAdministrador": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "chats": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Chat"
+          }
+        },
+        "cuentaAdministradors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CuentaAdministrador"
+          }
+        },
+        "gerentes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Gerente"
+          }
+        },
+        "idDetallesAdministradorNavigation": {
+          "$ref": "#/definitions/DetallesAdministrador"
+        },
+        "mensajeAdministradors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MensajeAdministrador"
+          }
+        },
+        "tienda": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Tiendum"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "AlertaApartado": {
+      "type": "object",
+      "properties": {
+        "idAlertaApartado": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idProductos": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idUsuario": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idProductosNavigation": {
+          "$ref": "#/definitions/Producto"
+        },
+        "idUsuarioNavigation": {
+          "$ref": "#/definitions/Usuario"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ApartadoActivo": {
+      "type": "object",
+      "properties": {
+        "idApartado": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "fechaApartado": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "estadoApartado": {
+          "type": "string"
+        },
+        "fechaVencimiento": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "idUsuario": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idTienda": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idProductos": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idSolicitud": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idProductosNavigation": {
+          "$ref": "#/definitions/Producto"
+        },
+        "idSolicitudNavigation": {
+          "$ref": "#/definitions/SolicitudesApartado"
+        },
+        "idTiendaNavigation": {
+          "$ref": "#/definitions/Tiendum"
+        },
+        "idUsuarioNavigation": {
+          "$ref": "#/definitions/Usuario"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Calificacion": {
+      "type": "object",
+      "properties": {
+        "idCalificacion": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "calificacion1": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idTienda": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idProductos": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idProductosNavigation": {
+          "$ref": "#/definitions/Producto"
+        },
+        "idTiendaNavigation": {
+          "$ref": "#/definitions/Tiendum"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Categoria": {
+      "type": "object",
+      "properties": {
+        "idCategoria": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "categoria1": {
+          "type": "string"
+        },
+        "categoriasProductos": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CategoriasProducto"
+          }
+        },
+        "categoriasTienda": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CategoriasTienda"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "CategoriaDto": {
+      "required": [
+        "categoria1"
+      ],
+      "type": "object",
+      "properties": {
+        "idCategoria": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "categoria1": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CategoriasProducto": {
+      "type": "object",
+      "properties": {
+        "idCp": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idProductos": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idCategoria": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idCategoriaNavigation": {
+          "$ref": "#/definitions/Categoria"
+        },
+        "idProductosNavigation": {
+          "$ref": "#/definitions/Producto"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CategoriasProductoDto": {
+      "required": [
+        "idCategoria",
+        "idProductos"
+      ],
+      "type": "object",
+      "properties": {
+        "idCp": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idProductos": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idCategoria": {
+          "format": "int32",
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CategoriasTienda": {
+      "type": "object",
+      "properties": {
+        "idCt": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idTienda": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idCategoria": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idCategoriaNavigation": {
+          "$ref": "#/definitions/Categoria"
+        },
+        "idTiendaNavigation": {
+          "$ref": "#/definitions/Tiendum"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CategoriasTiendaDto": {
+      "required": [
+        "idCategoria",
+        "idTienda"
+      ],
+      "type": "object",
+      "properties": {
+        "idCt": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idTienda": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idCategoria": {
+          "format": "int32",
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CentroComercial": {
+      "type": "object",
+      "properties": {
+        "idCentroComercial": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "iconoCentroComercial": {
+          "type": "string"
+        },
+        "imagenCentroComercial": {
+          "type": "string"
+        },
+        "nombreCentroComercial": {
+          "type": "string"
+        },
+        "horarioCentroComercial": {
+          "type": "string"
+        },
+        "direccionCentroComercial": {
+          "type": "string"
+        },
+        "tienda": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Tiendum"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "CentroComercialDto": {
+      "required": [
+        "direccionCentroComercial",
+        "horarioCentroComercial",
+        "nombreCentroComercial"
+      ],
+      "type": "object",
+      "properties": {
+        "idCentroComercial": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "iconoCentroComercial": {
+          "type": "string"
+        },
+        "imagenCentroComercial": {
+          "type": "string"
+        },
+        "nombreCentroComercial": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "horarioCentroComercial": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "direccionCentroComercial": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Chat": {
+      "type": "object",
+      "properties": {
+        "idChat": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "fechaCreacion": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "idUsuario": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idGerente": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idAdministrador": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "detallesMensajes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DetallesMensaje"
+          }
+        },
+        "idAdministradorNavigation": {
+          "$ref": "#/definitions/AdministradorTiendum"
+        },
+        "idGerenteNavigation": {
+          "$ref": "#/definitions/Gerente"
+        },
+        "idUsuarioNavigation": {
+          "$ref": "#/definitions/Usuario"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Comentario": {
+      "type": "object",
+      "properties": {
+        "idComentarios": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "comentario1": {
+          "type": "string"
+        },
+        "idProductos": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idTienda": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idUsuario": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idProductosNavigation": {
+          "$ref": "#/definitions/Producto"
+        },
+        "idTiendaNavigation": {
+          "$ref": "#/definitions/Tiendum"
+        },
+        "idUsuarioNavigation": {
+          "$ref": "#/definitions/Usuario"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CuentaAdministrador": {
+      "type": "object",
+      "properties": {
+        "idCuentaAdministrador": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "password": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "idDetallesCuentaAdministrador": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idAdministrador": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idAdministradorNavigation": {
+          "$ref": "#/definitions/AdministradorTiendum"
+        },
+        "idDetallesCuentaAdministradorNavigation": {
+          "$ref": "#/definitions/DetallesCuentaAdministrador"
         }
       },
       "additionalProperties": false
@@ -417,6 +2812,577 @@
       },
       "additionalProperties": false
     },
+    "CuentaGerente": {
+      "type": "object",
+      "properties": {
+        "idCuentaGerente": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "password": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "idDetallesCuentaGerente": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idGerente": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idDetallesCuentaGerenteNavigation": {
+          "$ref": "#/definitions/DetallesCuentaGerente"
+        },
+        "idGerenteNavigation": {
+          "$ref": "#/definitions/Gerente"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CuentaUsuario": {
+      "type": "object",
+      "properties": {
+        "idCuentaUsuario": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "password": {
+          "type": "string"
+        },
+        "email": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idDetallesCuentaUsuario": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idUsuario": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idDetallesCuentaUsuarioNavigation": {
+          "$ref": "#/definitions/DetallesCuentaUsuario"
+        },
+        "idUsuarioNavigation": {
+          "$ref": "#/definitions/Usuario"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Dato": {
+      "type": "object",
+      "properties": {
+        "idDatos": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "primerNombre": {
+          "type": "string"
+        },
+        "primerApellido": {
+          "type": "string"
+        },
+        "detallesAdministradors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DetallesAdministrador"
+          }
+        },
+        "detallesUsuarios": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DetallesUsuario"
+          }
+        },
+        "gerentes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Gerente"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "DetallesAdministrador": {
+      "type": "object",
+      "properties": {
+        "idDetallesAdministrador": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idDatos": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "administradorTienda": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AdministradorTiendum"
+          }
+        },
+        "idDatosNavigation": {
+          "$ref": "#/definitions/Dato"
+        }
+      },
+      "additionalProperties": false
+    },
+    "DetallesCuentaAdministrador": {
+      "type": "object",
+      "properties": {
+        "idDetallesCuentaAdministrador": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "fechaRegistro": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "idImagenPerfil": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "cuentaAdministradors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CuentaAdministrador"
+          }
+        },
+        "idImagenPerfilNavigation": {
+          "$ref": "#/definitions/ImagenPerfil"
+        }
+      },
+      "additionalProperties": false
+    },
+    "DetallesCuentaGerente": {
+      "type": "object",
+      "properties": {
+        "idDetallesCuentaGerente": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "fechaRegistro": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "idImagenPerfil": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "cuentaGerentes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CuentaGerente"
+          }
+        },
+        "idImagenPerfilNavigation": {
+          "$ref": "#/definitions/ImagenPerfil"
+        }
+      },
+      "additionalProperties": false
+    },
+    "DetallesCuentaUsuario": {
+      "type": "object",
+      "properties": {
+        "idDetallesCuentaUsuario": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "fechaRegistro": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "idImagenPerfil": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "cuentaUsuarios": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CuentaUsuario"
+          }
+        },
+        "idImagenPerfilNavigation": {
+          "$ref": "#/definitions/ImagenPerfil"
+        }
+      },
+      "additionalProperties": false
+    },
+    "DetallesMensaje": {
+      "type": "object",
+      "properties": {
+        "idDetallesMensaje": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "contenido": {
+          "type": "string"
+        },
+        "fechaMensaje": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "idChat": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idImagenesMensaje": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idChatNavigation": {
+          "$ref": "#/definitions/Chat"
+        },
+        "idImagenesMensajeNavigation": {
+          "$ref": "#/definitions/ImagenesMensaje"
+        },
+        "mensajeAdministradors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MensajeAdministrador"
+          }
+        },
+        "mensajeGerentes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MensajeGerente"
+          }
+        },
+        "mensajeUsuarios": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MensajeUsuario"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "DetallesUsuario": {
+      "type": "object",
+      "properties": {
+        "idDetallesUsuario": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "estado": {
+          "type": "string"
+        },
+        "idPenalizacionUsuario": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idRatioUsuario": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idDatos": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idDatosNavigation": {
+          "$ref": "#/definitions/Dato"
+        },
+        "idPenalizacionUsuarioNavigation": {
+          "$ref": "#/definitions/PenalizacionUsuario"
+        },
+        "idRatioUsuarioNavigation": {
+          "$ref": "#/definitions/RatioUsuario"
+        },
+        "usuarios": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Usuario"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "Favorito": {
+      "type": "object",
+      "properties": {
+        "idFavoritos": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idProductos": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idTienda": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idUsuario": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idProductosNavigation": {
+          "$ref": "#/definitions/Producto"
+        },
+        "idTiendaNavigation": {
+          "$ref": "#/definitions/Tiendum"
+        },
+        "idUsuarioNavigation": {
+          "$ref": "#/definitions/Usuario"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Gerente": {
+      "type": "object",
+      "properties": {
+        "idGerente": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idDatos": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idAdministrador": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idTienda": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "chats": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Chat"
+          }
+        },
+        "cuentaGerentes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CuentaGerente"
+          }
+        },
+        "idAdministradorNavigation": {
+          "$ref": "#/definitions/AdministradorTiendum"
+        },
+        "idDatosNavigation": {
+          "$ref": "#/definitions/Dato"
+        },
+        "idTiendaNavigation": {
+          "$ref": "#/definitions/Tiendum"
+        },
+        "mensajeGerentes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MensajeGerente"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "Historial": {
+      "type": "object",
+      "properties": {
+        "idHistorial": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "fechaVisita": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "idTienda": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idProductos": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idUsuario": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idProductosNavigation": {
+          "$ref": "#/definitions/Producto"
+        },
+        "idTiendaNavigation": {
+          "$ref": "#/definitions/Tiendum"
+        },
+        "idUsuarioNavigation": {
+          "$ref": "#/definitions/Usuario"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Horario": {
+      "type": "object",
+      "properties": {
+        "idHorario": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "dia": {
+          "type": "string"
+        },
+        "horarioApertura": {
+          "type": "string"
+        },
+        "horarioCierre": {
+          "type": "string"
+        },
+        "idTienda": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idTiendaNavigation": {
+          "$ref": "#/definitions/Tiendum"
+        }
+      },
+      "additionalProperties": false
+    },
+    "HorarioDto": {
+      "required": [
+        "dia",
+        "horarioApertura",
+        "horarioCierre",
+        "idTienda"
+      ],
+      "type": "object",
+      "properties": {
+        "idHorario": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "dia": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "horarioApertura": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "horarioCierre": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "idTienda": {
+          "format": "int32",
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ImagenPerfil": {
+      "type": "object",
+      "properties": {
+        "idImagenPerfil": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "iconoPerfil": {
+          "type": "string"
+        },
+        "detallesCuentaAdministradors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DetallesCuentaAdministrador"
+          }
+        },
+        "detallesCuentaGerentes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DetallesCuentaGerente"
+          }
+        },
+        "detallesCuentaUsuarios": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DetallesCuentaUsuario"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "ImagenesMensaje": {
+      "type": "object",
+      "properties": {
+        "idImagenesMensaje": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "imagenMensaje": {
+          "type": "string"
+        },
+        "detallesMensajes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DetallesMensaje"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "ImagenesProducto": {
+      "type": "object",
+      "properties": {
+        "idImagenesProductos": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "imagenProducto": {
+          "type": "string"
+        },
+        "idProductos": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idProductosNavigation": {
+          "$ref": "#/definitions/Producto"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ImagenesPublicacion": {
+      "type": "object",
+      "properties": {
+        "idImagenesPublicacion": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "imagenPublicacion": {
+          "type": "string"
+        },
+        "idPublicacion": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idPublicacionNavigation": {
+          "$ref": "#/definitions/Publicacione"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ImagenesTienda": {
+      "type": "object",
+      "properties": {
+        "idImagenesTiendas": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "imagenTienda": {
+          "type": "string"
+        },
+        "idTienda": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idTiendaNavigation": {
+          "$ref": "#/definitions/Tiendum"
+        }
+      },
+      "additionalProperties": false
+    },
     "LoginDto": {
       "required": [
         "email",
@@ -435,6 +3401,175 @@
         },
         "remember": {
           "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "MensajeAdministrador": {
+      "type": "object",
+      "properties": {
+        "idMensajeAdministrador": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idDetallesMensaje": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idAdministrador": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idAdministradorNavigation": {
+          "$ref": "#/definitions/AdministradorTiendum"
+        },
+        "idDetallesMensajeNavigation": {
+          "$ref": "#/definitions/DetallesMensaje"
+        }
+      },
+      "additionalProperties": false
+    },
+    "MensajeGerente": {
+      "type": "object",
+      "properties": {
+        "idMensajeGerente": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idDetallesMensaje": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idGerente": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idDetallesMensajeNavigation": {
+          "$ref": "#/definitions/DetallesMensaje"
+        },
+        "idGerenteNavigation": {
+          "$ref": "#/definitions/Gerente"
+        }
+      },
+      "additionalProperties": false
+    },
+    "MensajeUsuario": {
+      "type": "object",
+      "properties": {
+        "idMensajeUsuario": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idDetallesMensaje": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idUsuario": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idDetallesMensajeNavigation": {
+          "$ref": "#/definitions/DetallesMensaje"
+        },
+        "idUsuarioNavigation": {
+          "$ref": "#/definitions/Usuario"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Operation": {
+      "type": "object",
+      "properties": {
+        "operationType": {
+          "$ref": "#/definitions/OperationType"
+        },
+        "path": {
+          "type": "string"
+        },
+        "op": {
+          "type": "string"
+        },
+        "from": {
+          "type": "string"
+        },
+        "value": { }
+      },
+      "additionalProperties": false
+    },
+    "OperationType": {
+      "format": "int32",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "type": "integer"
+    },
+    "PenalizacionUsuario": {
+      "type": "object",
+      "properties": {
+        "idPenalizacionUsuario": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "tiempoPenalizacion": {
+          "$ref": "#/definitions/TimeSpan"
+        },
+        "cantidadPenalizaciones": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "detallesUsuarios": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DetallesUsuario"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "PeriodosPredeterminado": {
+      "type": "object",
+      "properties": {
+        "idApartadoPredeterminado": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "apartadoPredeterminado": {
+          "type": "string"
+        },
+        "idTienda": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idTiendaNavigation": {
+          "$ref": "#/definitions/Tiendum"
+        }
+      },
+      "additionalProperties": false
+    },
+    "PeriodosPredeterminadosDto": {
+      "required": [
+        "apartadoPredeterminado",
+        "idTienda"
+      ],
+      "type": "object",
+      "properties": {
+        "idApartadoPredeterminado": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "apartadoPredeterminado": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "idTienda": {
+          "format": "int32",
+          "type": "integer"
         }
       },
       "additionalProperties": false
@@ -461,6 +3596,212 @@
       },
       "additionalProperties": { }
     },
+    "Producto": {
+      "type": "object",
+      "properties": {
+        "idProductos": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "nombreProducto": {
+          "type": "string"
+        },
+        "precioProducto": {
+          "format": "double",
+          "type": "number"
+        },
+        "cantidadApartado": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "descripcion": {
+          "type": "string"
+        },
+        "stock": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idTienda": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "alertaApartados": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AlertaApartado"
+          }
+        },
+        "apartadoActivos": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ApartadoActivo"
+          }
+        },
+        "calificacions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Calificacion"
+          }
+        },
+        "categoriasProductos": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CategoriasProducto"
+          }
+        },
+        "comentarios": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Comentario"
+          }
+        },
+        "favoritos": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Favorito"
+          }
+        },
+        "historials": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Historial"
+          }
+        },
+        "idTiendaNavigation": {
+          "$ref": "#/definitions/Tiendum"
+        },
+        "imagenesProductos": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ImagenesProducto"
+          }
+        },
+        "solicitudesApartados": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SolicitudesApartado"
+          }
+        },
+        "tendenciasVenta": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TendenciasVentum"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "ProductoDto": {
+      "required": [
+        "cantidadApartado",
+        "descripcion",
+        "idTienda",
+        "nombreProducto",
+        "precioProducto",
+        "stock"
+      ],
+      "type": "object",
+      "properties": {
+        "idProductos": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "nombreProducto": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "precioProducto": {
+          "format": "double",
+          "type": "number"
+        },
+        "cantidadApartado": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "descripcion": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "stock": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idTienda": {
+          "format": "int32",
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Publicacione": {
+      "type": "object",
+      "properties": {
+        "idPublicacion": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "contenido": {
+          "type": "string"
+        },
+        "idTienda": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idTiendaNavigation": {
+          "$ref": "#/definitions/Tiendum"
+        },
+        "imagenesPublicacions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ImagenesPublicacion"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "RatioUsuario": {
+      "type": "object",
+      "properties": {
+        "idRatioUsuario": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "apartadosExitosos": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "apartadosFallidos": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "detallesUsuarios": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DetallesUsuario"
+          }
+        },
+        "solicitudesApartados": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SolicitudesApartado"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "RecoverDto": {
+      "required": [
+        "email"
+      ],
+      "type": "object",
+      "properties": {
+        "email": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
     "RegisterDto": {
       "required": [
         "email",
@@ -485,6 +3826,387 @@
         "primerApellido": {
           "minLength": 1,
           "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "SolicitudesApartado": {
+      "type": "object",
+      "properties": {
+        "idSolicitud": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "periodoApartado": {
+          "type": "string"
+        },
+        "unidadesProducto": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "statusSolicitud": {
+          "type": "string"
+        },
+        "idRatioUsuario": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idProductos": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idUsuario": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "apartadoActivos": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ApartadoActivo"
+          }
+        },
+        "idProductosNavigation": {
+          "$ref": "#/definitions/Producto"
+        },
+        "idRatioUsuarioNavigation": {
+          "$ref": "#/definitions/RatioUsuario"
+        },
+        "idUsuarioNavigation": {
+          "$ref": "#/definitions/Usuario"
+        }
+      },
+      "additionalProperties": false
+    },
+    "TendenciasVentum": {
+      "type": "object",
+      "properties": {
+        "idTendencia": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idTienda": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idProductos": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idProductosNavigation": {
+          "$ref": "#/definitions/Producto"
+        },
+        "idTiendaNavigation": {
+          "$ref": "#/definitions/Tiendum"
+        }
+      },
+      "additionalProperties": false
+    },
+    "TiendaDto": {
+      "required": [
+        "idCentroComercial",
+        "nombreTienda"
+      ],
+      "type": "object",
+      "properties": {
+        "idTienda": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "nombreTienda": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "rangoPrecio": {
+          "type": "string"
+        },
+        "idCentroComercial": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idAdministrador": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "apartados": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "vistas": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "logoTienda": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Tiendum": {
+      "type": "object",
+      "properties": {
+        "idTienda": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "nombreTienda": {
+          "type": "string"
+        },
+        "rangoPrecio": {
+          "type": "string"
+        },
+        "idCentroComercial": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idAdministrador": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "apartados": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "vistas": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "logoTienda": {
+          "type": "string"
+        },
+        "apartadoActivos": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ApartadoActivo"
+          }
+        },
+        "calificacions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Calificacion"
+          }
+        },
+        "categoriasTienda": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CategoriasTienda"
+          }
+        },
+        "comentarios": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Comentario"
+          }
+        },
+        "favoritos": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Favorito"
+          }
+        },
+        "gerentes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Gerente"
+          }
+        },
+        "historials": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Historial"
+          }
+        },
+        "horarios": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Horario"
+          }
+        },
+        "idAdministradorNavigation": {
+          "$ref": "#/definitions/AdministradorTiendum"
+        },
+        "idCentroComercialNavigation": {
+          "$ref": "#/definitions/CentroComercial"
+        },
+        "imagenesTienda": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ImagenesTienda"
+          }
+        },
+        "periodosPredeterminados": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PeriodosPredeterminado"
+          }
+        },
+        "productos": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Producto"
+          }
+        },
+        "publicaciones": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Publicacione"
+          }
+        },
+        "tendenciasVenta": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TendenciasVentum"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "TimeSpan": {
+      "type": "object",
+      "properties": {
+        "ticks": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "days": {
+          "format": "int32",
+          "type": "integer",
+          "readOnly": true
+        },
+        "hours": {
+          "format": "int32",
+          "type": "integer",
+          "readOnly": true
+        },
+        "milliseconds": {
+          "format": "int32",
+          "type": "integer",
+          "readOnly": true
+        },
+        "microseconds": {
+          "format": "int32",
+          "type": "integer",
+          "readOnly": true
+        },
+        "nanoseconds": {
+          "format": "int32",
+          "type": "integer",
+          "readOnly": true
+        },
+        "minutes": {
+          "format": "int32",
+          "type": "integer",
+          "readOnly": true
+        },
+        "seconds": {
+          "format": "int32",
+          "type": "integer",
+          "readOnly": true
+        },
+        "totalDays": {
+          "format": "double",
+          "type": "number",
+          "readOnly": true
+        },
+        "totalHours": {
+          "format": "double",
+          "type": "number",
+          "readOnly": true
+        },
+        "totalMilliseconds": {
+          "format": "double",
+          "type": "number",
+          "readOnly": true
+        },
+        "totalMicroseconds": {
+          "format": "double",
+          "type": "number",
+          "readOnly": true
+        },
+        "totalNanoseconds": {
+          "format": "double",
+          "type": "number",
+          "readOnly": true
+        },
+        "totalMinutes": {
+          "format": "double",
+          "type": "number",
+          "readOnly": true
+        },
+        "totalSeconds": {
+          "format": "double",
+          "type": "number",
+          "readOnly": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "Usuario": {
+      "type": "object",
+      "properties": {
+        "idUsuario": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idDetallesUsuario": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "alertaApartados": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AlertaApartado"
+          }
+        },
+        "apartadoActivos": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ApartadoActivo"
+          }
+        },
+        "chats": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Chat"
+          }
+        },
+        "comentarios": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Comentario"
+          }
+        },
+        "cuentaUsuarios": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CuentaUsuario"
+          }
+        },
+        "favoritos": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Favorito"
+          }
+        },
+        "historials": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Historial"
+          }
+        },
+        "idDetallesUsuarioNavigation": {
+          "$ref": "#/definitions/DetallesUsuario"
+        },
+        "mensajeUsuarios": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MensajeUsuario"
+          }
+        },
+        "solicitudesApartados": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SolicitudesApartado"
+          }
         }
       },
       "additionalProperties": false

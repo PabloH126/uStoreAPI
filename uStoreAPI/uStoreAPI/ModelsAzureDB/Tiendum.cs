@@ -19,6 +19,8 @@ public partial class Tiendum
 
     public int? Vistas { get; set; }
 
+    public string? LogoTienda { get; set; }
+
     public virtual ICollection<ApartadoActivo> ApartadoActivos { get; set; } = new List<ApartadoActivo>();
 
     public virtual ICollection<Calificacion> Calificacions { get; set; } = new List<Calificacion>();
@@ -40,8 +42,6 @@ public partial class Tiendum
     public virtual CentroComercial? IdCentroComercialNavigation { get; set; }
 
     public virtual ICollection<ImagenesTienda> ImagenesTienda { get; set; } = new List<ImagenesTienda>();
-
-    public virtual ICollection<LogoTiendum> LogoTienda { get; set; } = new List<LogoTiendum>();
 
     public virtual ICollection<PeriodosPredeterminado> PeriodosPredeterminados { get; set; } = new List<PeriodosPredeterminado>();
 

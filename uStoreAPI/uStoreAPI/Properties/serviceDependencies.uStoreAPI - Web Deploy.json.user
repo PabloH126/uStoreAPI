@@ -7,6 +7,10 @@
     "mssql1": {
       "restored": true,
       "restoreTime": "2023-07-22T17:09:59.7832392Z"
+    },
+    "storage1": {
+      "restored": true,
+      "restoreTime": "2023-08-09T03:13:00.9691656Z"
     }
   },
   "parameters": {
@@ -20,6 +24,11 @@
       "Type": "resourceGroup",
       "Value": "uStore"
     },
+    "storage1.resourceGroupName": {
+      "Name": "storage1.resourceGroupName",
+      "Type": "resourceGroup",
+      "Value": "uStore"
+    },
     "apis1.resourceGroupName": {
       "Name": "apis1.resourceGroupName",
       "Type": "resourceGroup",
@@ -27,6 +36,11 @@
     },
     "apis1.subscriptionId": {
       "Name": "apis1.subscriptionId",
+      "Type": "subscription",
+      "Value": "78bd8741-5ab0-4ce0-8bd5-c0f80620a48f"
+    },
+    "storage1.subscriptionId": {
+      "Name": "storage1.subscriptionId",
       "Type": "subscription",
       "Value": "78bd8741-5ab0-4ce0-8bd5-c0f80620a48f"
     }

@@ -1,0 +1,62 @@
+﻿using Microsoft.EntityFrameworkCore;
+using uStoreAPI.ModelsAzureDB;
+
+namespace uStoreAPI.Services
+{
+    public class PeriodosPredeterminadosService
+    {
+        private readonly UstoreContext context;
+        public PeriodosPredeterminadosService(UstoreContext _context)
+        {
+            context = _context;
+        }
+
+        public async Task<IEnumerable<PeriodosPredeterminado>> GetPeriodosPredeterminados(int? idTienda)
+        {
+            return await context.PeriodosPredeterminados.Where(p => p.IdTienda == idTienda).AsNoTracking().ToListAsync();
+        }
+
+        public async Task<PeriodosPredeterminado?> GetOnePeriodoPredeterminado(int? id)
+        {
+            return await context.PeriodosPredeterminados.FindAsync(id);
+        }
+
+        public async Task<PeriodosPredeterminado?> GetOnePeriodoPredeterminadoWithTienda(int idTienda, int id)
+        {
+            return await context.PeriodosPredeterminados.FirstOrDefaultAsync(p => p.IdTienda == idTienda && p.IdApartadoPredeterminado == id);
+        }
+
+        public async Task<IEnumerable<PeriodosPredeterminado>> CreateAllPeriodoPredeterminado(IEnumerable<PeriodosPredeterminado> periodos)
+        {
+            foreach(var periodo in periodos)
+            {
+                await context.PeriodosPredeterminados.AddAsync(periodo);
+            }
+            await context.SaveChangesAsync();
+
+            return periodos;
+        }
+
+        public async Task UpdatePeriodoPredeterminado(PeriodosPredeterminado periodo)
+        {
+            context.PeriodosPredeterminados.Update(periodo);
+            await context.SaveChangesAsync();
+        }
+
+        public async Task DeletePeriodoPredeterminado(PeriodosPredeterminado periodo)
+        {
+            context.PeriodosPredeterminados.Remove(periodo);
+            await context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAllPeriodosPredeterminados(int idTienda)
+        {
+            var periodos = await GetPeriodosPredeterminados(idTienda);
+            foreach (var periodo in periodos)
+            {
+                context.PeriodosPredeterminados.Remove(periodo);
+            }
+            await context.SaveChangesAsync();
+        }
+    }
+}

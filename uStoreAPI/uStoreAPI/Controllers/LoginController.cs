@@ -20,13 +20,12 @@ namespace uStoreAPI.Controllers
         private readonly LoginService loginService;
         private readonly TokenService tokenService;
         private readonly IMapper mapper;
-        private IConfiguration config;
-        public LoginController(LoginService _loginService, AdminService _adminService,TokenService _tokenService, IMapper _mapper, IConfiguration _config)
+        public LoginController(LoginService _loginService, AdminService _adminService,TokenService _tokenService, IMapper _mapper)
         {
             loginService = _loginService;
             mapper = _mapper;
             adminService = _adminService;
-            config = _config;
+            
             tokenService = _tokenService;
         }
 

@@ -73,8 +73,6 @@ public partial class UstoreContext : DbContext
 
     public virtual DbSet<ImagenesTienda> ImagenesTiendas { get; set; }
 
-    public virtual DbSet<LogoTiendum> LogoTienda { get; set; }
-
     public virtual DbSet<MensajeAdministrador> MensajeAdministradors { get; set; }
 
     public virtual DbSet<MensajeGerente> MensajeGerentes { get; set; }
@@ -227,8 +225,20 @@ public partial class UstoreContext : DbContext
 
             entity.ToTable("centro_comercial");
 
-            entity.Property(e => e.Imagen)
+            entity.Property(e => e.DireccionCentroComercial)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.HorarioCentroComercial)
+                .HasMaxLength(30)
+                .IsUnicode(false);
+            entity.Property(e => e.IconoCentroComercial)
                 .HasMaxLength(255)
+                .IsUnicode(false);
+            entity.Property(e => e.ImagenCentroComercial)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+            entity.Property(e => e.NombreCentroComercial)
+                .HasMaxLength(50)
                 .IsUnicode(false);
         });
 
@@ -591,21 +601,6 @@ public partial class UstoreContext : DbContext
                 .HasConstraintName("imagenes_tiendas_ibfk_tienda");
         });
 
-        modelBuilder.Entity<LogoTiendum>(entity =>
-        {
-            entity.HasKey(e => e.IdLogoTienda).HasName("PK__logo_tie__66AF103CCA832890");
-
-            entity.ToTable("logo_tienda");
-
-            entity.Property(e => e.LogoTienda)
-                .HasMaxLength(255)
-                .IsUnicode(false);
-
-            entity.HasOne(d => d.IdTiendaNavigation).WithMany(p => p.LogoTienda)
-                .HasForeignKey(d => d.IdTienda)
-                .HasConstraintName("logo_tienda_ibfk_tienda");
-        });
-
         modelBuilder.Entity<MensajeAdministrador>(entity =>
         {
             entity.HasKey(e => e.IdMensajeAdministrador).HasName("PK__mensaje___8654F5EECB00812A");
@@ -756,6 +751,9 @@ public partial class UstoreContext : DbContext
 
             entity.ToTable("tienda");
 
+            entity.Property(e => e.LogoTienda)
+                .HasMaxLength(255)
+                .IsUnicode(false);
             entity.Property(e => e.NombreTienda)
                 .HasMaxLength(30)
                 .IsUnicode(false);
