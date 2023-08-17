@@ -23,7 +23,7 @@ public partial class Producto
 
     public virtual ICollection<ApartadoActivo> ApartadoActivos { get; set; } = new List<ApartadoActivo>();
 
-    public virtual ICollection<Calificacion> Calificacions { get; set; } = new List<Calificacion>();
+    public virtual ICollection<CalificacionProducto> CalificacionProductos { get; set; } = new List<CalificacionProducto>();
 
     public virtual ICollection<CategoriasProducto> CategoriasProductos { get; set; } = new List<CategoriasProducto>();
 

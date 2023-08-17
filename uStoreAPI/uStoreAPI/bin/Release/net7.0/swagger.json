@@ -2139,68 +2139,6 @@
         }
       }
     },
-    "/api/Tiendas/CreateImagenNewTienda": {
-      "post": {
-        "tags": [
-          "Tiendas"
-        ],
-        "consumes": [
-          "multipart/form-data"
-        ],
-        "produces": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "idTienda",
-            "type": "integer",
-            "format": "int32",
-            "collectionFormat": "multi"
-          },
-          {
-            "in": "formData",
-            "name": "primera",
-            "type": "file"
-          },
-          {
-            "in": "formData",
-            "name": "segunda",
-            "type": "file"
-          },
-          {
-            "in": "formData",
-            "name": "tercera",
-            "type": "file"
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created",
-            "schema": {
-              "$ref": "#/definitions/ImagenesTienda"
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "schema": {
-              "$ref": "#/definitions/ProblemDetails"
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "schema": {
-              "$ref": "#/definitions/ProblemDetails"
-            }
-          },
-          "500": {
-            "description": "Server Error"
-          }
-        }
-      }
-    },
     "/api/Tiendas/CreateImagenTienda": {
       "post": {
         "tags": [
@@ -2501,18 +2439,14 @@
       },
       "additionalProperties": false
     },
-    "Calificacion": {
+    "CalificacionProducto": {
       "type": "object",
       "properties": {
-        "idCalificacion": {
+        "idCalificacionProducto": {
           "format": "int32",
           "type": "integer"
         },
-        "calificacion1": {
-          "format": "int32",
-          "type": "integer"
-        },
-        "idTienda": {
+        "calificacion": {
           "format": "int32",
           "type": "integer"
         },
@@ -2520,11 +2454,43 @@
           "format": "int32",
           "type": "integer"
         },
+        "idUsuario": {
+          "format": "int32",
+          "type": "integer"
+        },
         "idProductosNavigation": {
           "$ref": "#/definitions/Producto"
         },
+        "idUsuarioNavigation": {
+          "$ref": "#/definitions/Usuario"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CalificacionTiendum": {
+      "type": "object",
+      "properties": {
+        "idCalificacionTienda": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "calificacion": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idTienda": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idUsuario": {
+          "format": "int32",
+          "type": "integer"
+        },
         "idTiendaNavigation": {
           "$ref": "#/definitions/Tiendum"
+        },
+        "idUsuarioNavigation": {
+          "$ref": "#/definitions/Usuario"
         }
       },
       "additionalProperties": false
@@ -3684,10 +3650,10 @@
             "$ref": "#/definitions/ApartadoActivo"
           }
         },
-        "calificacions": {
+        "calificacionProductos": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Calificacion"
+            "$ref": "#/definitions/CalificacionProducto"
           }
         },
         "categoriasProductos": {
@@ -4026,10 +3992,10 @@
             "$ref": "#/definitions/ApartadoActivo"
           }
         },
-        "calificacions": {
+        "calificacionTienda": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Calificacion"
+            "$ref": "#/definitions/CalificacionTiendum"
           }
         },
         "categoriasTienda": {
@@ -4208,6 +4174,18 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/ApartadoActivo"
+          }
+        },
+        "calificacionProductos": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CalificacionProducto"
+          }
+        },
+        "calificacionTienda": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CalificacionTiendum"
           }
         },
         "chats": {

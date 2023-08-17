@@ -33,6 +33,7 @@ builder.Services.AddScoped<HorariosService>();
 builder.Services.AddScoped<CategoriasService>();
 builder.Services.AddScoped<ProductosService>();
 builder.Services.AddScoped<PeriodosPredeterminadosService>();
+builder.Services.AddScoped<CalificacionesService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

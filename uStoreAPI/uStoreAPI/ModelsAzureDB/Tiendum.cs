@@ -23,7 +23,7 @@ public partial class Tiendum
 
     public virtual ICollection<ApartadoActivo> ApartadoActivos { get; set; } = new List<ApartadoActivo>();
 
-    public virtual ICollection<Calificacion> Calificacions { get; set; } = new List<Calificacion>();
+    public virtual ICollection<CalificacionTiendum> CalificacionTienda { get; set; } = new List<CalificacionTiendum>();
 
     public virtual ICollection<CategoriasTienda> CategoriasTienda { get; set; } = new List<CategoriasTienda>();
 

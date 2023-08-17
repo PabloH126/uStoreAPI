@@ -13,6 +13,10 @@ public partial class Usuario
 
     public virtual ICollection<ApartadoActivo> ApartadoActivos { get; set; } = new List<ApartadoActivo>();
 
+    public virtual ICollection<CalificacionProducto> CalificacionProductos { get; set; } = new List<CalificacionProducto>();
+
+    public virtual ICollection<CalificacionTiendum> CalificacionTienda { get; set; } = new List<CalificacionTiendum>();
+
     public virtual ICollection<Chat> Chats { get; set; } = new List<Chat>();
 
     public virtual ICollection<Comentario> Comentarios { get; set; } = new List<Comentario>();

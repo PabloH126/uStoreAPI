@@ -21,8 +21,9 @@ namespace uStoreAPI.Controllers
         private readonly HorariosService horariosService;
         private readonly CategoriasService categoriasService;
         private readonly PeriodosPredeterminadosService periodosPredeterminadosService;
+        private readonly CalificacionesService calificacionesService;
         private IMapper mapper;
-        public TiendasController(PeriodosPredeterminadosService _periodosPredeterminadosService,HorariosService _horariosService,TiendasService _tiendasService, IMapper _mapper, UploadService _uploadService, PlazasService _plazasService, CategoriasService _categoriasService)
+        public TiendasController(CalificacionesService _calificacionesService, PeriodosPredeterminadosService _periodosPredeterminadosService,HorariosService _horariosService,TiendasService _tiendasService, IMapper _mapper, UploadService _uploadService, PlazasService _plazasService, CategoriasService _categoriasService)
         {
             tiendasService = _tiendasService;
             mapper = _mapper;
@@ -31,6 +32,7 @@ namespace uStoreAPI.Controllers
             horariosService = _horariosService;
             categoriasService = _categoriasService;
             periodosPredeterminadosService = _periodosPredeterminadosService;
+            calificacionesService = _calificacionesService;
         }
 
         [HttpGet("GetTiendas")]
@@ -144,44 +146,6 @@ namespace uStoreAPI.Controllers
             }
         }
 
-        [HttpPost("CreateImagenNewTienda")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<ImagenesTienda>> CreateImagenesNewTienda(int idTienda, IFormFile? primera, IFormFile? segunda, IFormFile? tercera)
-        {
-            if ((primera is null || primera.Length == 0) && (segunda is null || segunda.Length == 0) && (tercera is null || tercera.Length == 0))
-            {
-                return BadRequest("Imagenes invalidas");
-            }
-            else
-            {
-                var tienda = await tiendasService.GetOneTienda(idTienda);
-                if(tienda is null)
-                {
-                    return NotFound("Ninguna tienda registrada con ese id");
-                }
-
-                if(!(primera is null || primera.Length == 0))
-                {
-                    await tiendasService.CreateImagenesTienda(await CreateImagenTienda(tienda.IdTienda, primera, $"{tienda.IdTienda}/{primera.Name}"));
-                }
-
-                if(!(segunda is null || segunda.Length == 0))
-                {
-                    await tiendasService.CreateImagenesTienda(await CreateImagenTienda(tienda.IdTienda, segunda, $"{tienda.IdTienda}/{segunda.Name}"));
-                }
-
-                if(!(tercera is null || tercera.Length == 0))
-                {
-                    await tiendasService.CreateImagenesTienda(await CreateImagenTienda(tienda.IdTienda, tercera, $"{tienda.IdTienda}/{tercera.Name}"));
-                }
-
-                return Ok();
-            }
-        }
-
         [HttpPost("CreateImagenTienda")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -195,18 +159,28 @@ namespace uStoreAPI.Controllers
             }
             else
             {
+                var user = HttpContext.User;
+                var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+
                 var tienda = await tiendasService.GetOneTienda(idTienda);
+
                 if (tienda is null)
                 {
                     return NotFound("Ninguna tienda registrada con ese id");
                 }
+                else if (tienda.IdAdministrador != idUser)
+                {
+                    return Unauthorized("Tienda no autorizada");
+                }
 
+                var imagenesTotal = await tiendasService.GetImagenesTienda(idTienda);
+                var imagenesCounter = imagenesTotal.Count() + 1;
 
                 await tiendasService.CreateImagenesTienda(
                                         await CreateImagenTienda(
                                                     tienda.IdTienda, 
                                                     imagen, 
-                                                    $"{tienda.IdTienda}/{await uploadService.CountBlobs("tiendas", $"{tienda.IdTienda}")}"
+                                                    $"{tienda.IdTienda}/{imagenesCounter}"
                                               )
                                         );
 
@@ -277,6 +251,7 @@ namespace uStoreAPI.Controllers
             await categoriasService.DeleteAllCategoriasTienda(tienda.IdTienda);
             await periodosPredeterminadosService.DeleteAllPeriodosPredeterminados(tienda.IdTienda);
             await tiendasService.DeleteImagenesTiendaWithId(tienda.IdTienda);
+            await calificacionesService.DeleteAllCalificacionesTienda(tienda.IdTienda);
             await tiendasService.DeleteTienda(tienda);
 
             return NoContent();
@@ -285,7 +260,7 @@ namespace uStoreAPI.Controllers
 
         private async Task<ImagenesTienda> CreateImagenTienda(int idTienda, IFormFile imagen, string fileName)
         {
-            var imagenUrl = await uploadService.UploadImageTiendas(imagen, $"{fileName}");
+            var imagenUrl = await uploadService.UploadImageTiendas(imagen, fileName);
             return new ImagenesTienda
             {
                 IdTienda = idTienda,

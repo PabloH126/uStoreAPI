@@ -21,7 +21,9 @@ public partial class UstoreContext : DbContext
 
     public virtual DbSet<ApartadoActivo> ApartadoActivos { get; set; }
 
-    public virtual DbSet<Calificacion> Calificacions { get; set; }
+    public virtual DbSet<CalificacionProducto> CalificacionProductos { get; set; }
+
+    public virtual DbSet<CalificacionTiendum> CalificacionTienda { get; set; }
 
     public virtual DbSet<Categoria> Categorias { get; set; }
 
@@ -156,21 +158,42 @@ public partial class UstoreContext : DbContext
                 .HasConstraintName("apartado_activo_ibfk_usuarios");
         });
 
-        modelBuilder.Entity<Calificacion>(entity =>
+        modelBuilder.Entity<CalificacionProducto>(entity =>
         {
-            entity.HasKey(e => e.IdCalificacion).HasName("PK__califica__40E4A751F36FBC77");
+            entity.HasKey(e => e.IdCalificacionProducto).HasName("PK__califica__EA5510DEE7271197");
 
-            entity.ToTable("calificacion");
+            entity.ToTable("calificacion_producto");
 
-            entity.Property(e => e.Calificacion1).HasColumnName("Calificacion");
+            entity.HasIndex(e => new { e.IdProductos, e.IdUsuario }, "UQ__califica__143A26FF2DBF3CEE").IsUnique();
 
-            entity.HasOne(d => d.IdProductosNavigation).WithMany(p => p.Calificacions)
+            entity.Property(e => e.IdCalificacionProducto).ValueGeneratedNever();
+
+            entity.HasOne(d => d.IdProductosNavigation).WithMany(p => p.CalificacionProductos)
                 .HasForeignKey(d => d.IdProductos)
-                .HasConstraintName("calificacion_ibfk_productos");
+                .HasConstraintName("FK__calificac__IdPro__6D9742D9");
 
-            entity.HasOne(d => d.IdTiendaNavigation).WithMany(p => p.Calificacions)
+            entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.CalificacionProductos)
+                .HasForeignKey(d => d.IdUsuario)
+                .HasConstraintName("FK__calificac__IdUsu__6E8B6712");
+        });
+
+        modelBuilder.Entity<CalificacionTiendum>(entity =>
+        {
+            entity.HasKey(e => e.IdCalificacionTienda).HasName("PK__califica__5CDFD1C3862890FF");
+
+            entity.ToTable("calificacion_tienda");
+
+            entity.HasIndex(e => new { e.IdTienda, e.IdUsuario }, "UQ__califica__3FA8E29388E3372A").IsUnique();
+
+            entity.Property(e => e.IdCalificacionTienda).ValueGeneratedNever();
+
+            entity.HasOne(d => d.IdTiendaNavigation).WithMany(p => p.CalificacionTienda)
                 .HasForeignKey(d => d.IdTienda)
-                .HasConstraintName("calificacion_ibfk_tienda");
+                .HasConstraintName("FK__calificac__IdTie__68D28DBC");
+
+            entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.CalificacionTienda)
+                .HasForeignKey(d => d.IdUsuario)
+                .HasConstraintName("FK__calificac__IdUsu__69C6B1F5");
         });
 
         modelBuilder.Entity<Categoria>(entity =>
