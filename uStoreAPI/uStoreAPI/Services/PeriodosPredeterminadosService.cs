@@ -43,6 +43,15 @@ namespace uStoreAPI.Services
             await context.SaveChangesAsync();
         }
 
+        public async Task UpdateAllPeriodosPredeterminados(IEnumerable<PeriodosPredeterminado> periodos)
+        {
+            foreach (var periodo in periodos)
+            {
+                context.PeriodosPredeterminados.Update(periodo);
+            }
+            await context.SaveChangesAsync();
+        }
+
         public async Task DeletePeriodoPredeterminado(PeriodosPredeterminado periodo)
         {
             context.PeriodosPredeterminados.Remove(periodo);

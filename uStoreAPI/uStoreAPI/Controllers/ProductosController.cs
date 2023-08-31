@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
@@ -10,6 +11,7 @@ using uStoreAPI.Services;
 
 namespace uStoreAPI.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ProductosController : ControllerBase
@@ -39,11 +41,21 @@ namespace uStoreAPI.Controllers
             }
 
             var productos = await productosService.GetProductos(idTienda);
+            
             if (productos.IsNullOrEmpty())
             {
                 return NotFound("No hay productos registrados para esa tienda");
             }
-            return Ok(productos);
+            var productosSalida = mapper.Map<IEnumerable<ProductoDto>>(productos);
+            foreach(var producto in productosSalida)
+            {
+                var imagenProducto = await productosService.GetPrincipalImageProducto(producto.IdProductos);
+                if(imagenProducto is not null)
+                {
+                    producto.ImageProducto = imagenProducto.ImagenProducto;
+                }
+            }
+            return Ok(productosSalida);
         }
 
         [HttpGet(Name = "GetProducto")]
@@ -59,7 +71,41 @@ namespace uStoreAPI.Controllers
             {
                 return NotFound("Producto no registrado");
             }
-            return Ok(producto);
+
+            var productoDto = mapper.Map<ProductoDto>(producto);
+
+            var imagenProducto = await productosService.GetPrincipalImageProducto(producto.IdProductos);
+
+            if (imagenProducto is not null)
+            {
+                productoDto.ImageProducto = imagenProducto.ImagenProducto;
+            }
+            return Ok(productoDto);
+        }
+
+        [HttpGet("GetImagenesProducto")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<IEnumerable<ImagenesProducto>>> GetImagenesProducto(int idProducto)
+        {
+            var user = HttpContext.User;
+            var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+            var producto = await productosService.GetOneProducto(idProducto);
+            if (producto is null)
+            {
+                return BadRequest("No hay una producto registrada con ese id");
+            }
+
+            var imagenesProducto = await productosService.GetImagenesProducto(idProducto);
+
+            if (imagenesProducto.IsNullOrEmpty())
+            {
+                return NotFound("No hay imagenes registradas de este producto");
+            }
+
+            return Ok(imagenesProducto);
         }
 
         [HttpPost("CreateProducto")]
@@ -81,39 +127,66 @@ namespace uStoreAPI.Controllers
                 return BadRequest("No hay tienda registrada con ese id");
             }
 
-            var producto = mapper.Map<Producto>(productoDto);
+            var user = HttpContext.User;
+            var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
 
-            await productosService.CreateProducto(producto);
+            if(tienda.IdAdministrador != idUser)
+            {
+                return Unauthorized("Tienda no autorizada");
+            }
+
+            var producto = new Producto()
+            {
+                NombreProducto = productoDto.NombreProducto,
+                PrecioProducto = productoDto.PrecioProducto,
+                CantidadApartado = productoDto.CantidadApartado,
+                Descripcion = productoDto.Descripcion,
+                Stock = productoDto.Stock,
+                IdTienda = productoDto.IdTienda
+            };
+
+
+            var productoCreado = await productosService.CreateProducto(producto);
             await tiendasService.UpdateRangoPrecio(tienda);
 
-            return CreatedAtRoute("GetProducto", new { id = producto.IdProductos }, producto);
+            return Ok(productoCreado.IdProductos);
         }
 
-        /*[HttpPost("CreateImageProducto")]
+        [HttpPost("CreateImageProducto")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<ProductoDto>> CreateProducto(int idProducto, IFormFile imagen)
+        public async Task<ActionResult<ProductoDto>> CreateImagenProducto(int idProducto, IFormFile imagen)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            else if (imagen is null || imagen.Length == 0)
+            if (imagen is null || imagen.Length == 0)
             {
                 return BadRequest("Imagen no valida");
             }
-            else if (await productosService.GetOneProducto(idProducto) is null)
+
+            var user = HttpContext.User;
+            var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+
+            var producto = await productosService.GetOneProducto(idProducto);
+
+            if (producto is null)
             {
-                return NotFound("No hay producto registrado con ese id");
+                return NotFound();
             }
 
-            await uploadService.UploadImageProductos(imagen, $"{idProducto}/{await uploadService.CountBlobs("productos", idProducto.ToString())}");
+            var imagenesTotal = await productosService.GetImagenesProducto(producto.IdProductos);
+            var imagenesCounter = imagenesTotal.Count() + 1;
 
-            return CreatedAtRoute("GetProducto", new { id = producto.IdProductos }, producto);
+            await productosService.CreateImagenesProducto(
+                                    await CreateImagenProducto(
+                                                    producto.IdProductos,
+                                                    imagen,
+                                                    $"{producto.IdProductos}/{imagenesCounter}")
+                                    );
+
+            return Ok();
         }
-        */
+
         [HttpPut("UpdateProducto")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -148,6 +221,42 @@ namespace uStoreAPI.Controllers
             return NoContent();
         }
 
+        [HttpPut("UpdateStockProducto")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> UpdateStockProducto(int idProducto, int stock)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var user = HttpContext.User;
+            var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+
+            var producto = await productosService.GetOneProducto(idProducto);
+
+            if (producto is null)
+            {
+                return NotFound("Producto no registrado");
+            }
+
+            var tienda = await tiendasService.GetOneTienda(producto.IdTienda);
+
+            if (tienda!.IdAdministrador != idUser)
+            {
+                return Unauthorized("Producto no autorizado");
+            }
+
+            producto.Stock = stock;
+
+            await productosService.UpdateProducto(producto);
+
+            return NoContent();
+        }
+
         [HttpDelete("DeleteProducto")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -178,6 +287,15 @@ namespace uStoreAPI.Controllers
 
             await productosService.DeleteProducto(producto);
             return NoContent();
+        }
+        private async Task<ImagenesProducto> CreateImagenProducto(int idProducto, IFormFile imagen, string fileName)
+        {
+            var imagenUrl = await uploadService.UploadImageProductos(imagen, fileName);
+            return new ImagenesProducto
+            {
+                IdProductos = idProducto,
+                ImagenProducto = imagenUrl
+            };
         }
     }
 }

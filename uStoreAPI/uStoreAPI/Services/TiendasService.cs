@@ -32,6 +32,11 @@ namespace uStoreAPI.Services
             return await context.ImagenesTiendas.Where(p => p.IdTienda == idTienda).AsNoTracking().ToListAsync();
         }
 
+        public async Task<ImagenesTienda?> GetImagenTienda(int idImagenTienda)
+        {
+            return await context.ImagenesTiendas.FindAsync(idImagenTienda);
+        }
+
         public async Task<Tiendum?> GetOneTienda(int? idTienda)
         {
             return await context.Tienda.FindAsync(idTienda);
@@ -61,9 +66,9 @@ namespace uStoreAPI.Services
             return tienda;
         }
 
-        public async Task UpdateTienda(Tiendum tienda)
+        public async Task UpdateTienda(Tiendum updatedTienda)
         {
-            context.Tienda.Update(tienda);
+            context.Tienda.Update(updatedTienda);
             await context.SaveChangesAsync();
         }
         

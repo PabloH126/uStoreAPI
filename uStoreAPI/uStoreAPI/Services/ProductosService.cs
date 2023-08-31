@@ -22,6 +22,22 @@ namespace uStoreAPI.Services
             return await context.Productos.FindAsync(id);
         }
 
+        public async Task<IEnumerable<ImagenesProducto>> GetImagenesProducto(int? idProducto)
+        {
+            return await context.ImagenesProductos.Where(p => p.IdProductos == idProducto).AsNoTracking().ToListAsync();
+        }
+
+        public async Task<ImagenesProducto?> GetImagenProducto(int? idImagenProducto)
+        {
+            return await context.ImagenesProductos.FindAsync(idImagenProducto);
+        }
+
+        public async Task<ImagenesProducto?> GetPrincipalImageProducto(int? idProducto)
+        {
+            var firstImagen = await context.ImagenesProductos.FirstOrDefaultAsync(p => p.IdProductos == idProducto);
+            return firstImagen;
+        }
+
         public async Task<Producto> CreateProducto(Producto producto)
         {
             await context.Productos.AddAsync(producto);
@@ -29,15 +45,41 @@ namespace uStoreAPI.Services
             return producto;
         }
 
+        public async Task<ImagenesProducto> CreateImagenesProducto(ImagenesProducto imagenProducto)
+        {
+            await context.ImagenesProductos.AddAsync(imagenProducto); 
+            await context.SaveChangesAsync();
+            return imagenProducto;
+        }
+
         public async Task UpdateProducto(Producto producto)
         {
             context.Productos.Update(producto);
+            await context.SaveChangesAsync();
+        }
+
+        public async Task UpdateImagenesProducto(ImagenesProducto imagenProducto)
+        {
+            context.ImagenesProductos.Update(imagenProducto);
             await context.SaveChangesAsync();
         }
         
         public async Task DeleteProducto(Producto producto)
         {
             context.Productos.Remove(producto); 
+            await context.SaveChangesAsync();
+        }
+
+        public async Task DeleteImagenProducto(ImagenesProducto imagenProducto)
+        {
+            context.ImagenesProductos.Remove(imagenProducto);
+            await context.SaveChangesAsync();
+        }
+
+        public async Task DeleteImagenesProductoWithId(int idProducto)
+        {
+            var imagenesProducto = await context.ImagenesProductos.Where(p => p.IdProductos == idProducto).AsNoTracking().ToListAsync();
+            context.ImagenesProductos.RemoveRange(imagenesProducto);
             await context.SaveChangesAsync();
         }
     }

@@ -56,6 +56,21 @@ namespace uStoreAPI.Services
             await context.SaveChangesAsync();
         }
 
+        public async Task UpdateAllHorarios(IEnumerable<Horario> horarios)
+        {
+            foreach (var horario in horarios)
+            {
+                var horarioDia = await context.Horarios.FirstOrDefaultAsync(p => p.IdTienda == horario.IdTienda && p.Dia == horario.Dia);
+                if(horarioDia is not null)
+                {
+                    horarioDia.HorarioApertura = horario.HorarioApertura;
+                    horarioDia.HorarioCierre = horario.HorarioCierre;
+                    context.Horarios.Update(horarioDia);
+                }
+            }
+            await context.SaveChangesAsync();
+        }
+
         public async Task DeleteHorario(Horario horario)
         {
             context.Horarios.Remove(horario);

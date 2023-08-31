@@ -13,9 +13,9 @@ namespace uStoreAPI.Dtos
         public int? CantidadApartado { get; set; }
         [Required]
         public string? Descripcion { get; set; }
-        [Required]
         public int? Stock { get; set; }
         [Required]
         public int? IdTienda { get; set; }
+        public string? ImageProducto { get; set; }
     }
 }

@@ -157,6 +157,19 @@ namespace uStoreAPI.Services
             return counter;
         }
 
+        public string GetBlobNameFromUrl(string? url)
+        {
+            if(string.IsNullOrEmpty(url))
+            {
+                return string.Empty;
+            }
+
+            Uri uri = new Uri(url);
+            string blobName = uri.Segments.Last();
+            string blobNameNoExt = Path.GetFileNameWithoutExtension(blobName);
+            return blobNameNoExt;
+        }
+
         private string GetKeyImage()
         {
             byte[] secretKey = new byte[4];

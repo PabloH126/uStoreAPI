@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 using uStoreAPI.Dtos;
 using uStoreAPI.ModelsAzureDB;
 using uStoreAPI.Services;
@@ -242,6 +243,38 @@ namespace uStoreAPI.Controllers
             }
             categoria.Categoria1 = catego;
             await categoriasService.UpdateCategoria(categoria);
+
+            return NoContent();
+        }
+
+        [HttpPut("UpdateCategoriasTienda")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> UpdateCategoriasTienda([FromBody] IEnumerable<CategoriasTiendaDto> categorias)
+        {
+            if (categorias is null || !ModelState.IsValid)
+            {
+                return BadRequest("Categorias no validas");
+            }
+
+            var user = HttpContext.User;
+            var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+            var tienda = await tiendasService.GetOneTienda(categorias.FirstOrDefault()!.IdTienda);
+
+            if (tienda is null)
+            {
+                return BadRequest("No hay una tienda registrada con ese id");
+            }
+            else if (!(tienda.IdAdministrador == idUser))
+            {
+                return Unauthorized("Tienda no autorizada");
+            }
+
+            var categoriasLista = mapper.Map<IEnumerable<CategoriasTienda>>(categorias);
+            await categoriasService.UpdateAllCategoriasTienda(categoriasLista);
+
 
             return NoContent();
         }

@@ -94,17 +94,18 @@ namespace uStoreAPI.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateCategoria([FromBody] PeriodosPredeterminadosDto periodo)
+        public async Task<IActionResult> UpdatePeriodo([FromBody] IEnumerable<PeriodosPredeterminadosDto> periodos)
         {
-            if (periodo is null)
+            if (periodos is null)
             {
                 return BadRequest("Periodo no valido");
             }
-            if(await tiendasService.GetOneTienda(periodo.IdTienda) is null)
+            if(await tiendasService.GetOneTienda(periodos.FirstOrDefault()!.IdTienda) is null)
             {
                 return NotFound("No hay una tienda registrada con ese id");
             }
-            await periodosPredeterminadosService.UpdatePeriodoPredeterminado(mapper.Map<PeriodosPredeterminado>(periodo));
+
+            await periodosPredeterminadosService.UpdateAllPeriodosPredeterminados(mapper.Map<IEnumerable<PeriodosPredeterminado>>(periodos));
 
             return NoContent();
         }

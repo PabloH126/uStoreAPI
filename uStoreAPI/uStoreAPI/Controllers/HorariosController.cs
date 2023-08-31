@@ -140,22 +140,30 @@ namespace uStoreAPI.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateHorario([FromBody] HorarioDto horarioDto)
+        public async Task<IActionResult> UpdateHorario([FromBody] IEnumerable<HorarioDto> horarioDto)
         {
-            if(horarioDto is null)
+            if(horarioDto is null || !ModelState.IsValid)
             {
-                return BadRequest("Datos invalidos");
-            }
-            var horario = await horariosService.GetHorarioTiendaWithDay(horarioDto.IdTienda, horarioDto.Dia);
-            if (horario is null)
-            {
-                return NotFound("Horario no registrado");
+                return BadRequest("Horario invalido");
             }
 
-            horario.HorarioApertura = horarioDto.HorarioApertura;
-            horario.HorarioCierre = horarioDto.HorarioCierre;
+            var user = HttpContext.User;
+            var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+            var tienda = await tiendasService.GetOneTienda(horarioDto.FirstOrDefault()!.IdTienda);
 
-            await horariosService.UpdateHorario(horario);
+            if (tienda is null)
+            {
+                return BadRequest("No hay una tienda registrada con ese id");
+            }
+            else if (!(tienda.IdAdministrador == idUser))
+            {
+                return Unauthorized("Tienda no autorizada");
+            }
+
+            var horario = mapper.Map<IEnumerable<Horario>>(horarioDto);
+
+
+            await horariosService.UpdateAllHorarios(horario);
 
             return NoContent();
         }

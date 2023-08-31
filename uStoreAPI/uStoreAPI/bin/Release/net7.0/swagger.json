@@ -269,6 +269,478 @@
         }
       }
     },
+    "/api/Calificaciones/GetCalificacionesTienda": {
+      "get": {
+        "tags": [
+          "Calificaciones"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "idTienda",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CalificacionTiendaDto"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Calificaciones/GetCalificacionesProducto": {
+      "get": {
+        "tags": [
+          "Calificaciones"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "idProducto",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CalificacionProductoDto"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Calificaciones/GetCalificacionTienda": {
+      "get": {
+        "tags": [
+          "Calificaciones"
+        ],
+        "operationId": "GetCalificacionTienda",
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/CalificacionTiendaDto"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Calificaciones/GetCalificacionProducto": {
+      "get": {
+        "tags": [
+          "Calificaciones"
+        ],
+        "operationId": "GetCalificacionProducto",
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/CalificacionProductoDto"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Calificaciones/CreateCalificacionTienda": {
+      "post": {
+        "tags": [
+          "Calificaciones"
+        ],
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/CalificacionTiendaDto"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/CalificacionTiendum"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Calificaciones/CreateCalificacionProducto": {
+      "post": {
+        "tags": [
+          "Calificaciones"
+        ],
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/CalificacionProducto"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/CalificacionProducto"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Calificaciones/UpdateCalificacionTienda": {
+      "put": {
+        "tags": [
+          "Calificaciones"
+        ],
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/CalificacionTiendaDto"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Calificaciones/UpdateCalificacionProducto": {
+      "put": {
+        "tags": [
+          "Calificaciones"
+        ],
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/CalificacionProductoDto"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Calificaciones/DeleteCalificacionTienda": {
+      "delete": {
+        "tags": [
+          "Calificaciones"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Calificaciones/DeleteCalificacionProducto": {
+      "delete": {
+        "tags": [
+          "Calificaciones"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
     "/api/Categorias/GetCategorias": {
       "get": {
         "tags": [
@@ -801,6 +1273,56 @@
         }
       }
     },
+    "/api/Categorias/UpdateCategoriasTienda": {
+      "put": {
+        "tags": [
+          "Categorias"
+        ],
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CategoriasTiendaDto"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
     "/api/Horarios/GetHorarios": {
       "get": {
         "tags": [
@@ -1014,7 +1536,10 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/HorarioDto"
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/HorarioDto"
+              }
             }
           }
         ],
@@ -1546,7 +2071,10 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/PeriodosPredeterminadosDto"
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PeriodosPredeterminadosDto"
+              }
             }
           }
         ],
@@ -1670,6 +2198,53 @@
         }
       }
     },
+    "/api/Productos/GetImagenesProducto": {
+      "get": {
+        "tags": [
+          "Productos"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "idProducto",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ImagenesProducto"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
     "/api/Productos/CreateProducto": {
       "post": {
         "tags": [
@@ -1720,6 +2295,58 @@
         }
       }
     },
+    "/api/Productos/CreateImageProducto": {
+      "post": {
+        "tags": [
+          "Productos"
+        ],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "idProducto",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          },
+          {
+            "in": "formData",
+            "name": "imagen",
+            "type": "file"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/ProductoDto"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
     "/api/Productos/UpdateProducto": {
       "put": {
         "tags": [
@@ -1743,6 +2370,54 @@
             "schema": {
               "$ref": "#/definitions/ProductoDto"
             }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Productos/UpdateStockProducto": {
+      "put": {
+        "tags": [
+          "Productos"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "idProducto",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          },
+          {
+            "in": "query",
+            "name": "stock",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
           }
         ],
         "responses": {
@@ -2191,16 +2866,13 @@
         }
       }
     },
-    "/api/Tiendas/UpdateTienda": {
+    "/api/Tiendas/UpdateImagenTienda": {
       "put": {
         "tags": [
           "Tiendas"
         ],
         "consumes": [
-          "application/json-patch+json",
-          "application/json",
-          "text/json",
-          "application/*+json"
+          "multipart/form-data"
         ],
         "produces": [
           "text/plain",
@@ -2209,11 +2881,76 @@
         ],
         "parameters": [
           {
-            "in": "body",
-            "name": "body",
+            "in": "query",
+            "name": "idTienda",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          },
+          {
+            "in": "query",
+            "name": "idImagenTienda",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          },
+          {
+            "in": "formData",
+            "name": "imagen",
+            "type": "file"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
             "schema": {
-              "$ref": "#/definitions/TiendaDto"
+              "$ref": "#/definitions/ProblemDetails"
             }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Tiendas/UpdateTienda": {
+      "put": {
+        "tags": [
+          "Tiendas"
+        ],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "IdTienda",
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "formData",
+            "name": "NombreTienda",
+            "type": "string"
+          },
+          {
+            "in": "formData",
+            "name": "logoTienda",
+            "type": "file"
           }
         ],
         "responses": {
@@ -2463,6 +3200,58 @@
         },
         "idUsuarioNavigation": {
           "$ref": "#/definitions/Usuario"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CalificacionProductoDto": {
+      "required": [
+        "calificacion",
+        "idProductos"
+      ],
+      "type": "object",
+      "properties": {
+        "idCalificacionProducto": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "calificacion": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idProductos": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idUsuario": {
+          "format": "int32",
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CalificacionTiendaDto": {
+      "required": [
+        "calificacion",
+        "idTienda"
+      ],
+      "type": "object",
+      "properties": {
+        "idCalificacionTienda": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "calificacion": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idTienda": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idUsuario": {
+          "format": "int32",
+          "type": "integer"
         }
       },
       "additionalProperties": false
@@ -3710,8 +4499,7 @@
         "descripcion",
         "idTienda",
         "nombreProducto",
-        "precioProducto",
-        "stock"
+        "precioProducto"
       ],
       "type": "object",
       "properties": {
@@ -3742,6 +4530,9 @@
         "idTienda": {
           "format": "int32",
           "type": "integer"
+        },
+        "imageProducto": {
+          "type": "string"
         }
       },
       "additionalProperties": false

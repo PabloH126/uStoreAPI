@@ -28,6 +28,13 @@ namespace uStoreAPI.Services
             return categorias;
         }
 
+        public async Task<IEnumerable<CategoriasTienda>> GetCategoriasTiendaWithIdCT(int idTienda)
+        {
+            return await context.CategoriasTiendas.Where(p => p.IdTienda == idTienda)
+                                                                  .AsNoTracking()
+                                                                  .ToListAsync();
+        }
+
         public async Task<IEnumerable<Categoria>> GetCategoriasProducto(int idProducto)
         {
             var categoriasProducto = await context.CategoriasProductos.Where(p => p.IdProductos == idProducto)
@@ -103,6 +110,12 @@ namespace uStoreAPI.Services
             await context.SaveChangesAsync();
         }
 
+        public async Task UpdateAllCategoriasTienda(IEnumerable<CategoriasTienda> categorias)
+        {
+            await DeleteAllCategoriasTienda(categorias.FirstOrDefault()!.IdTienda);
+            await CreateAllCategoriasTienda(categorias);
+        }
+
         public async Task UpdateCategoriaProducto(CategoriasProducto categoria)
         {
             context.CategoriasProductos.Update(categoria);
@@ -121,7 +134,7 @@ namespace uStoreAPI.Services
             await context.SaveChangesAsync();
         }
 
-        public async Task DeleteAllCategoriasTienda(int idTienda)
+        public async Task DeleteAllCategoriasTienda(int? idTienda)
         {
             var categorias = await context.CategoriasTiendas.Where(c => c.IdTienda == idTienda).AsNoTracking().ToListAsync();
             foreach (var categoria in categorias)

@@ -188,18 +188,65 @@ namespace uStoreAPI.Controllers
             }
         }
 
+        [HttpPut("UpdateImagenTienda")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> UpdateImagenTienda(int idTienda, int idImagenTienda, IFormFile? imagen)
+        {
+            if (imagen is null || imagen.Length == 0)
+            {
+                return BadRequest("Imagen invalida");
+            }
+            else
+            {
+                var user = HttpContext.User;
+                var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+
+                var tienda = await tiendasService.GetOneTienda(idTienda);
+
+                if (tienda is null)
+                {
+                    return NotFound("Ninguna tienda registrada con ese id");
+                }
+                else if (tienda.IdAdministrador != idUser)
+                {
+                    return Unauthorized("Tienda no autorizada");
+                }
+                else if(idImagenTienda == 0)
+                {
+                    var imagenesTotal = await tiendasService.GetImagenesTienda(idTienda);
+                    var imagenesCounter = imagenesTotal.Count() + 1;
+
+                    await tiendasService.CreateImagenesTienda(
+                                            await CreateImagenTienda(
+                                                        tienda.IdTienda,
+                                                        imagen,
+                                                        $"{tienda.IdTienda}/{imagenesCounter}"
+                                                  )
+                                            );
+                    return NoContent();
+                }
+
+                var imagenTienda = await tiendasService.GetImagenTienda(idImagenTienda);
+                var newImagenTienda = await CreateImagenTienda(tienda.IdTienda, imagen, $"{tienda.IdTienda}/{uploadService.GetBlobNameFromUrl(imagenTienda!.ImagenTienda)}");
+                imagenTienda.ImagenTienda = newImagenTienda.ImagenTienda;
+
+                await tiendasService.UpdateImagenTienda(imagenTienda);
+                                        
+
+                return NoContent();
+            }
+        }
+
         [HttpPut("UpdateTienda")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateTienda([FromBody] TiendaDto tiendaDto)
+        public async Task<IActionResult> UpdateTienda([FromForm] TiendaUpdateDto tiendaDto, IFormFile? logoTienda)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             var user = HttpContext.User;
             var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
 
@@ -212,10 +259,17 @@ namespace uStoreAPI.Controllers
 
             if (tienda!.IdAdministrador != idUser)
             {
-                return Unauthorized("Producto no autorizado");
+                return Unauthorized("Tienda no autorizada");
+            }
+            
+            if (logoTienda is not null)
+            {
+                var logoUrl = await uploadService.UploadImageTiendas(logoTienda, $"{tienda.IdTienda}/{tienda.IdTienda}");
+                tienda.LogoTienda = logoUrl;
             }
 
-            await tiendasService.UpdateTienda(mapper.Map<Tiendum>(tiendaDto));
+            tienda.NombreTienda = tiendaDto.NombreTienda;
+            await tiendasService.UpdateTienda(tienda);
 
             return NoContent();
         }

@@ -160,40 +160,36 @@ public partial class UstoreContext : DbContext
 
         modelBuilder.Entity<CalificacionProducto>(entity =>
         {
-            entity.HasKey(e => e.IdCalificacionProducto).HasName("PK__califica__EA5510DEE7271197");
+            entity.HasKey(e => e.IdCalificacionProducto).HasName("PK__califica__EA5510DE2770903B");
 
             entity.ToTable("calificacion_producto");
 
-            entity.HasIndex(e => new { e.IdProductos, e.IdUsuario }, "UQ__califica__143A26FF2DBF3CEE").IsUnique();
-
-            entity.Property(e => e.IdCalificacionProducto).ValueGeneratedNever();
+            entity.HasIndex(e => new { e.IdProductos, e.IdUsuario }, "UQ__califica__143A26FFED97307D").IsUnique();
 
             entity.HasOne(d => d.IdProductosNavigation).WithMany(p => p.CalificacionProductos)
                 .HasForeignKey(d => d.IdProductos)
-                .HasConstraintName("FK__calificac__IdPro__6D9742D9");
+                .HasConstraintName("FK__calificac__IdPro__22FF2F51");
 
             entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.CalificacionProductos)
                 .HasForeignKey(d => d.IdUsuario)
-                .HasConstraintName("FK__calificac__IdUsu__6E8B6712");
+                .HasConstraintName("FK__calificac__IdUsu__23F3538A");
         });
 
         modelBuilder.Entity<CalificacionTiendum>(entity =>
         {
-            entity.HasKey(e => e.IdCalificacionTienda).HasName("PK__califica__5CDFD1C3862890FF");
+            entity.HasKey(e => e.IdCalificacionTienda).HasName("PK__califica__5CDFD1C39FC8126B");
 
             entity.ToTable("calificacion_tienda");
 
-            entity.HasIndex(e => new { e.IdTienda, e.IdUsuario }, "UQ__califica__3FA8E29388E3372A").IsUnique();
-
-            entity.Property(e => e.IdCalificacionTienda).ValueGeneratedNever();
+            entity.HasIndex(e => new { e.IdTienda, e.IdUsuario }, "UQ__califica__3FA8E29398E07191").IsUnique();
 
             entity.HasOne(d => d.IdTiendaNavigation).WithMany(p => p.CalificacionTienda)
                 .HasForeignKey(d => d.IdTienda)
-                .HasConstraintName("FK__calificac__IdTie__68D28DBC");
+                .HasConstraintName("FK__calificac__IdTie__1E3A7A34");
 
             entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.CalificacionTienda)
                 .HasForeignKey(d => d.IdUsuario)
-                .HasConstraintName("FK__calificac__IdUsu__69C6B1F5");
+                .HasConstraintName("FK__calificac__IdUsu__1F2E9E6D");
         });
 
         modelBuilder.Entity<Categoria>(entity =>

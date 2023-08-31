@@ -30,7 +30,7 @@ namespace uStoreAPI.Services
             {
                 var token = new JwtSecurityToken(
                          claims: claims,
-                         expires: DateTime.UtcNow.AddDays(7),
+                         expires: DateTime.UtcNow.Date.AddDays(15),
                          signingCredentials: creds);
 
                 return new JwtSecurityTokenHandler().WriteToken(token);
@@ -39,7 +39,7 @@ namespace uStoreAPI.Services
             {
                 var token = new JwtSecurityToken(
                          claims: claims,
-                         expires: DateTime.UtcNow.AddHours(3),
+                         expires: DateTime.UtcNow.Date.AddDays(1),
                          signingCredentials: creds);
 
                 return new JwtSecurityTokenHandler().WriteToken(token);
