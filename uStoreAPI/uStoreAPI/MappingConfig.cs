@@ -23,6 +23,7 @@ namespace uStoreAPI
             CreateMap<Producto, ProductoDto>().ReverseMap();
             CreateMap<CalificacionTiendum, CalificacionTiendaDto>().ReverseMap();
             CreateMap<CalificacionProducto, CalificacionProductoDto>().ReverseMap();
+            CreateMap<SolicitudesApartado, SolicitudesApartadoDto>().ReverseMap();
         }
     }
 }
