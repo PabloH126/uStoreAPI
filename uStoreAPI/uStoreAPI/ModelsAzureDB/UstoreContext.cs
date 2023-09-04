@@ -744,6 +744,10 @@ public partial class UstoreContext : DbContext
                 .HasForeignKey(d => d.IdRatioUsuario)
                 .HasConstraintName("solicitudes_apartado_ibfk_ratio_usuario");
 
+            entity.HasOne(d => d.IdTiendaNavigation).WithMany(p => p.SolicitudesApartados)
+                .HasForeignKey(d => d.IdTienda)
+                .HasConstraintName("FK_tienda_solicitudes_apartado");
+
             entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.SolicitudesApartados)
                 .HasForeignKey(d => d.IdUsuario)
                 .HasConstraintName("solicitudes_apartado_ibfk_usuarios");

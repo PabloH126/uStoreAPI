@@ -19,11 +19,15 @@ public partial class SolicitudesApartado
 
     public int? IdUsuario { get; set; }
 
+    public int? IdTienda { get; set; }
+
     public virtual ICollection<ApartadoActivo> ApartadoActivos { get; set; } = new List<ApartadoActivo>();
 
     public virtual Producto? IdProductosNavigation { get; set; }
 
     public virtual RatioUsuario? IdRatioUsuarioNavigation { get; set; }
+
+    public virtual Tiendum? IdTiendaNavigation { get; set; }
 
     public virtual Usuario? IdUsuarioNavigation { get; set; }
 }

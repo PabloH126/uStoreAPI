@@ -49,5 +49,7 @@ public partial class Tiendum
 
     public virtual ICollection<Publicacione> Publicaciones { get; set; } = new List<Publicacione>();
 
+    public virtual ICollection<SolicitudesApartado> SolicitudesApartados { get; set; } = new List<SolicitudesApartado>();
+
     public virtual ICollection<TendenciasVentum> TendenciasVenta { get; set; } = new List<TendenciasVentum>();
 }
