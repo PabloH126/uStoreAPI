@@ -92,9 +92,8 @@ namespace uStoreAPI.Services
             foreach (var categoria in categorias)
             {
                 await context.CategoriasProductos.AddAsync(categoria);
-                await context.SaveChangesAsync();
             }
-
+            await context.SaveChangesAsync();
             return categorias;
         }
 
@@ -114,6 +113,12 @@ namespace uStoreAPI.Services
         {
             await DeleteAllCategoriasTienda(categorias.FirstOrDefault()!.IdTienda);
             await CreateAllCategoriasTienda(categorias);
+        }
+
+        public async Task UpdateAllCategoriasProducto(IEnumerable<CategoriasProducto> categorias)
+        {
+            await DeleteAllCategoriasProducto(categorias.FirstOrDefault()!.IdProductos);
+            await CreateAllCategoriasProducto(categorias);
         }
 
         public async Task UpdateCategoriaProducto(CategoriasProducto categoria)
@@ -149,6 +154,18 @@ namespace uStoreAPI.Services
         public async Task DeleteCategoriaProducto(CategoriasProducto categoria)
         {
             context.CategoriasProductos.Remove(categoria);
+            await context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAllCategoriasProducto(int? idProducto)
+        {
+            var categorias = await context.CategoriasProductos.Where(c => c.IdProductos == idProducto).AsNoTracking().ToListAsync();
+            foreach (var categoria in categorias)
+            {
+                context.CategoriasProductos.Remove(categoria);
+
+            }
+
             await context.SaveChangesAsync();
         }
     }

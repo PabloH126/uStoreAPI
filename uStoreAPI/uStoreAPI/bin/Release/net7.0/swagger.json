@@ -1323,6 +1323,56 @@
         }
       }
     },
+    "/api/Categorias/UpdateCategoriasProducto": {
+      "put": {
+        "tags": [
+          "Categorias"
+        ],
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CategoriasProductoDto"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
     "/api/Horarios/GetHorarios": {
       "get": {
         "tags": [
@@ -2368,8 +2418,64 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/ProductoDto"
+              "$ref": "#/definitions/ProductoUpdateDto"
             }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Productos/UpdateImagenProducto": {
+      "put": {
+        "tags": [
+          "Productos"
+        ],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "idProducto",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          },
+          {
+            "in": "query",
+            "name": "idImagenProducto",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          },
+          {
+            "in": "formData",
+            "name": "imagen",
+            "type": "file"
           }
         ],
         "responses": {
@@ -4532,6 +4638,33 @@
           "type": "integer"
         },
         "imageProducto": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ProductoUpdateDto": {
+      "required": [
+        "idProductos"
+      ],
+      "type": "object",
+      "properties": {
+        "idProductos": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "nombreProducto": {
+          "type": "string"
+        },
+        "precioProducto": {
+          "format": "double",
+          "type": "number"
+        },
+        "cantidadApartado": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "descripcion": {
           "type": "string"
         }
       },

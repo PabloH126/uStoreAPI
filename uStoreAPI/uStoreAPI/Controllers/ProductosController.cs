@@ -192,7 +192,7 @@ namespace uStoreAPI.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateProducto([FromBody] ProductoDto productoDto)
+        public async Task<IActionResult> UpdateProducto([FromBody] ProductoUpdateDto productoDto)
         {
             if(!ModelState.IsValid)
             {
@@ -216,9 +216,69 @@ namespace uStoreAPI.Controllers
                 return Unauthorized("Producto no autorizado");
             }
 
-            await productosService.UpdateProducto(mapper.Map<Producto>(productoDto));
+            producto.NombreProducto = productoDto.NombreProducto;
+            producto.PrecioProducto = productoDto.PrecioProducto;
+            producto.CantidadApartado = productoDto.CantidadApartado;
+            producto.Descripcion = productoDto.Descripcion;
+
+            await productosService.UpdateProducto(producto);
 
             return NoContent();
+        }
+
+        [HttpPut("UpdateImagenProducto")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> UpdateImagenProducto(int idProducto, int idImagenProducto, IFormFile? imagen)
+        {
+            if (imagen is null || imagen.Length == 0)
+            {
+                return BadRequest("Imagen invalida");
+            }
+            else
+            {
+                var user = HttpContext.User;
+                var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+
+                var producto = await productosService.GetOneProducto(idProducto);
+                
+                if (producto is null)
+                {
+                    return NotFound("Ningun producto registrado con ese id");
+                }
+
+                var tienda = await tiendasService.GetOneTienda(producto.IdTienda);
+
+                if (tienda!.IdAdministrador != idUser)
+                {
+                    return Unauthorized("Producto no autorizado");
+                }
+                else if (idImagenProducto == 0)
+                {
+                    var imagenesTotal = await productosService.GetImagenesProducto(idProducto);
+                    var imagenesCounter = imagenesTotal.Count();
+
+                    await productosService.CreateImagenesProducto(
+                                            await CreateImagenProducto(
+                                                        producto.IdProductos,
+                                                        imagen,
+                                                        $"{producto.IdProductos}/{imagenesCounter}"
+                                                  )
+                                            );
+                    return NoContent();
+                }
+
+                var imagenProducto = await productosService.GetImagenProducto(idImagenProducto);
+                var newImagenProducto = await CreateImagenProducto(producto.IdProductos, imagen, $"{producto.IdProductos}/{uploadService.GetBlobNameFromUrl(imagenProducto!.ImagenProducto)}");
+                imagenProducto.ImagenProducto = newImagenProducto.ImagenProducto;
+
+                await productosService.UpdateImagenesProducto(imagenProducto);
+
+
+                return NoContent();
+            }
         }
 
         [HttpPut("UpdateStockProducto")]

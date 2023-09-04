@@ -45,9 +45,18 @@ namespace uStoreAPI.Services
 
         public async Task UpdateAllPeriodosPredeterminados(IEnumerable<PeriodosPredeterminado> periodos)
         {
-            foreach (var periodo in periodos)
+            foreach (var newPeriodo in periodos)
             {
-                context.PeriodosPredeterminados.Update(periodo);
+                var periodo = await context.PeriodosPredeterminados.FindAsync(newPeriodo.IdApartadoPredeterminado);
+                if(periodo is not null)
+                { 
+                    periodo.ApartadoPredeterminado = newPeriodo.ApartadoPredeterminado;
+                    context.PeriodosPredeterminados.Update(periodo);
+                }
+                else
+                {
+                    await context.PeriodosPredeterminados.AddAsync(newPeriodo);
+                }
             }
             await context.SaveChangesAsync();
         }

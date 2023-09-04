@@ -278,6 +278,41 @@ namespace uStoreAPI.Controllers
 
             return NoContent();
         }
+
+        [HttpPut("UpdateCategoriasProducto")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> UpdateCategoriasProducto([FromBody] IEnumerable<CategoriasProductoDto> categorias)
+        {
+            if (categorias is null || !ModelState.IsValid)
+            {
+                return BadRequest("Categorias no validas");
+            }
+
+            var user = HttpContext.User;
+            var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+            var producto = await productosService.GetOneProducto(categorias.FirstOrDefault()!.IdProductos);
+
+            if (producto is null)
+            {
+                return BadRequest("No hay un producto registrado con ese id");
+            }
+
+            var tienda = await tiendasService.GetOneTienda(producto.IdTienda);
+
+            if (!(tienda!.IdAdministrador == idUser))
+            {
+                return Unauthorized("Producto no autorizado");
+            }
+
+            var categoriasLista = mapper.Map<IEnumerable<CategoriasProducto>>(categorias);
+            await categoriasService.UpdateAllCategoriasProducto(categoriasLista);
+
+
+            return NoContent();
+        }
         #endregion
     }
 }
