@@ -124,6 +124,18 @@ namespace uStoreAPI.Services
             }
         }
 
+        public async Task DeleteImagenesProductos(string directorio)
+        {
+            var containerClient = blobServiceClient.GetBlobContainerClient("productos");
+
+            var blobs = containerClient.GetBlobsAsync(BlobTraits.None, BlobStates.None, directorio);
+            await foreach (var blob in blobs)
+            {
+                var blobClient = containerClient.GetBlobClient(blob.Name);
+                await blobClient.DeleteIfExistsAsync();
+            }
+        }
+
         public async Task DeleteImageAdmins(string imageName)
         {
             var containerClient = blobServiceClient.GetBlobContainerClient("admins");

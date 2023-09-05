@@ -345,6 +345,8 @@ namespace uStoreAPI.Controllers
                 return Unauthorized("Producto no autorizado");
             }
 
+            await uploadService.DeleteImagenesProductos($"{producto.IdProductos}");
+            await productosService.DeleteImagenesProductoWithId(producto.IdProductos);
             await productosService.DeleteProducto(producto);
             return NoContent();
         }
