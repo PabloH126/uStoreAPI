@@ -16,6 +16,11 @@ namespace uStoreAPI.Services
             return await context.SolicitudesApartados.Where(p => p.IdProductos == idProducto).AsNoTracking().ToListAsync();
         }
 
+        public async Task<IEnumerable<SolicitudesApartado>> GetSolicitudesApartadoWithIdTienda(int idTienda)
+        {
+            return await context.SolicitudesApartados.Where(p => p.IdTienda == idTienda).AsNoTracking().ToListAsync();
+        }
+
         public async Task<SolicitudesApartado?> GetOneSolicitudApartado(int idSolicitud)
         {
             return await context.SolicitudesApartados.FindAsync(idSolicitud);
