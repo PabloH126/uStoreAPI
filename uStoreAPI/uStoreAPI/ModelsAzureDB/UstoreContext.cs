@@ -89,8 +89,6 @@ public partial class UstoreContext : DbContext
 
     public virtual DbSet<Publicacione> Publicaciones { get; set; }
 
-    public virtual DbSet<RatioUsuario> RatioUsuarios { get; set; }
-
     public virtual DbSet<SolicitudesApartado> SolicitudesApartados { get; set; }
 
     public virtual DbSet<TendenciasVentum> TendenciasVenta { get; set; }
@@ -456,6 +454,8 @@ public partial class UstoreContext : DbContext
 
             entity.ToTable("detalles_usuario");
 
+            entity.Property(e => e.ApartadosExitosos).HasDefaultValueSql("((0))");
+            entity.Property(e => e.ApartadosFallidos).HasDefaultValueSql("((0))");
             entity.Property(e => e.Estado)
                 .HasMaxLength(255)
                 .IsUnicode(false);
@@ -467,10 +467,6 @@ public partial class UstoreContext : DbContext
             entity.HasOne(d => d.IdPenalizacionUsuarioNavigation).WithMany(p => p.DetallesUsuarios)
                 .HasForeignKey(d => d.IdPenalizacionUsuario)
                 .HasConstraintName("detalles_usuario_ibfk_penalizacion_usuario");
-
-            entity.HasOne(d => d.IdRatioUsuarioNavigation).WithMany(p => p.DetallesUsuarios)
-                .HasForeignKey(d => d.IdRatioUsuario)
-                .HasConstraintName("detalles_usuario_ibfk_ratio_usuario");
         });
 
         modelBuilder.Entity<Favorito>(entity =>
@@ -716,13 +712,6 @@ public partial class UstoreContext : DbContext
                 .HasConstraintName("publicaciones_ibfk_tienda");
         });
 
-        modelBuilder.Entity<RatioUsuario>(entity =>
-        {
-            entity.HasKey(e => e.IdRatioUsuario).HasName("PK__ratio_us__9359AF44F5794221");
-
-            entity.ToTable("ratio_usuario");
-        });
-
         modelBuilder.Entity<SolicitudesApartado>(entity =>
         {
             entity.HasKey(e => e.IdSolicitud).HasName("PK__solicitu__36899CEF46DF2058");
@@ -739,10 +728,6 @@ public partial class UstoreContext : DbContext
             entity.HasOne(d => d.IdProductosNavigation).WithMany(p => p.SolicitudesApartados)
                 .HasForeignKey(d => d.IdProductos)
                 .HasConstraintName("solicitudes_apartado_ibfk_productos");
-
-            entity.HasOne(d => d.IdRatioUsuarioNavigation).WithMany(p => p.SolicitudesApartados)
-                .HasForeignKey(d => d.IdRatioUsuario)
-                .HasConstraintName("solicitudes_apartado_ibfk_ratio_usuario");
 
             entity.HasOne(d => d.IdTiendaNavigation).WithMany(p => p.SolicitudesApartados)
                 .HasForeignKey(d => d.IdTienda)

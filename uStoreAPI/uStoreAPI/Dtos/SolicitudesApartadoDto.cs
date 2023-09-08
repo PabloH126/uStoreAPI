@@ -19,5 +19,6 @@ namespace uStoreAPI.Dtos
         public int? IdUsuario { get; set; }
         [Required]
         public int? IdTienda { get; set; }
+        public bool? personalizado { get; set; }
     }
 }

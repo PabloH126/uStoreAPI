@@ -160,12 +160,7 @@ namespace uStoreAPI.Services
         public async Task DeleteAllCategoriasProducto(int? idProducto)
         {
             var categorias = await context.CategoriasProductos.Where(c => c.IdProductos == idProducto).AsNoTracking().ToListAsync();
-            foreach (var categoria in categorias)
-            {
-                context.CategoriasProductos.Remove(categoria);
-
-            }
-
+            context.CategoriasProductos.RemoveRange(categorias);
             await context.SaveChangesAsync();
         }
     }

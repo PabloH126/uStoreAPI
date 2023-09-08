@@ -17,27 +17,31 @@ namespace uStoreAPI.Controllers
     {
         private readonly TiendasService tiendasService;
         private readonly ProductosService productosService;
+        private readonly PeriodosPredeterminadosService periodosService;
         private readonly SolicitudesApartadoService solicitudesApartadoService;
         private IMapper mapper;
-        public ApartadosController(TiendasService _tiendasService, ProductosService _productosService, SolicitudesApartadoService _solicitudesApartadoService, IMapper _mapper)
+        public ApartadosController(TiendasService _tiendasService, ProductosService _productosService, SolicitudesApartadoService _solicitudesApartadoService, IMapper _mapper, PeriodosPredeterminadosService _periodosService)
         {
             tiendasService = _tiendasService;
             productosService = _productosService;
             solicitudesApartadoService = _solicitudesApartadoService;
             mapper = _mapper;
+            periodosService = _periodosService;
+
         }
 
         #region GetSolicitudes
-        [HttpGet("GetSolicitudes")]
+        [HttpGet("GetSolicitudesPendientes")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<SolicitudesApartadoDto>>> GetSolicitudesApartado(int idTienda)
+        public async Task<ActionResult<object>> GetSolicitudesApartadoPendientes(int idTienda)
         {
             var user = HttpContext.User;
             var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
             var tienda = await tiendasService.GetOneTienda(idTienda);
+            var periodos = await periodosService.GetPeriodosPredeterminados(idTienda);
             if(tienda is null)
             {
                 return BadRequest("Tienda no registrada");
@@ -47,9 +51,120 @@ namespace uStoreAPI.Controllers
                 return Unauthorized("Tienda no autorizada");
             }
 
-            var SolicitudesApartado = await solicitudesApartadoService.GetSolicitudesApartadoWithIdTienda(idTienda);
+            var SolicitudesApartado = mapper.Map<IEnumerable<SolicitudesApartadoDto>>(await solicitudesApartadoService.GetSolicitudesApartadoPendientesWithIdTienda(idTienda));
+            
+            if (SolicitudesApartado.IsNullOrEmpty())
+            {
+                return NotFound("No hay solicitudes pendientes en esta tienda");
+            }
+            
+            var productosApartados = new List<ProductoDto>();
+            
+            foreach (var solicitud in SolicitudesApartado)
+            {
+                var producto = mapper.Map<ProductoDto>(await productosService.GetOneProducto(solicitud.IdProductos));
+                if (producto is not null)
+                {
+                    var imagenProducto = await productosService.GetPrincipalImageProducto(producto.IdProductos);
+                    if (imagenProducto is not null)
+                    {
+                        producto.ImageProducto = imagenProducto.ImagenProducto;
+                    }
+                    productosApartados.Add(producto);
+                }
+                else
+                {
+                    return BadRequest("Hubo un error en la obtencion del producto");
+                }
 
-            return Ok(SolicitudesApartado);
+                foreach (var periodo in periodos)
+                {
+                    if(solicitud.PeriodoApartado == periodo.ApartadoPredeterminado)
+                    {
+                        solicitud.personalizado = false;
+                    }
+                    else
+                    {
+                        solicitud.personalizado = true;
+                    }
+                }
+            }
+
+            var result = new
+            {
+                solicitudes = SolicitudesApartado,
+                productos = productosApartados,
+            };
+
+            return Ok(result);
+        }
+
+        [HttpGet("GetSolicitudesActivas")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<object>> GetSolicitudesApartadoActivas(int idTienda)
+        {
+            var user = HttpContext.User;
+            var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+            var tienda = await tiendasService.GetOneTienda(idTienda);
+            var periodos = await periodosService.GetPeriodosPredeterminados(idTienda);
+            if (tienda is null)
+            {
+                return BadRequest("Tienda no registrada");
+            }
+            else if (tienda.IdAdministrador != idUser)
+            {
+                return Unauthorized("Tienda no autorizada");
+            }
+
+            var SolicitudesApartado = mapper.Map<IEnumerable<SolicitudesApartadoDto>>(await solicitudesApartadoService.GetSolicitudesApartadoActivasWithIdTienda(idTienda));
+
+            if (SolicitudesApartado.IsNullOrEmpty())
+            {
+                return NotFound("No hay solicitudes pendientes en esta tienda");
+            }
+
+            var productosApartados = new List<ProductoDto>();
+
+            foreach (var solicitud in SolicitudesApartado)
+            {
+                var producto = mapper.Map<ProductoDto>(await productosService.GetOneProducto(solicitud.IdProductos));
+                if (producto is not null)
+                {
+                    var imagenProducto = await productosService.GetPrincipalImageProducto(producto.IdProductos);
+                    if (imagenProducto is not null)
+                    {
+                        producto.ImageProducto = imagenProducto.ImagenProducto;
+                    }
+                    productosApartados.Add(producto);
+                }
+                else
+                {
+                    return BadRequest("Hubo un error en la obtencion del producto");
+                }
+
+                foreach (var periodo in periodos)
+                {
+                    if (solicitud.PeriodoApartado == periodo.ApartadoPredeterminado)
+                    {
+                        solicitud.personalizado = false;
+                    }
+                    else
+                    {
+                        solicitud.personalizado = true;
+                    }
+                }
+            }
+
+            var result = new
+            {
+                solicitudes = SolicitudesApartado,
+                productos = productosApartados,
+            };
+
+            return Ok(result);
         }
 
         [HttpGet(Name = "GetSolicitud")]

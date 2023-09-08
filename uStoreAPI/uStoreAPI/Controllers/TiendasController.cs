@@ -22,8 +22,9 @@ namespace uStoreAPI.Controllers
         private readonly CategoriasService categoriasService;
         private readonly PeriodosPredeterminadosService periodosPredeterminadosService;
         private readonly CalificacionesService calificacionesService;
+        private readonly ProductosService productosService;
         private IMapper mapper;
-        public TiendasController(CalificacionesService _calificacionesService, PeriodosPredeterminadosService _periodosPredeterminadosService,HorariosService _horariosService,TiendasService _tiendasService, IMapper _mapper, UploadService _uploadService, PlazasService _plazasService, CategoriasService _categoriasService)
+        public TiendasController(CalificacionesService _calificacionesService, PeriodosPredeterminadosService _periodosPredeterminadosService,HorariosService _horariosService,TiendasService _tiendasService, IMapper _mapper, UploadService _uploadService, PlazasService _plazasService, CategoriasService _categoriasService, ProductosService _productosService)
         {
             tiendasService = _tiendasService;
             mapper = _mapper;
@@ -33,6 +34,7 @@ namespace uStoreAPI.Controllers
             categoriasService = _categoriasService;
             periodosPredeterminadosService = _periodosPredeterminadosService;
             calificacionesService = _calificacionesService;
+            productosService = _productosService;
         }
 
         [HttpGet("GetTiendas")]
@@ -298,6 +300,16 @@ namespace uStoreAPI.Controllers
             else if(!(tienda.IdAdministrador == idUser))
             {
                 return Unauthorized("Tienda no autorizada");
+            }
+
+            var productosTienda = await productosService.GetProductos(tienda.IdTienda);
+
+            foreach(var producto in productosTienda)
+            {
+                await uploadService.DeleteImagenesProductos($"{producto.IdProductos}");
+                await productosService.DeleteImagenesProductoWithId(producto.IdProductos);
+                await categoriasService.DeleteAllCategoriasProducto(producto.IdProductos);
+                await productosService.DeleteProducto(producto);
             }
 
             await uploadService.DeleteImagenesTiendas($"{tienda.IdTienda}");

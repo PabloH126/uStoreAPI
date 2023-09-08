@@ -13,8 +13,6 @@ public partial class SolicitudesApartado
 
     public string? StatusSolicitud { get; set; }
 
-    public int? IdRatioUsuario { get; set; }
-
     public int? IdProductos { get; set; }
 
     public int? IdUsuario { get; set; }
@@ -24,8 +22,6 @@ public partial class SolicitudesApartado
     public virtual ICollection<ApartadoActivo> ApartadoActivos { get; set; } = new List<ApartadoActivo>();
 
     public virtual Producto? IdProductosNavigation { get; set; }
-
-    public virtual RatioUsuario? IdRatioUsuarioNavigation { get; set; }
 
     public virtual Tiendum? IdTiendaNavigation { get; set; }
 

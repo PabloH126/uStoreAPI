@@ -18,14 +18,16 @@ namespace uStoreAPI.Controllers
     {
         private readonly ProductosService productosService;
         private readonly TiendasService tiendasService;
+        private readonly CategoriasService categoriasService;
         private readonly UploadService uploadService;
         private IMapper mapper;
-        public ProductosController(ProductosService _productosService, TiendasService _tiendasService, IMapper _mapper, UploadService _uploadService)
+        public ProductosController(ProductosService _productosService, TiendasService _tiendasService, IMapper _mapper, UploadService _uploadService, CategoriasService _categoriasService)
         {
             productosService = _productosService;
             tiendasService = _tiendasService;
             uploadService = _uploadService;
             mapper = _mapper;
+            categoriasService = _categoriasService;
         }
 
         [HttpGet("GetProductos")]
@@ -347,6 +349,7 @@ namespace uStoreAPI.Controllers
 
             await uploadService.DeleteImagenesProductos($"{producto.IdProductos}");
             await productosService.DeleteImagenesProductoWithId(producto.IdProductos);
+            await categoriasService.DeleteAllCategoriasProducto(producto.IdProductos);
             await productosService.DeleteProducto(producto);
             return NoContent();
         }

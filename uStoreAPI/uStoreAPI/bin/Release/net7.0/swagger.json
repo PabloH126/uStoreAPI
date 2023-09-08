@@ -290,13 +290,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/SolicitudesApartadoDto"
-              }
-            }
+            "description": "Success"
           },
           "400": {
             "description": "Bad Request",
@@ -5100,6 +5094,9 @@
         "idTienda": {
           "format": "int32",
           "type": "integer"
+        },
+        "personalizado": {
+          "type": "boolean"
         }
       },
       "additionalProperties": false
