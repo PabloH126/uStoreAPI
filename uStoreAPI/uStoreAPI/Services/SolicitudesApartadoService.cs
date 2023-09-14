@@ -54,5 +54,20 @@ namespace uStoreAPI.Services
             context.SolicitudesApartados.Remove(solicitud);
             await context.SaveChangesAsync();
         }
+
+        public async Task MarcarComoVencida(int idSolicitud)
+        {
+            var solicitud = await context.SolicitudesApartados.FindAsync(idSolicitud);
+            if (solicitud is not null && solicitud.StatusSolicitud == "activa")
+            {
+                solicitud.StatusSolicitud = "vencida";
+                context.SolicitudesApartados.Update(solicitud);
+                var usuario = await context.Usuarios.FindAsync(solicitud.IdUsuario);
+                var detallesUsuario = await context.DetallesUsuarios.FindAsync(usuario!.IdDetallesUsuario);
+                detallesUsuario!.ApartadosFallidos += 1;
+                context.DetallesUsuarios.Update(detallesUsuario);
+                await context.SaveChangesAsync();
+            }
+        }
     }
 }

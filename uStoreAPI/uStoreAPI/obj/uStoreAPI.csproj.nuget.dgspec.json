@@ -73,6 +73,30 @@
               "target": "Package",
               "version": "[12.15.0, )"
             },
+            "Hangfire": {
+              "target": "Package",
+              "version": "[1.8.5, )"
+            },
+            "Hangfire.AspNetCore": {
+              "target": "Package",
+              "version": "[1.8.5, )"
+            },
+            "Hangfire.Core": {
+              "target": "Package",
+              "version": "[1.8.5, )"
+            },
+            "Hangfire.Dashboard.Authorization": {
+              "target": "Package",
+              "version": "[3.0.1, )"
+            },
+            "Hangfire.MemoryStorage": {
+              "target": "Package",
+              "version": "[1.8.0, )"
+            },
+            "Hangfire.SqlServer": {
+              "target": "Package",
+              "version": "[1.8.5, )"
+            },
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",
               "version": "[7.0.10, )"
@@ -112,6 +136,10 @@
             "Microsoft.Extensions.Azure": {
               "target": "Package",
               "version": "[1.7.0, )"
+            },
+            "Microsoft.Extensions.Configuration.AzureAppConfiguration": {
+              "target": "Package",
+              "version": "[6.1.0, )"
             },
             "Microsoft.Extensions.DependencyInjection": {
               "target": "Package",

@@ -19,7 +19,13 @@ public partial class SolicitudesApartado
 
     public int? IdTienda { get; set; }
 
-    public virtual ICollection<ApartadoActivo> ApartadoActivos { get; set; } = new List<ApartadoActivo>();
+    public DateTime? FechaApartado { get; set; }
+
+    public DateTime? FechaVencimiento { get; set; }
+
+    public DateTime? FechaSolicitud { get; set; }
+
+    public string? IdJob { get; set; }
 
     public virtual Producto? IdProductosNavigation { get; set; }
 

@@ -269,7 +269,51 @@
         }
       }
     },
-    "/api/Apartados/GetSolicitudes": {
+    "/api/Apartados/GetSolicitudesPendientes": {
+      "get": {
+        "tags": [
+          "Apartados"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "idTienda",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/SolicitudesApartadoDto"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Apartados/GetSolicitudesActivas": {
       "get": {
         "tags": [
           "Apartados"
@@ -1898,6 +1942,59 @@
         }
       }
     },
+    "/api/Login/UserAuthenticate": {
+      "post": {
+        "tags": [
+          "Login"
+        ],
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/LoginDto"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
     "/api/Login/getClaims": {
       "post": {
         "tags": [
@@ -2819,6 +2916,338 @@
         }
       }
     },
+    "/api/Productos/DeleteImagenProducto": {
+      "delete": {
+        "tags": [
+          "Productos"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Publicaciones/GetPublicacionesRecientes": {
+      "get": {
+        "tags": [
+          "Publicaciones"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "idMall",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PublicacionesDto"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Publicaciones": {
+      "get": {
+        "tags": [
+          "Publicaciones"
+        ],
+        "operationId": "GetPublicacion",
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/PublicacionesDto"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Publicaciones/CreatePublicacion": {
+      "post": {
+        "tags": [
+          "Publicaciones"
+        ],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "IdPublicacion",
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "formData",
+            "name": "Contenido",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "formData",
+            "name": "IdTienda",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "formData",
+            "name": "FechaPublicacion",
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "in": "formData",
+            "name": "IdCentroComercial",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "formData",
+            "name": "Imagen",
+            "type": "string"
+          },
+          {
+            "in": "formData",
+            "name": "NombreTienda",
+            "type": "string"
+          },
+          {
+            "in": "formData",
+            "name": "LogoTienda",
+            "type": "string"
+          },
+          {
+            "in": "formData",
+            "name": "imagen",
+            "type": "file"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/PublicacionesDto"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Publicaciones/UpdatePublicacion": {
+      "put": {
+        "tags": [
+          "Publicaciones"
+        ],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "IdPublicacion",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "formData",
+            "name": "Contenido",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "formData",
+            "name": "Imagen",
+            "type": "string"
+          },
+          {
+            "in": "formData",
+            "name": "imagen",
+            "type": "file"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Publicaciones/DeletePublicacion": {
+      "delete": {
+        "tags": [
+          "Publicaciones"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "idPublicacion",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
     "/api/Register/RegisterAdmin": {
       "post": {
         "tags": [
@@ -2869,7 +3298,101 @@
         }
       }
     },
+    "/api/Register/RegisterUser": {
+      "post": {
+        "tags": [
+          "Register"
+        ],
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/RegisterDto"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/CuentaUsuarioDto"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          },
+          "409": {
+            "description": "Conflict",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          }
+        }
+      }
+    },
     "/api/Register/Recover": {
+      "post": {
+        "tags": [
+          "Register"
+        ],
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/RecoverDto"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          }
+        }
+      }
+    },
+    "/api/Register/RecoverUser": {
       "post": {
         "tags": [
           "Register"
@@ -3352,6 +3875,299 @@
         }
       }
     },
+    "/api/Tiendas/DeleteImagenTienda": {
+      "delete": {
+        "tags": [
+          "Tiendas"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Users/Account": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "GetCuentaUser",
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/CuentaUsuarioDto"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          }
+        }
+      }
+    },
+    "/api/Users/User": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "GetUser",
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/UsuarioDto"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          }
+        }
+      }
+    },
+    "/api/Users/UpdateProfileImage": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "image",
+            "type": "file"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Users/UpdatePass": {
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Operation"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Users/DeleteAccount": {
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "idUser",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          }
+        }
+      }
+    },
+    "/api/Users/DeleteUser": {
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "idUser",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          }
+        }
+      }
+    },
     "/WeatherForecast": {
       "get": {
         "tags": [
@@ -3456,55 +4272,6 @@
         },
         "idProductosNavigation": {
           "$ref": "#/definitions/Producto"
-        },
-        "idUsuarioNavigation": {
-          "$ref": "#/definitions/Usuario"
-        }
-      },
-      "additionalProperties": false
-    },
-    "ApartadoActivo": {
-      "type": "object",
-      "properties": {
-        "idApartado": {
-          "format": "int32",
-          "type": "integer"
-        },
-        "fechaApartado": {
-          "format": "date-time",
-          "type": "string"
-        },
-        "estadoApartado": {
-          "type": "string"
-        },
-        "fechaVencimiento": {
-          "format": "date-time",
-          "type": "string"
-        },
-        "idUsuario": {
-          "format": "int32",
-          "type": "integer"
-        },
-        "idTienda": {
-          "format": "int32",
-          "type": "integer"
-        },
-        "idProductos": {
-          "format": "int32",
-          "type": "integer"
-        },
-        "idSolicitud": {
-          "format": "int32",
-          "type": "integer"
-        },
-        "idProductosNavigation": {
-          "$ref": "#/definitions/Producto"
-        },
-        "idSolicitudNavigation": {
-          "$ref": "#/definitions/SolicitudesApartado"
-        },
-        "idTiendaNavigation": {
-          "$ref": "#/definitions/Tiendum"
         },
         "idUsuarioNavigation": {
           "$ref": "#/definitions/Usuario"
@@ -3776,6 +4543,12 @@
         "direccionCentroComercial": {
           "type": "string"
         },
+        "publicaciones": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Publicacione"
+          }
+        },
         "tienda": {
           "type": "array",
           "items": {
@@ -3991,8 +4764,7 @@
           "type": "string"
         },
         "email": {
-          "format": "int32",
-          "type": "integer"
+          "type": "string"
         },
         "idDetallesCuentaUsuario": {
           "format": "int32",
@@ -4007,6 +4779,33 @@
         },
         "idUsuarioNavigation": {
           "$ref": "#/definitions/Usuario"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CuentaUsuarioDto": {
+      "required": [
+        "email",
+        "idUsuario",
+        "password"
+      ],
+      "type": "object",
+      "properties": {
+        "idCuentaUsuario": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "password": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "email": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "idUsuario": {
+          "format": "int32",
+          "type": "integer"
         }
       },
       "additionalProperties": false
@@ -4212,11 +5011,15 @@
           "format": "int32",
           "type": "integer"
         },
-        "idRatioUsuario": {
+        "idDatos": {
           "format": "int32",
           "type": "integer"
         },
-        "idDatos": {
+        "apartadosExitosos": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "apartadosFallidos": {
           "format": "int32",
           "type": "integer"
         },
@@ -4225,9 +5028,6 @@
         },
         "idPenalizacionUsuarioNavigation": {
           "$ref": "#/definitions/PenalizacionUsuario"
-        },
-        "idRatioUsuarioNavigation": {
-          "$ref": "#/definitions/RatioUsuario"
         },
         "usuarios": {
           "type": "array",
@@ -4477,26 +5277,6 @@
         },
         "idProductosNavigation": {
           "$ref": "#/definitions/Producto"
-        }
-      },
-      "additionalProperties": false
-    },
-    "ImagenesPublicacion": {
-      "type": "object",
-      "properties": {
-        "idImagenesPublicacion": {
-          "format": "int32",
-          "type": "integer"
-        },
-        "imagenPublicacion": {
-          "type": "string"
-        },
-        "idPublicacion": {
-          "format": "int32",
-          "type": "integer"
-        },
-        "idPublicacionNavigation": {
-          "$ref": "#/definitions/Publicacione"
         }
       },
       "additionalProperties": false
@@ -4769,12 +5549,6 @@
             "$ref": "#/definitions/AlertaApartado"
           }
         },
-        "apartadoActivos": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ApartadoActivo"
-          }
-        },
         "calificacionProductos": {
           "type": "array",
           "items": {
@@ -4914,44 +5688,62 @@
           "format": "int32",
           "type": "integer"
         },
+        "fechaPublicacion": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "idCentroComercial": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "imagen": {
+          "type": "string"
+        },
+        "idCentroComercialNavigation": {
+          "$ref": "#/definitions/CentroComercial"
+        },
         "idTiendaNavigation": {
           "$ref": "#/definitions/Tiendum"
-        },
-        "imagenesPublicacions": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ImagenesPublicacion"
-          }
         }
       },
       "additionalProperties": false
     },
-    "RatioUsuario": {
+    "PublicacionesDto": {
+      "required": [
+        "contenido",
+        "idCentroComercial",
+        "idTienda"
+      ],
       "type": "object",
       "properties": {
-        "idRatioUsuario": {
+        "idPublicacion": {
           "format": "int32",
           "type": "integer"
         },
-        "apartadosExitosos": {
+        "contenido": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "idTienda": {
           "format": "int32",
           "type": "integer"
         },
-        "apartadosFallidos": {
+        "fechaPublicacion": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "idCentroComercial": {
           "format": "int32",
           "type": "integer"
         },
-        "detallesUsuarios": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/DetallesUsuario"
-          }
+        "imagen": {
+          "type": "string"
         },
-        "solicitudesApartados": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/SolicitudesApartado"
-          }
+        "nombreTienda": {
+          "type": "string"
+        },
+        "logoTienda": {
+          "type": "string"
         }
       },
       "additionalProperties": false
@@ -5014,10 +5806,6 @@
         "statusSolicitud": {
           "type": "string"
         },
-        "idRatioUsuario": {
-          "format": "int32",
-          "type": "integer"
-        },
         "idProductos": {
           "format": "int32",
           "type": "integer"
@@ -5030,17 +5818,23 @@
           "format": "int32",
           "type": "integer"
         },
-        "apartadoActivos": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ApartadoActivo"
-          }
+        "fechaApartado": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "fechaVencimiento": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "fechaSolicitud": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "idJob": {
+          "type": "string"
         },
         "idProductosNavigation": {
           "$ref": "#/definitions/Producto"
-        },
-        "idRatioUsuarioNavigation": {
-          "$ref": "#/definitions/RatioUsuario"
         },
         "idTiendaNavigation": {
           "$ref": "#/definitions/Tiendum"
@@ -5054,11 +5848,9 @@
     "SolicitudesApartadoDto": {
       "required": [
         "idProductos",
-        "idRatioUsuario",
         "idTienda",
         "idUsuario",
         "periodoApartado",
-        "statusSolicitud",
         "unidadesProducto"
       ],
       "type": "object",
@@ -5076,12 +5868,7 @@
           "type": "integer"
         },
         "statusSolicitud": {
-          "minLength": 1,
           "type": "string"
-        },
-        "idRatioUsuario": {
-          "format": "int32",
-          "type": "integer"
         },
         "idProductos": {
           "format": "int32",
@@ -5095,18 +5882,41 @@
           "format": "int32",
           "type": "integer"
         },
+        "fechaApartado": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "fechaVencimiento": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "fechaSolicitud": {
+          "format": "date-time",
+          "type": "string"
+        },
         "personalizado": {
           "type": "boolean"
+        },
+        "ratioUsuario": {
+          "type": "string"
+        },
+        "imageProducto": {
+          "type": "string"
+        },
+        "nombreProducto": {
+          "type": "string"
+        },
+        "precioProducto": {
+          "format": "double",
+          "type": "number"
         }
       },
       "additionalProperties": false
     },
     "SolicitudesApartadoUpdateDto": {
       "required": [
-        "idProductos",
         "idSolicitud",
-        "idTienda",
-        "idUsuario"
+        "statusSolicitud"
       ],
       "type": "object",
       "properties": {
@@ -5114,31 +5924,9 @@
           "format": "int32",
           "type": "integer"
         },
-        "periodoApartado": {
-          "type": "string"
-        },
-        "unidadesProducto": {
-          "format": "int32",
-          "type": "integer"
-        },
         "statusSolicitud": {
+          "minLength": 1,
           "type": "string"
-        },
-        "idRatioUsuario": {
-          "format": "int32",
-          "type": "integer"
-        },
-        "idProductos": {
-          "format": "int32",
-          "type": "integer"
-        },
-        "idUsuario": {
-          "format": "int32",
-          "type": "integer"
-        },
-        "idTienda": {
-          "format": "int32",
-          "type": "integer"
         }
       },
       "additionalProperties": false
@@ -5238,12 +6026,6 @@
         },
         "logoTienda": {
           "type": "string"
-        },
-        "apartadoActivos": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ApartadoActivo"
-          }
         },
         "calificacionTienda": {
           "type": "array",
@@ -5429,12 +6211,6 @@
             "$ref": "#/definitions/AlertaApartado"
           }
         },
-        "apartadoActivos": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ApartadoActivo"
-          }
-        },
         "calificacionProductos": {
           "type": "array",
           "items": {
@@ -5491,6 +6267,20 @@
           "items": {
             "$ref": "#/definitions/SolicitudesApartado"
           }
+        }
+      },
+      "additionalProperties": false
+    },
+    "UsuarioDto": {
+      "type": "object",
+      "properties": {
+        "idUsuario": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idDetallesUsuario": {
+          "format": "int32",
+          "type": "integer"
         }
       },
       "additionalProperties": false

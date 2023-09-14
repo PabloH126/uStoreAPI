@@ -9,7 +9,7 @@ public partial class CuentaUsuario
 
     public string? Password { get; set; }
 
-    public int? Email { get; set; }
+    public string? Email { get; set; }
 
     public int? IdDetallesCuentaUsuario { get; set; }
 

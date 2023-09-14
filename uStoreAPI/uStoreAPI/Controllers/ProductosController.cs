@@ -353,6 +353,28 @@ namespace uStoreAPI.Controllers
             await productosService.DeleteProducto(producto);
             return NoContent();
         }
+
+        [HttpDelete("DeleteImagenProducto")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> DeleteImagenProducto(int id)
+        {
+            if(id == 0)
+            {
+                return BadRequest();
+            }
+            var imagenProducto = await productosService.GetImagenProducto(id);
+            if(imagenProducto is null)
+            {
+                return NotFound();
+            }
+            await uploadService.DeleteImageProducto(imagenProducto.IdProductos.ToString()!, uploadService.GetBlobNameFromUrl(imagenProducto.ImagenProducto));
+            await productosService.DeleteImagenProducto(imagenProducto);
+
+            return NoContent();
+        }
         private async Task<ImagenesProducto> CreateImagenProducto(int idProducto, IFormFile imagen, string fileName)
         {
             var imagenUrl = await uploadService.UploadImageProductos(imagen, fileName);

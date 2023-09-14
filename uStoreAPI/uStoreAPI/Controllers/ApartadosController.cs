@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using uStoreAPI.Dtos;
 using uStoreAPI.ModelsAzureDB;
 using uStoreAPI.Services;
+using Hangfire;
 
 namespace uStoreAPI.Controllers
 {
@@ -19,14 +19,16 @@ namespace uStoreAPI.Controllers
         private readonly ProductosService productosService;
         private readonly PeriodosPredeterminadosService periodosService;
         private readonly SolicitudesApartadoService solicitudesApartadoService;
+        private readonly UserService userService;
         private IMapper mapper;
-        public ApartadosController(TiendasService _tiendasService, ProductosService _productosService, SolicitudesApartadoService _solicitudesApartadoService, IMapper _mapper, PeriodosPredeterminadosService _periodosService)
+        public ApartadosController(UserService _userService, TiendasService _tiendasService, ProductosService _productosService, SolicitudesApartadoService _solicitudesApartadoService, IMapper _mapper, PeriodosPredeterminadosService _periodosService)
         {
             tiendasService = _tiendasService;
             productosService = _productosService;
             solicitudesApartadoService = _solicitudesApartadoService;
             mapper = _mapper;
             periodosService = _periodosService;
+            userService = _userService;
 
         }
 
@@ -36,7 +38,7 @@ namespace uStoreAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<object>> GetSolicitudesApartadoPendientes(int idTienda)
+        public async Task<ActionResult<SolicitudesApartadoDto>> GetSolicitudesApartadoPendientes(int idTienda)
         {
             var user = HttpContext.User;
             var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
@@ -51,26 +53,28 @@ namespace uStoreAPI.Controllers
                 return Unauthorized("Tienda no autorizada");
             }
 
-            var SolicitudesApartado = mapper.Map<IEnumerable<SolicitudesApartadoDto>>(await solicitudesApartadoService.GetSolicitudesApartadoPendientesWithIdTienda(idTienda));
+            var solicitudesApartado = mapper.Map<IEnumerable<SolicitudesApartadoDto>>(await solicitudesApartadoService.GetSolicitudesApartadoPendientesWithIdTienda(idTienda));
             
-            if (SolicitudesApartado.IsNullOrEmpty())
+            if (solicitudesApartado.IsNullOrEmpty())
             {
                 return NotFound("No hay solicitudes pendientes en esta tienda");
             }
             
-            var productosApartados = new List<ProductoDto>();
-            
-            foreach (var solicitud in SolicitudesApartado)
+            foreach (var solicitud in solicitudesApartado)
             {
+                var usuario = await userService.GetUsuario(solicitud.IdUsuario);
+                var detallesUser = await userService.GetDetallesUsuario(usuario!.IdDetallesUsuario);
+                solicitud.RatioUsuario = $"{detallesUser!.ApartadosExitosos}/{detallesUser.ApartadosFallidos + detallesUser.ApartadosExitosos}";
                 var producto = mapper.Map<ProductoDto>(await productosService.GetOneProducto(solicitud.IdProductos));
                 if (producto is not null)
                 {
                     var imagenProducto = await productosService.GetPrincipalImageProducto(producto.IdProductos);
                     if (imagenProducto is not null)
                     {
-                        producto.ImageProducto = imagenProducto.ImagenProducto;
+                        solicitud.ImageProducto = imagenProducto.ImagenProducto;
                     }
-                    productosApartados.Add(producto);
+                    solicitud.NombreProducto = producto.NombreProducto;
+                    solicitud.PrecioProducto = producto.PrecioProducto;
                 }
                 else
                 {
@@ -90,13 +94,7 @@ namespace uStoreAPI.Controllers
                 }
             }
 
-            var result = new
-            {
-                solicitudes = SolicitudesApartado,
-                productos = productosApartados,
-            };
-
-            return Ok(result);
+            return Ok(solicitudesApartado);
         }
 
         [HttpGet("GetSolicitudesActivas")]
@@ -200,6 +198,8 @@ namespace uStoreAPI.Controllers
             var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
 
             var solicitudApartado = mapper.Map<SolicitudesApartado>(solicitud);
+            solicitudApartado.StatusSolicitud = "pendiente";
+            solicitudApartado.FechaSolicitud = DateTime.UtcNow;
             await solicitudesApartadoService.CreateSolicitud(solicitudApartado);
 
             return Ok(mapper.Map<SolicitudesApartadoDto>(solicitudApartado));
@@ -216,10 +216,6 @@ namespace uStoreAPI.Controllers
             {
                 return BadRequest(ModelState);
             }
-            else if (await productosService.GetOneProducto(solicitud.IdProductos) is null)
-            {
-                return NotFound("No se ha encontrado un producto registrado");
-            }
 
             var user = HttpContext.User;
             var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
@@ -229,11 +225,68 @@ namespace uStoreAPI.Controllers
             if(solicitudApartado is null)
             {
                 return NotFound("No se ha encontrado una solicitud registrada");
-            }
+            };
 
-            solicitudApartado.PeriodoApartado = solicitud.PeriodoApartado;
-            solicitudApartado.UnidadesProducto = solicitud.UnidadesProducto;
-            solicitudApartado.StatusSolicitud = solicitud.StatusSolicitud;
+            if (solicitudApartado.StatusSolicitud == "completada")
+            {
+                return BadRequest("La solicitud ya esta completada");
+            }
+            
+            if(solicitud.StatusSolicitud == "activa")
+            {
+                solicitudApartado.StatusSolicitud = "activa";
+                solicitudApartado.FechaApartado = DateTime.UtcNow;
+
+                var expiracionApartado = solicitudApartado.PeriodoApartado!.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                if (!int.TryParse(expiracionApartado[0], out int cantidadTiempo))
+                {
+                    throw new ArgumentException("La cantidad de tiempo en PeriodoApartado no es un número");
+                }
+
+                DateTime fechaVencimiento;
+
+                switch(expiracionApartado[1])
+                {
+                    case "minutos": 
+                        fechaVencimiento = DateTime.UtcNow.AddMinutes(cantidadTiempo);
+                        break;
+                    case "horas":
+                        fechaVencimiento = DateTime.UtcNow.AddHours(cantidadTiempo);
+                        break;
+                    case "dias":
+                        fechaVencimiento = DateTime.UtcNow.AddDays(cantidadTiempo);
+                        break;
+                    default:
+                        throw new ArgumentException("Unidad de tiempo desconocida en PeriodoApartado");
+                }
+
+                solicitudApartado.FechaVencimiento = fechaVencimiento;
+
+                var jobId = BackgroundJob.Schedule(() => solicitudesApartadoService.MarcarComoVencida(solicitudApartado.IdSolicitud), fechaVencimiento);
+
+                solicitudApartado.IdJob = jobId;
+                
+            }
+            else if (solicitud.StatusSolicitud == "completada")
+            {
+                solicitudApartado.StatusSolicitud = "completada";
+
+                if (!string.IsNullOrEmpty(solicitudApartado.IdJob))
+                {
+                    BackgroundJob.Delete(solicitudApartado.IdJob);
+                    solicitudApartado.IdJob = null;
+                }
+            }
+            else if(solicitud.StatusSolicitud == "rechazada")
+            {
+                solicitudApartado.StatusSolicitud = "rechazada";
+
+                if (!string.IsNullOrEmpty(solicitudApartado.IdJob))
+                {
+                    BackgroundJob.Delete(solicitudApartado.IdJob);
+                    solicitudApartado.IdJob = null;
+                }
+            }
 
             await solicitudesApartadoService.UpdateSolicitud(solicitudApartado);
 

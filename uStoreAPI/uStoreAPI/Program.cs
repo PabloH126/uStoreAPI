@@ -6,6 +6,8 @@ using uStoreAPI;
 using uStoreAPI.ModelsAzureDB;
 using uStoreAPI.Services;
 using Microsoft.Extensions.Azure;
+using Hangfire;
+using Hangfire.SqlServer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +37,8 @@ builder.Services.AddScoped<ProductosService>();
 builder.Services.AddScoped<PeriodosPredeterminadosService>();
 builder.Services.AddScoped<CalificacionesService>();
 builder.Services.AddScoped<SolicitudesApartadoService>();
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<PublicacionesService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -54,6 +58,22 @@ builder.Services.AddAzureClients(clientBuilder =>
     clientBuilder.AddBlobServiceClient(builder.Configuration["AzureBlobStorageConnection:blob"], preferMsi: true);
     clientBuilder.AddQueueServiceClient(builder.Configuration["AzureBlobStorageConnection:queue"], preferMsi: true);
 });
+
+builder.Services.AddHangfire(configuration => configuration
+    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
+    .UseSqlServerStorage(builder.Configuration.GetConnectionString("HangFireConnection"), new SqlServerStorageOptions
+    {
+        CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+        SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+        QueuePollInterval = TimeSpan.Zero,
+        UseRecommendedIsolationLevel = true,
+        DisableGlobalLocks = true
+    })
+);
+builder.Services.AddHangfireServer();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -67,6 +87,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseHangfireDashboard();
 
 app.MapControllers();
 

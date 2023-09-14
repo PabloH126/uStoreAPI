@@ -18,5 +18,10 @@ namespace uStoreAPI.Services
         {
             return await context.CuentaAdministradors.SingleOrDefaultAsync(p => p.Email == loginData.Email && p.Password == loginData.Password);
         }
+
+        public async Task<CuentaUsuario?> GetUser(LoginDto loginData)
+        {
+            return await context.CuentaUsuarios.SingleOrDefaultAsync(p => p.Email == loginData.Email && p.Password == loginData.Password);
+        }
     }
 }

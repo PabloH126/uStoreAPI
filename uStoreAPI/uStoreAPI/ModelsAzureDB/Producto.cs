@@ -21,8 +21,6 @@ public partial class Producto
 
     public virtual ICollection<AlertaApartado> AlertaApartados { get; set; } = new List<AlertaApartado>();
 
-    public virtual ICollection<ApartadoActivo> ApartadoActivos { get; set; } = new List<ApartadoActivo>();
-
     public virtual ICollection<CalificacionProducto> CalificacionProductos { get; set; } = new List<CalificacionProducto>();
 
     public virtual ICollection<CategoriasProducto> CategoriasProductos { get; set; } = new List<CategoriasProducto>();

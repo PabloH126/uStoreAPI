@@ -19,8 +19,6 @@ public partial class UstoreContext : DbContext
 
     public virtual DbSet<AlertaApartado> AlertaApartados { get; set; }
 
-    public virtual DbSet<ApartadoActivo> ApartadoActivos { get; set; }
-
     public virtual DbSet<CalificacionProducto> CalificacionProductos { get; set; }
 
     public virtual DbSet<CalificacionTiendum> CalificacionTienda { get; set; }
@@ -70,8 +68,6 @@ public partial class UstoreContext : DbContext
     public virtual DbSet<ImagenesMensaje> ImagenesMensajes { get; set; }
 
     public virtual DbSet<ImagenesProducto> ImagenesProductos { get; set; }
-
-    public virtual DbSet<ImagenesPublicacion> ImagenesPublicacions { get; set; }
 
     public virtual DbSet<ImagenesTienda> ImagenesTiendas { get; set; }
 
@@ -125,35 +121,6 @@ public partial class UstoreContext : DbContext
             entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.AlertaApartados)
                 .HasForeignKey(d => d.IdUsuario)
                 .HasConstraintName("alerta_apartado_ibfk_usuarios");
-        });
-
-        modelBuilder.Entity<ApartadoActivo>(entity =>
-        {
-            entity.HasKey(e => e.IdApartado).HasName("PK__apartado__C5FE962405E06459");
-
-            entity.ToTable("apartado_activo");
-
-            entity.Property(e => e.EstadoApartado)
-                .HasMaxLength(20)
-                .IsUnicode(false);
-            entity.Property(e => e.FechaApartado).HasColumnType("datetime");
-            entity.Property(e => e.FechaVencimiento).HasColumnType("datetime");
-
-            entity.HasOne(d => d.IdProductosNavigation).WithMany(p => p.ApartadoActivos)
-                .HasForeignKey(d => d.IdProductos)
-                .HasConstraintName("apartado_activo_ibfk_productos");
-
-            entity.HasOne(d => d.IdSolicitudNavigation).WithMany(p => p.ApartadoActivos)
-                .HasForeignKey(d => d.IdSolicitud)
-                .HasConstraintName("apartado_activo_ibfk_solicitudes_apartado");
-
-            entity.HasOne(d => d.IdTiendaNavigation).WithMany(p => p.ApartadoActivos)
-                .HasForeignKey(d => d.IdTienda)
-                .HasConstraintName("apartado_activo_ibfk_tienda");
-
-            entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.ApartadoActivos)
-                .HasForeignKey(d => d.IdUsuario)
-                .HasConstraintName("apartado_activo_ibfk_usuarios");
         });
 
         modelBuilder.Entity<CalificacionProducto>(entity =>
@@ -353,6 +320,9 @@ public partial class UstoreContext : DbContext
 
             entity.ToTable("cuenta_usuario");
 
+            entity.Property(e => e.Email)
+                .HasMaxLength(255)
+                .IsUnicode(false);
             entity.Property(e => e.Password)
                 .HasMaxLength(255)
                 .IsUnicode(false);
@@ -586,21 +556,6 @@ public partial class UstoreContext : DbContext
                 .HasConstraintName("imagenes_productos_ibfk_productos");
         });
 
-        modelBuilder.Entity<ImagenesPublicacion>(entity =>
-        {
-            entity.HasKey(e => e.IdImagenesPublicacion).HasName("PK__imagenes__AA5AE371CC714484");
-
-            entity.ToTable("imagenes_publicacion");
-
-            entity.Property(e => e.ImagenPublicacion)
-                .HasMaxLength(255)
-                .IsUnicode(false);
-
-            entity.HasOne(d => d.IdPublicacionNavigation).WithMany(p => p.ImagenesPublicacions)
-                .HasForeignKey(d => d.IdPublicacion)
-                .HasConstraintName("imagenes_publicacion_ibfk_publicaciones");
-        });
-
         modelBuilder.Entity<ImagenesTienda>(entity =>
         {
             entity.HasKey(e => e.IdImagenesTiendas).HasName("PK__imagenes__E284A875298BFEEF");
@@ -706,6 +661,14 @@ public partial class UstoreContext : DbContext
             entity.ToTable("publicaciones");
 
             entity.Property(e => e.Contenido).HasColumnType("text");
+            entity.Property(e => e.FechaPublicacion).HasColumnType("date");
+            entity.Property(e => e.Imagen)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.IdCentroComercialNavigation).WithMany(p => p.Publicaciones)
+                .HasForeignKey(d => d.IdCentroComercial)
+                .HasConstraintName("FK_publicaciones_centro_comercial");
 
             entity.HasOne(d => d.IdTiendaNavigation).WithMany(p => p.Publicaciones)
                 .HasForeignKey(d => d.IdTienda)
@@ -718,6 +681,10 @@ public partial class UstoreContext : DbContext
 
             entity.ToTable("solicitudes_apartado");
 
+            entity.Property(e => e.FechaApartado).HasColumnType("datetime");
+            entity.Property(e => e.FechaSolicitud).HasColumnType("datetime");
+            entity.Property(e => e.FechaVencimiento).HasColumnType("datetime");
+            entity.Property(e => e.IdJob).HasMaxLength(50);
             entity.Property(e => e.PeriodoApartado)
                 .HasMaxLength(20)
                 .IsUnicode(false);

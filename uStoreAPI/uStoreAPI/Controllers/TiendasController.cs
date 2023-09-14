@@ -23,8 +23,9 @@ namespace uStoreAPI.Controllers
         private readonly PeriodosPredeterminadosService periodosPredeterminadosService;
         private readonly CalificacionesService calificacionesService;
         private readonly ProductosService productosService;
+        private readonly PublicacionesService publicacionesService;
         private IMapper mapper;
-        public TiendasController(CalificacionesService _calificacionesService, PeriodosPredeterminadosService _periodosPredeterminadosService,HorariosService _horariosService,TiendasService _tiendasService, IMapper _mapper, UploadService _uploadService, PlazasService _plazasService, CategoriasService _categoriasService, ProductosService _productosService)
+        public TiendasController(PublicacionesService _publicacionesService, CalificacionesService _calificacionesService, PeriodosPredeterminadosService _periodosPredeterminadosService,HorariosService _horariosService,TiendasService _tiendasService, IMapper _mapper, UploadService _uploadService, PlazasService _plazasService, CategoriasService _categoriasService, ProductosService _productosService)
         {
             tiendasService = _tiendasService;
             mapper = _mapper;
@@ -35,6 +36,7 @@ namespace uStoreAPI.Controllers
             periodosPredeterminadosService = _periodosPredeterminadosService;
             calificacionesService = _calificacionesService;
             productosService = _productosService;
+            publicacionesService = _publicacionesService;
         }
 
         [HttpGet("GetTiendas")]
@@ -312,6 +314,7 @@ namespace uStoreAPI.Controllers
                 await productosService.DeleteProducto(producto);
             }
 
+            await publicacionesService.DeleteAllPublicaciones(tienda.IdTienda);
             await uploadService.DeleteImagenesTiendas($"{tienda.IdTienda}");
             await horariosService.DeleteAllHorarios(tienda.IdTienda);
             await categoriasService.DeleteAllCategoriasTienda(tienda.IdTienda);
@@ -323,6 +326,26 @@ namespace uStoreAPI.Controllers
             return NoContent();
         }
 
+        [HttpDelete("DeleteImagenTienda")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> DeleteImagenTienda(int id)
+        {
+            if (id == 0)
+            {
+                return BadRequest();
+            }
+            var imagenTienda = await tiendasService.GetImagenTienda(id);
+            if(imagenTienda is null)
+            {
+                return NotFound();
+            }
+            await uploadService.DeleteImageTiendas(imagenTienda.IdTienda.ToString()!, uploadService.GetBlobNameFromUrl(imagenTienda.ImagenTienda));
+            await tiendasService.DeleteImagenTienda(imagenTienda);
+            return NoContent();
+        }
 
         private async Task<ImagenesTienda> CreateImagenTienda(int idTienda, IFormFile imagen, string fileName)
         {

@@ -34,6 +34,26 @@ namespace uStoreAPI.Services
             return blobClient.Uri.AbsoluteUri;
         }
 
+        public async Task<string> UploadImageUser(IFormFile image, string imageFileName = null!)
+        {
+            var containerClient = blobServiceClient.GetBlobContainerClient("users");
+            var finalImageName = string.IsNullOrEmpty(imageFileName) ? image.FileName : imageFileName;
+            var blobClient = containerClient.GetBlobClient(finalImageName);
+
+            await using var stream = image.OpenReadStream();
+
+            var blobUploadOptions = new BlobUploadOptions
+            {
+                HttpHeaders = new BlobHttpHeaders
+                {
+                    ContentType = image.ContentType
+                }
+            };
+
+            await blobClient.UploadAsync(stream, blobUploadOptions);
+            return blobClient.Uri.AbsoluteUri;
+        }
+
         public async Task<string> UploadImagePlazas(IFormFile image, string directorio, string imageName)
         {
             var containerClient = blobServiceClient.GetBlobContainerClient("plazas");
@@ -102,11 +122,54 @@ namespace uStoreAPI.Services
             return blobClient.Uri.AbsoluteUri;
         }
 
+        public async Task<string> UploadImagePublicacion(IFormFile image, string imageName)
+        {
+            var containerClient = blobServiceClient.GetBlobContainerClient("publicaciones");
+
+            var blobName = $"{imageName}.png";
+
+            var blobClient = containerClient.GetBlobClient(blobName);
+
+            await using var stream = image.OpenReadStream();
+
+            var blobUploadOptions = new BlobUploadOptions
+            {
+                HttpHeaders = new BlobHttpHeaders
+                {
+                    ContentType = image.ContentType
+                }
+            };
+
+            await blobClient.UploadAsync(stream, blobUploadOptions);
+
+            return blobClient.Uri.AbsoluteUri;
+        }
+
         public async Task DeleteImageTiendas(string directorio, string imageName)
         {
             var containerClient = blobServiceClient.GetBlobContainerClient("tiendas");
 
-            var blobName = $"{directorio}/{imageName}";
+            var blobName = $"{directorio}/{imageName}.png";
+            var blobClient = containerClient.GetBlobClient(blobName);
+
+            await blobClient.DeleteIfExistsAsync();
+        }
+
+        public async Task DeleteImageProducto(string directorio, string imageName)
+        {
+            var containerClient = blobServiceClient.GetBlobContainerClient("productos");
+
+            var blobName = $"{directorio}/{imageName}.png";
+            var blobClient = containerClient.GetBlobClient(blobName);
+
+            await blobClient.DeleteIfExistsAsync();
+        }
+
+        public async Task DeleteImagePublicacion(string imageName)
+        {
+            var containerClient = blobServiceClient.GetBlobContainerClient("publicaciones");
+
+            var blobName = $"{imageName}.png";
             var blobClient = containerClient.GetBlobClient(blobName);
 
             await blobClient.DeleteIfExistsAsync();
@@ -139,6 +202,16 @@ namespace uStoreAPI.Services
         public async Task DeleteImageAdmins(string imageName)
         {
             var containerClient = blobServiceClient.GetBlobContainerClient("admins");
+
+            var blobName = $"{imageName}.png";
+            var blobClient = containerClient.GetBlobClient(blobName);
+
+            await blobClient.DeleteIfExistsAsync();
+        }
+
+        public async Task DeleteImageUser(string imageName)
+        {
+            var containerClient = blobServiceClient.GetBlobContainerClient("users");
 
             var blobName = $"{imageName}.png";
             var blobClient = containerClient.GetBlobClient(blobName);

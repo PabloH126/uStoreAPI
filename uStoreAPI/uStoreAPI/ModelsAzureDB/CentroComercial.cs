@@ -17,5 +17,7 @@ public partial class CentroComercial
 
     public string? DireccionCentroComercial { get; set; }
 
+    public virtual ICollection<Publicacione> Publicaciones { get; set; } = new List<Publicacione>();
+
     public virtual ICollection<Tiendum> Tienda { get; set; } = new List<Tiendum>();
 }
