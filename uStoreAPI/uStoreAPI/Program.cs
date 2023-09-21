@@ -8,6 +8,7 @@ using uStoreAPI.Services;
 using Microsoft.Extensions.Azure;
 using Hangfire;
 using Hangfire.SqlServer;
+using uStoreAPI.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,6 +40,8 @@ builder.Services.AddScoped<CalificacionesService>();
 builder.Services.AddScoped<SolicitudesApartadoService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<PublicacionesService>();
+
+builder.Services.AddSingleton<NotificacionesApartadoService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -73,6 +76,16 @@ builder.Services.AddHangfire(configuration => configuration
     })
 );
 builder.Services.AddHangfireServer();
+builder.Services.AddSignalR();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsWebPage",
+    builder => builder.WithOrigins("https://ustoree.azurewebsites.net") // Reemplaza con la URL de tu aplicación cliente.
+                       .AllowAnyMethod()
+                       .AllowAnyHeader()
+                       .AllowCredentials()); // Si necesitas enviar cookies o autenticación.
+});
 
 var app = builder.Build();
 
@@ -84,11 +97,19 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseRouting();
+
+app.UseCors("CorsWebPage");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.UseHangfireDashboard();
 
-app.MapControllers();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHub<ApartadosHub>("/apartadosHub");
+    endpoints.MapControllers();
+});
 
 app.Run();

@@ -25,10 +25,17 @@ C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp
 C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp\Out\Hangfire.SqlServer.dll
 C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp\Out\Humanizer.dll
 C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp\Out\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp\Out\Microsoft.AspNetCore.Connections.Abstractions.dll
+C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp\Out\Microsoft.AspNetCore.Http.Connections.Client.dll
+C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp\Out\Microsoft.AspNetCore.Http.Connections.Common.dll
 C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp\Out\Microsoft.AspNetCore.JsonPatch.dll
 C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp\Out\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
 C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp\Out\Microsoft.AspNetCore.OpenApi.dll
 C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp\Out\Microsoft.AspNetCore.Razor.Language.dll
+C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp\Out\Microsoft.AspNetCore.SignalR.Client.dll
+C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp\Out\Microsoft.AspNetCore.SignalR.Client.Core.dll
+C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp\Out\Microsoft.AspNetCore.SignalR.Common.dll
+C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp\Out\Microsoft.AspNetCore.SignalR.Protocols.Json.dll
 C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp\Out\Microsoft.Bcl.AsyncInterfaces.dll
 C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp\Out\Microsoft.Build.dll
 C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp\Out\Microsoft.Build.Framework.dll
@@ -51,6 +58,9 @@ C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp
 C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp\Out\Microsoft.EntityFrameworkCore.SqlServer.dll
 C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp\Out\Microsoft.Extensions.Azure.dll
 C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp\Out\Microsoft.Extensions.Configuration.AzureAppConfiguration.dll
+C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp\Out\Microsoft.Extensions.Features.dll
+C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp\Out\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp\Out\Microsoft.Extensions.Options.dll
 C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp\Out\Microsoft.Identity.Client.dll
 C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp\Out\Microsoft.Identity.Client.Extensions.Msal.dll
 C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp\Out\Microsoft.IdentityModel.Abstractions.dll

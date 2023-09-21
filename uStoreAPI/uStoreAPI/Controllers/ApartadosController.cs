@@ -20,8 +20,9 @@ namespace uStoreAPI.Controllers
         private readonly PeriodosPredeterminadosService periodosService;
         private readonly SolicitudesApartadoService solicitudesApartadoService;
         private readonly UserService userService;
+        private readonly NotificacionesApartadoService notificacionesApartadoService;
         private IMapper mapper;
-        public ApartadosController(UserService _userService, TiendasService _tiendasService, ProductosService _productosService, SolicitudesApartadoService _solicitudesApartadoService, IMapper _mapper, PeriodosPredeterminadosService _periodosService)
+        public ApartadosController(NotificacionesApartadoService _notificacionesApartadoService, UserService _userService, TiendasService _tiendasService, ProductosService _productosService, SolicitudesApartadoService _solicitudesApartadoService, IMapper _mapper, PeriodosPredeterminadosService _periodosService)
         {
             tiendasService = _tiendasService;
             productosService = _productosService;
@@ -29,7 +30,7 @@ namespace uStoreAPI.Controllers
             mapper = _mapper;
             periodosService = _periodosService;
             userService = _userService;
-
+            notificacionesApartadoService = _notificacionesApartadoService;
         }
 
         #region GetSolicitudes
@@ -102,7 +103,7 @@ namespace uStoreAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<object>> GetSolicitudesApartadoActivas(int idTienda)
+        public async Task<ActionResult<SolicitudesApartadoDto>> GetSolicitudesApartadoActivas(int idTienda)
         {
             var user = HttpContext.User;
             var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
@@ -117,16 +118,14 @@ namespace uStoreAPI.Controllers
                 return Unauthorized("Tienda no autorizada");
             }
 
-            var SolicitudesApartado = mapper.Map<IEnumerable<SolicitudesApartadoDto>>(await solicitudesApartadoService.GetSolicitudesApartadoActivasWithIdTienda(idTienda));
+            var solicitudesApartado = mapper.Map<IEnumerable<SolicitudesApartadoDto>>(await solicitudesApartadoService.GetSolicitudesApartadoActivasWithIdTienda(idTienda));
 
-            if (SolicitudesApartado.IsNullOrEmpty())
+            if (solicitudesApartado.IsNullOrEmpty())
             {
-                return NotFound("No hay solicitudes pendientes en esta tienda");
+                return NotFound("No hay solicitudes activas en esta tienda");
             }
 
-            var productosApartados = new List<ProductoDto>();
-
-            foreach (var solicitud in SolicitudesApartado)
+            foreach (var solicitud in solicitudesApartado)
             {
                 var producto = mapper.Map<ProductoDto>(await productosService.GetOneProducto(solicitud.IdProductos));
                 if (producto is not null)
@@ -134,9 +133,10 @@ namespace uStoreAPI.Controllers
                     var imagenProducto = await productosService.GetPrincipalImageProducto(producto.IdProductos);
                     if (imagenProducto is not null)
                     {
-                        producto.ImageProducto = imagenProducto.ImagenProducto;
+                        solicitud.ImageProducto = imagenProducto.ImagenProducto;
                     }
-                    productosApartados.Add(producto);
+                    solicitud.NombreProducto = producto.NombreProducto;
+                    solicitud.PrecioProducto = producto.PrecioProducto;
                 }
                 else
                 {
@@ -156,13 +156,21 @@ namespace uStoreAPI.Controllers
                 }
             }
 
-            var result = new
-            {
-                solicitudes = SolicitudesApartado,
-                productos = productosApartados,
-            };
+            return Ok(solicitudesApartado);
+        }
 
-            return Ok(result);
+        [HttpGet("GetNumeroSolicitudes")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<SolicitudesApartadoDto>> GetNumeroSolicitudes()
+        {
+            var user = HttpContext.User;
+            var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+            
+            var solicitudesApartado = await solicitudesApartadoService.GetSolicitudesApartadoTiendas(idUser);
+            return Ok(solicitudesApartado);
         }
 
         [HttpGet(Name = "GetSolicitud")]
@@ -202,7 +210,38 @@ namespace uStoreAPI.Controllers
             solicitudApartado.FechaSolicitud = DateTime.UtcNow;
             await solicitudesApartadoService.CreateSolicitud(solicitudApartado);
 
-            return Ok(mapper.Map<SolicitudesApartadoDto>(solicitudApartado));
+            var solicitudApartadoDto = mapper.Map<SolicitudesApartadoDto>(solicitudApartado);
+            var producto = mapper.Map<ProductoDto>(await productosService.GetOneProducto(solicitud.IdProductos));
+            var periodos = await periodosService.GetPeriodosPredeterminados(solicitudApartado.IdTienda);
+            var usuario = await userService.GetUsuario(solicitud.IdUsuario);
+            var detallesUser = await userService.GetDetallesUsuario(usuario!.IdDetallesUsuario);
+
+            solicitudApartadoDto.RatioUsuario = $"{detallesUser!.ApartadosExitosos}/{detallesUser.ApartadosFallidos + detallesUser.ApartadosExitosos}";
+
+            if (producto is not null)
+            {
+                var imagenProducto = await productosService.GetPrincipalImageProducto(producto.IdProductos);
+                if (imagenProducto is not null)
+                {
+                    solicitudApartadoDto.ImageProducto = imagenProducto.ImagenProducto;
+                }
+                solicitudApartadoDto.NombreProducto = producto.NombreProducto;
+                solicitudApartadoDto.PrecioProducto = producto.PrecioProducto;
+            }
+            foreach (var periodo in periodos)
+            {
+                if (solicitudApartadoDto.PeriodoApartado == periodo.ApartadoPredeterminado)
+                {
+                    solicitudApartadoDto.personalizado = false;
+                }
+                else
+                {
+                    solicitudApartadoDto.personalizado = true;
+                }
+            }
+
+            notificacionesApartadoService.CreateSolicitud(solicitudApartadoDto);
+            return Ok(solicitudApartadoDto);
         }
 
         [HttpPut("UpdateSolicitud")]

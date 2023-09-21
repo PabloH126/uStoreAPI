@@ -32,14 +32,14 @@ namespace uStoreAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<PublicacionesDto>>> GetPublicacionesRecientes(int idMall)
+        public async Task<ActionResult<IEnumerable<PublicacionesDto>>> GetPublicacionesRecientes(int idTienda)
         {
-            if (await plazasService.GetOneMall(idMall) is null)
+            if (await tiendasService.GetOneTienda(idTienda) is null)
             {
-                return BadRequest("No hay ninguna plaza registrada con ese id");
+                return BadRequest("No hay ninguna tienda registrada con ese id");
             }
 
-            var publicaciones = await publicacionesService.GetPublicacionesRecientes(idMall);
+            var publicaciones = await publicacionesService.GetPublicacionesRecientes(idTienda);
             
             if (publicaciones.IsNullOrEmpty())
             {
