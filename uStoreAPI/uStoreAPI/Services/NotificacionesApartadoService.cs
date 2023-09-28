@@ -14,7 +14,7 @@ namespace uStoreAPI.Services
         public NotificacionesApartadoService(IHubContext<ApartadosHub> _hubContext)
         {
             hubContext = _hubContext;
-            timer = new System.Timers.Timer(60000);
+            timer = new System.Timers.Timer(5000);
             timer.Elapsed += SendSolicitudes;
             timer.Start();
         }
@@ -24,6 +24,14 @@ namespace uStoreAPI.Services
             lock (pendingSolicitudes)
             {
                 pendingSolicitudes.Add(solicitud);
+            }
+        }
+
+        public void CancelarSend()
+        {
+            lock (pendingSolicitudes)
+            {
+                pendingSolicitudes.Clear();
             }
         }
 

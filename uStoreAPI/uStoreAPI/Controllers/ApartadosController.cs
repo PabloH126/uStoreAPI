@@ -7,6 +7,8 @@ using uStoreAPI.Dtos;
 using uStoreAPI.ModelsAzureDB;
 using uStoreAPI.Services;
 using Hangfire;
+using Microsoft.AspNetCore.SignalR;
+using uStoreAPI.Hubs;
 
 namespace uStoreAPI.Controllers
 {
@@ -21,8 +23,9 @@ namespace uStoreAPI.Controllers
         private readonly SolicitudesApartadoService solicitudesApartadoService;
         private readonly UserService userService;
         private readonly NotificacionesApartadoService notificacionesApartadoService;
+        private readonly IHubContext<ApartadosHub> hubContext;
         private IMapper mapper;
-        public ApartadosController(NotificacionesApartadoService _notificacionesApartadoService, UserService _userService, TiendasService _tiendasService, ProductosService _productosService, SolicitudesApartadoService _solicitudesApartadoService, IMapper _mapper, PeriodosPredeterminadosService _periodosService)
+        public ApartadosController(IHubContext<ApartadosHub> _hubContext, NotificacionesApartadoService _notificacionesApartadoService, UserService _userService, TiendasService _tiendasService, ProductosService _productosService, SolicitudesApartadoService _solicitudesApartadoService, IMapper _mapper, PeriodosPredeterminadosService _periodosService)
         {
             tiendasService = _tiendasService;
             productosService = _productosService;
@@ -31,6 +34,7 @@ namespace uStoreAPI.Controllers
             periodosService = _periodosService;
             userService = _userService;
             notificacionesApartadoService = _notificacionesApartadoService;
+            hubContext = _hubContext;
         }
 
         #region GetSolicitudes
@@ -94,7 +98,7 @@ namespace uStoreAPI.Controllers
                     }
                 }
             }
-
+            notificacionesApartadoService.CancelarSend();
             return Ok(solicitudesApartado);
         }
 
@@ -164,7 +168,7 @@ namespace uStoreAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<SolicitudesApartadoDto>> GetNumeroSolicitudes()
+        public async Task<ActionResult<Dictionary<int, int>>> GetNumeroSolicitudes()
         {
             var user = HttpContext.User;
             var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
@@ -241,6 +245,8 @@ namespace uStoreAPI.Controllers
             }
 
             notificacionesApartadoService.CreateSolicitud(solicitudApartadoDto);
+            var solicitudesCount = await solicitudesApartadoService.GetSolicitudesApartadoTiendas(idUser);
+            await hubContext.Clients.Group(idUser.ToString()).SendAsync("RecieveUpdateNotificaciones", solicitudesCount);
             return Ok(solicitudApartadoDto);
         }
 
@@ -309,7 +315,16 @@ namespace uStoreAPI.Controllers
             else if (solicitud.StatusSolicitud == "completada")
             {
                 solicitudApartado.StatusSolicitud = "completada";
-
+                var usuario = await userService.GetUsuario(solicitudApartado.IdUsuario);
+                if(usuario is not null)
+                {
+                    var detallesUsuario = await userService.GetDetallesUsuario(usuario.IdDetallesUsuario);
+                    if(detallesUsuario is not null)
+                    {
+                        detallesUsuario.ApartadosExitosos += 1;
+                        await userService.PatchUserApartados(detallesUsuario);
+                    }
+                }
                 if (!string.IsNullOrEmpty(solicitudApartado.IdJob))
                 {
                     BackgroundJob.Delete(solicitudApartado.IdJob);

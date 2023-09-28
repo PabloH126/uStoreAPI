@@ -371,7 +371,11 @@
           "200": {
             "description": "Success",
             "schema": {
-              "$ref": "#/definitions/SolicitudesApartadoDto"
+              "type": "object",
+              "additionalProperties": {
+                "format": "int32",
+                "type": "integer"
+              }
             }
           },
           "400": {
@@ -3474,6 +3478,59 @@
         }
       }
     },
+    "/api/TendenciasVenta/GetTendencias": {
+      "post": {
+        "tags": [
+          "TendenciasVenta"
+        ],
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/filtrosGraficaDto"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/TendenciaDto"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
     "/api/Tiendas/GetTiendas": {
       "get": {
         "tags": [
@@ -5969,6 +6026,19 @@
       },
       "additionalProperties": false
     },
+    "TendenciaDto": {
+      "type": "object",
+      "properties": {
+        "nombre": {
+          "type": "string"
+        },
+        "numeroSolicitudes": {
+          "format": "int32",
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false
+    },
     "TendenciasVentum": {
       "type": "object",
       "properties": {
@@ -6340,6 +6410,25 @@
           "readOnly": true
         },
         "summary": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "filtrosGraficaDto": {
+      "type": "object",
+      "properties": {
+        "isTienda": {
+          "type": "boolean"
+        },
+        "categorias": {
+          "type": "array",
+          "items": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "periodoTiempo": {
           "type": "string"
         }
       },

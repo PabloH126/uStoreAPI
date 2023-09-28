@@ -40,6 +40,7 @@ builder.Services.AddScoped<CalificacionesService>();
 builder.Services.AddScoped<SolicitudesApartadoService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<PublicacionesService>();
+builder.Services.AddScoped<TendenciasService>();
 
 builder.Services.AddSingleton<NotificacionesApartadoService>();
 
@@ -54,6 +55,20 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = false,
             ValidateLifetime = true,
             ClockSkew = TimeSpan.Zero
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+                if (!string.IsNullOrEmpty(accessToken) && context.HttpContext.WebSockets.IsWebSocketRequest)
+                {
+                    context.Token = accessToken;
+                }
+
+                return Task.CompletedTask;
+            }
         };
     });
 builder.Services.AddAzureClients(clientBuilder =>
@@ -81,10 +96,10 @@ builder.Services.AddSignalR();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsWebPage",
-    builder => builder.WithOrigins("https://ustoree.azurewebsites.net") // Reemplaza con la URL de tu aplicación cliente.
+    builder => builder.WithOrigins("https://ustoree.azurewebsites.net")
                        .AllowAnyMethod()
                        .AllowAnyHeader()
-                       .AllowCredentials()); // Si necesitas enviar cookies o autenticación.
+                       .AllowCredentials());
 });
 
 var app = builder.Build();

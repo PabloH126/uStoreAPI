@@ -103,6 +103,12 @@ namespace uStoreAPI.Services
             await context.SaveChangesAsync();
         }
 
+        public async Task PatchUserApartados(DetallesUsuario detallesUser)
+        {
+            context.DetallesUsuarios.Update(detallesUser);
+            await context.SaveChangesAsync();
+        }
+
         public async Task PatchUserImage(string userImageUrl, int id)
         {
             var user = await context.CuentaUsuarios.FindAsync(id);

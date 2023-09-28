@@ -11,10 +11,15 @@ namespace uStoreAPI.Services
             context= _context;
         }
 
-        public async Task<IEnumerable<SolicitudesApartado>> GetSolicitudesApartadoTiendas(int idAdministrador)
+        public async Task<Dictionary<int, int>> GetSolicitudesApartadoTiendas(int idAdministrador)
         {
             var tiendas = await context.Tienda.Where(p => p.IdAdministrador == idAdministrador).Select(p => p.IdTienda).ToListAsync();
-            var solicitudes = await context.SolicitudesApartados.Where(p => tiendas.Contains((int)p.IdTienda!) && p.StatusSolicitud == "pendiente").ToListAsync();
+            var solicitudes = await context.SolicitudesApartados.Where(p => tiendas.Contains((int)p.IdTienda!) && p.StatusSolicitud == "pendiente")
+                                                                .GroupBy(p => p.IdTienda)
+                                                                .ToDictionaryAsync(
+                                                                    tienda => (int)tienda.Key!,
+                                                                    notificaciones => notificaciones.Count()
+                                                                 );
             return solicitudes;
         }
 
