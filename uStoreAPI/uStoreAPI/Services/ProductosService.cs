@@ -82,5 +82,18 @@ namespace uStoreAPI.Services
             context.ImagenesProductos.RemoveRange(imagenesProducto);
             await context.SaveChangesAsync();
         }
+
+        public async Task<bool> VerificarProductoTienda(int idProducto, int idTienda)
+        {
+            var producto = await context.Productos.FirstOrDefaultAsync(p => p.IdProductos == idProducto && p.IdTienda == idTienda);
+            if (producto is null)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
     }
 }

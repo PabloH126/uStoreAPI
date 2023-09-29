@@ -201,11 +201,21 @@ namespace uStoreAPI.Controllers
             {
                 return BadRequest(ModelState);
             }
-            else if(await productosService.GetOneProducto(solicitud.IdProductos) is null) 
+            var productoSolicitado = await productosService.GetOneProducto(solicitud.IdProductos);
+            if (productoSolicitado is null) 
             {
                 return NotFound("No se ha encontrado un producto registrado");
             }
-            
+            var tienda = await tiendasService.GetOneTienda(solicitud.IdTienda);
+            if (tienda is null)
+            {
+                return NotFound("Tienda solicitada no registrada");
+            }
+            else if (!(await productosService.VerificarProductoTienda(productoSolicitado.IdProductos, tienda.IdTienda)))
+            {
+                return Unauthorized("Producto no perteneciente a esa tienda");
+            }
+
             var user = HttpContext.User;
             var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
 
@@ -215,8 +225,11 @@ namespace uStoreAPI.Controllers
             await solicitudesApartadoService.CreateSolicitud(solicitudApartado);
 
             var solicitudApartadoDto = mapper.Map<SolicitudesApartadoDto>(solicitudApartado);
-            var producto = mapper.Map<ProductoDto>(await productosService.GetOneProducto(solicitud.IdProductos));
+
+            var producto = mapper.Map<ProductoDto>(productoSolicitado);
+
             var periodos = await periodosService.GetPeriodosPredeterminados(solicitudApartado.IdTienda);
+
             var usuario = await userService.GetUsuario(solicitud.IdUsuario);
             var detallesUser = await userService.GetDetallesUsuario(usuario!.IdDetallesUsuario);
 
@@ -245,8 +258,11 @@ namespace uStoreAPI.Controllers
             }
 
             notificacionesApartadoService.CreateSolicitud(solicitudApartadoDto);
-            var solicitudesCount = await solicitudesApartadoService.GetSolicitudesApartadoTiendas(idUser);
-            await hubContext.Clients.Group(idUser.ToString()).SendAsync("RecieveUpdateNotificaciones", solicitudesCount);
+
+            var idAdmin = tienda.IdAdministrador;
+            var solicitudesCount = await solicitudesApartadoService.GetSolicitudesApartadoTiendas((int)idAdmin!);
+            await hubContext.Clients.Group(idAdmin.ToString()!).SendAsync("RecieveUpdateNotificaciones", solicitudesCount);
+
             return Ok(solicitudApartadoDto);
         }
 
@@ -334,6 +350,16 @@ namespace uStoreAPI.Controllers
             else if(solicitud.StatusSolicitud == "rechazada")
             {
                 solicitudApartado.StatusSolicitud = "rechazada";
+
+                if (!string.IsNullOrEmpty(solicitudApartado.IdJob))
+                {
+                    BackgroundJob.Delete(solicitudApartado.IdJob);
+                    solicitudApartado.IdJob = null;
+                }
+            }
+            else if (solicitud.StatusSolicitud == "cancelada")
+            {
+                solicitudApartado.StatusSolicitud = "cancelada";
 
                 if (!string.IsNullOrEmpty(solicitudApartado.IdJob))
                 {
