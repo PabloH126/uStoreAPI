@@ -67,6 +67,13 @@ namespace uStoreAPI.Services
             await context.SaveChangesAsync();
         }
 
+        public async Task DeleteSolicitudesTienda(int idTienda)
+        {
+            var solicitudes = await context.SolicitudesApartados.Where(p => p.IdTienda == idTienda).ToListAsync();
+            context.SolicitudesApartados.RemoveRange(solicitudes);
+            await context.SaveChangesAsync();
+        }
+
         public async Task MarcarComoVencida(int idSolicitud)
         {
             var solicitud = await context.SolicitudesApartados.FindAsync(idSolicitud);

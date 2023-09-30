@@ -24,8 +24,9 @@ namespace uStoreAPI.Controllers
         private readonly CalificacionesService calificacionesService;
         private readonly ProductosService productosService;
         private readonly PublicacionesService publicacionesService;
+        private readonly SolicitudesApartadoService solicitudesService;
         private IMapper mapper;
-        public TiendasController(PublicacionesService _publicacionesService, CalificacionesService _calificacionesService, PeriodosPredeterminadosService _periodosPredeterminadosService,HorariosService _horariosService,TiendasService _tiendasService, IMapper _mapper, UploadService _uploadService, PlazasService _plazasService, CategoriasService _categoriasService, ProductosService _productosService)
+        public TiendasController(SolicitudesApartadoService _solicitudesService, PublicacionesService _publicacionesService, CalificacionesService _calificacionesService, PeriodosPredeterminadosService _periodosPredeterminadosService,HorariosService _horariosService,TiendasService _tiendasService, IMapper _mapper, UploadService _uploadService, PlazasService _plazasService, CategoriasService _categoriasService, ProductosService _productosService)
         {
             tiendasService = _tiendasService;
             mapper = _mapper;
@@ -37,6 +38,7 @@ namespace uStoreAPI.Controllers
             calificacionesService = _calificacionesService;
             productosService = _productosService;
             publicacionesService = _publicacionesService;
+            solicitudesService = _solicitudesService;
         }
 
         [HttpGet("GetTiendas")]
@@ -313,7 +315,7 @@ namespace uStoreAPI.Controllers
                 await categoriasService.DeleteAllCategoriasProducto(producto.IdProductos);
                 await productosService.DeleteProducto(producto);
             }
-
+            await solicitudesService.DeleteSolicitudesTienda(tienda.IdTienda);
             await publicacionesService.DeleteAllPublicaciones(tienda.IdTienda);
             await uploadService.DeleteImagenesTiendas($"{tienda.IdTienda}");
             await horariosService.DeleteAllHorarios(tienda.IdTienda);
