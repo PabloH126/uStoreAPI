@@ -17,7 +17,11 @@ namespace uStoreAPI.Services
         public async Task<IEnumerable<Publicacione>> GetPublicacionesRecientes(int idTienda)
         {
             DateTime fechaMaxima = DateTime.UtcNow.AddMonths(-2);
-            return await context.Publicaciones.Where(p => p.FechaPublicacion >= fechaMaxima && p.IdTienda == idTienda).AsNoTracking().ToListAsync();
+            return await context.Publicaciones.Where(p => p.FechaPublicacion >= fechaMaxima && p.IdTienda == idTienda)
+                                              .OrderByDescending(p => p.FechaPublicacion)
+                                              .ThenByDescending(p => p.IdPublicacion)
+                                              .AsNoTracking()
+                                              .ToListAsync();
         }
 
         public async Task<Publicacione?> GetPublicacion(int id)
