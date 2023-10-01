@@ -77,8 +77,10 @@ namespace uStoreAPI.Services
         public async Task MarcarComoVencida(int idSolicitud)
         {
             var solicitud = await context.SolicitudesApartados.FindAsync(idSolicitud);
+            var producto = await context.Productos.FindAsync(solicitud!.IdProductos);
             if (solicitud is not null && solicitud.StatusSolicitud == "activa")
             {
+                producto!.CantidadApartado += solicitud.UnidadesProducto;
                 solicitud.StatusSolicitud = "vencida";
                 context.SolicitudesApartados.Update(solicitud);
                 var usuario = await context.Usuarios.FindAsync(solicitud.IdUsuario);

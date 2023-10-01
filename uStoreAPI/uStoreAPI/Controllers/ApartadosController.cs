@@ -219,6 +219,16 @@ namespace uStoreAPI.Controllers
             var user = HttpContext.User;
             var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
 
+            if (productoSolicitado.CantidadApartado < solicitud.UnidadesProducto)
+            {
+                return BadRequest("La cantidad de unidades del producto es mayor a las disponibles actualmente");
+            }
+            else
+            {
+                productoSolicitado.CantidadApartado -= solicitud.UnidadesProducto;
+                await productosService.UpdateProducto(productoSolicitado);
+            }
+
             var solicitudApartado = mapper.Map<SolicitudesApartado>(solicitud);
             solicitudApartado.StatusSolicitud = "pendiente";
             solicitudApartado.FechaSolicitud = DateTime.UtcNow;
@@ -292,6 +302,8 @@ namespace uStoreAPI.Controllers
             {
                 return BadRequest("La solicitud ya esta completada");
             }
+
+            var productoSolicitado = await productosService.GetOneProducto(solicitudApartado.IdProductos);
             
             if(solicitud.StatusSolicitud == "activa")
             {
@@ -356,6 +368,9 @@ namespace uStoreAPI.Controllers
                     BackgroundJob.Delete(solicitudApartado.IdJob);
                     solicitudApartado.IdJob = null;
                 }
+
+                productoSolicitado!.CantidadApartado += solicitudApartado.UnidadesProducto;
+                await productosService.UpdateProducto(productoSolicitado);
             }
             else if (solicitud.StatusSolicitud == "cancelada")
             {
@@ -366,6 +381,9 @@ namespace uStoreAPI.Controllers
                     BackgroundJob.Delete(solicitudApartado.IdJob);
                     solicitudApartado.IdJob = null;
                 }
+
+                productoSolicitado!.CantidadApartado += solicitudApartado.UnidadesProducto;
+                await productosService.UpdateProducto(productoSolicitado);
             }
 
             await solicitudesApartadoService.UpdateSolicitud(solicitudApartado);
