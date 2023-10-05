@@ -40,7 +40,12 @@ namespace uStoreAPI.Services
 
         public async Task<IEnumerable<SolicitudesApartado>> GetSolicitudesApartadoActivasWithIdTienda(int idTienda)
         {
-            return await context.SolicitudesApartados.Where(p => p.IdTienda == idTienda && (p.StatusSolicitud == "activa" || p.StatusSolicitud == "vencida")).AsNoTracking().ToListAsync();
+            return await context.SolicitudesApartados.Where(p => p.IdTienda == idTienda && (p.StatusSolicitud == "activa" || p.StatusSolicitud == "vencida"))
+                                                     .OrderBy(p => p.StatusSolicitud == "vencida" ? 1 : 0)
+                                                     .ThenBy(p => p.FechaVencimiento)
+                                                     .ThenBy(p => p.FechaSolicitud)
+                                                     .AsNoTracking()
+                                                     .ToListAsync();
         }
 
         public async Task<SolicitudesApartado?> GetOneSolicitudApartado(int idSolicitud)

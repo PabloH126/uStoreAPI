@@ -17,6 +17,26 @@ namespace uStoreAPI.Services
             context = _context;
         }
 
+        public async Task<PerfilDto?> GetPerfilAdmin(int? id)
+        {
+            var perfilAdmin = await (from cA in context.CuentaAdministradors
+                                     join dCA in context.DetallesCuentaAdministradors on cA.IdDetallesCuentaAdministrador equals dCA.IdDetallesCuentaAdministrador
+                                     join iP in context.ImagenPerfils on dCA.IdImagenPerfil equals iP.IdImagenPerfil
+                                     join a in context.AdministradorTienda on cA.IdAdministrador equals a.IdAdministrador
+                                     join dA in context.DetallesAdministradors on a.IdDetallesAdministrador equals dA.IdDetallesAdministrador
+                                     join datos in context.Datos on dA.IdDatos equals datos.IdDatos
+                                     where cA.IdAdministrador == id
+                                     select new PerfilDto
+                                     {
+                                         Nombre = $"{datos.PrimerNombre} {datos.PrimerApellido}",
+                                         FechaRegistro = dCA.FechaRegistro,
+                                         ImagenP = iP.IconoPerfil,
+                                         correo = cA.Email
+                                     }).FirstOrDefaultAsync();
+            return perfilAdmin;
+
+        }
+
         public async Task<CuentaAdministrador?> GetCuentaAdminTienda(int? id)
         {
             return await context.CuentaAdministradors.FindAsync(id) ?? await context.CuentaAdministradors.FirstOrDefaultAsync(p => p.IdAdministrador == id);

@@ -44,6 +44,21 @@ namespace uStoreAPI.Controllers
 
             return Ok(tendencias);
         }
-        
+
+        [HttpPost("GetTendenciasPerfil")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<IEnumerable<TendenciaDto>>> GetTendenciasPerfil([FromBody] filtrosGraficaDto filtros, int? idTienda)
+        {
+            var user = HttpContext.User;
+            var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+
+            var tendencias = await tendenciasService.GetTendenciasAdmin(filtros, idUser, idTienda);
+
+            return Ok(tendencias);
+        }
+
     }
 }
