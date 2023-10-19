@@ -552,3 +552,13 @@ C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\bin\Debug\net7.0\Owin.dll
 C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\bin\Debug\net7.0\Azure.Data.AppConfiguration.dll
 C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\bin\Debug\net7.0\Azure.Messaging.EventGrid.dll
 C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\bin\Debug\net7.0\Microsoft.Extensions.Configuration.AzureAppConfiguration.dll
+C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\bin\Debug\net7.0\Microsoft.AspNetCore.Connections.Abstractions.dll
+C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\bin\Debug\net7.0\Microsoft.AspNetCore.Http.Connections.Client.dll
+C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\bin\Debug\net7.0\Microsoft.AspNetCore.Http.Connections.Common.dll
+C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\bin\Debug\net7.0\Microsoft.AspNetCore.SignalR.Client.dll
+C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\bin\Debug\net7.0\Microsoft.AspNetCore.SignalR.Client.Core.dll
+C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\bin\Debug\net7.0\Microsoft.AspNetCore.SignalR.Common.dll
+C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\bin\Debug\net7.0\Microsoft.AspNetCore.SignalR.Protocols.Json.dll
+C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\bin\Debug\net7.0\Microsoft.Extensions.Features.dll
+C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\bin\Debug\net7.0\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\bin\Debug\net7.0\Microsoft.Extensions.Options.dll

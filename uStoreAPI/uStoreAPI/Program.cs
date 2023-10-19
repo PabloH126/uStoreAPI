@@ -41,6 +41,8 @@ builder.Services.AddScoped<SolicitudesApartadoService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<PublicacionesService>();
 builder.Services.AddScoped<TendenciasService>();
+builder.Services.AddScoped<GerentesService>();
+builder.Services.AddScoped<ChatService>();
 
 builder.Services.AddSingleton<NotificacionesApartadoService>();
 
@@ -71,6 +73,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             }
         };
     });
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Admin", policy => policy.RequireClaim("UserType", "Administrador"));
+    options.AddPolicy("AdminGerente", policy => policy.RequireClaim("UserType", new[] { "Administrador", "Gerente" }));
+});
+
 builder.Services.AddAzureClients(clientBuilder =>
 {
     clientBuilder.AddBlobServiceClient(builder.Configuration["AzureBlobStorageConnection:blob"], preferMsi: true);
@@ -124,6 +132,7 @@ app.UseHangfireDashboard();
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapHub<ApartadosHub>("/apartadosHub");
+    endpoints.MapHub<ChatHub>("/chatHub");
     endpoints.MapControllers();
 });
 

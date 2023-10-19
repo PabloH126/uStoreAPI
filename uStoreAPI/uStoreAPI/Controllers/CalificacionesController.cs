@@ -38,13 +38,16 @@ namespace uStoreAPI.Controllers
         {
             var user = HttpContext.User;
             var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+            string? idTiendaClaim = user.Claims.FirstOrDefault(u => u.Type == "IdTienda")?.Value;
+            int idTiendaClaimValue = 0;
+            int.TryParse(idTiendaClaim, out idTiendaClaimValue);
             var tienda = await tiendasService.GetOneTienda(idTienda);
 
             if (tienda is null)
             {
                 return BadRequest("No hay una tienda registrada con ese id");
             }
-            else if (!(tienda.IdAdministrador == idUser))
+            else if (tienda.IdAdministrador != idUser && idTiendaClaimValue != tienda.IdTienda)
             {
                 return Unauthorized("Tienda no autorizada");
             }

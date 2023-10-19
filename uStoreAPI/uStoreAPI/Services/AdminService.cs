@@ -169,9 +169,23 @@ namespace uStoreAPI.Services
             await context.SaveChangesAsync();
         }
 
-        public async Task<CuentaAdministrador?> VerifyEmail(string email)
+        public async Task<CuentaAdministrador?> VerifyCuentaAdministrador(string email)
         {
             return await context.CuentaAdministradors.FirstOrDefaultAsync(p => p.Email == email);
+        }
+
+        public async Task<bool> VerifyEmail(string email)
+        {
+            var existingEmailGerentes = await context.CuentaGerentes.AnyAsync(p => p.Email == email);
+            if (existingEmailGerentes) return true;
+
+            var existingEmailUsuarios = await context.CuentaUsuarios.AnyAsync(p => p.Email == email);
+            if (existingEmailUsuarios) return true;
+
+            var existingEmailAdmin = await context.CuentaAdministradors.AnyAsync(p => p.Email == email);
+            if (existingEmailAdmin) return true;
+
+            return false;
         }
     }
 }

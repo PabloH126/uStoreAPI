@@ -22,14 +22,16 @@ namespace uStoreAPI.Controllers
     {
         private readonly ILogger<AdminsTiendaController> logger;
         private readonly AdminService service;
+        private readonly TiendasService tiendasService;
         private readonly UploadService uploadService;
         private readonly IMapper mapper;
-        public AdminsTiendaController(ILogger<AdminsTiendaController> _logger, AdminService _service, UploadService _uploadService, IMapper _mapper)
+        public AdminsTiendaController(TiendasService _tiendasService, ILogger<AdminsTiendaController> _logger, AdminService _service, UploadService _uploadService, IMapper _mapper)
         {
             logger = _logger;
             service = _service;
             mapper = _mapper;
             uploadService = _uploadService;
+            tiendasService = _tiendasService;
         }
         [Authorize]
         [HttpGet("Key")]
@@ -172,7 +174,26 @@ namespace uStoreAPI.Controllers
         public async Task<IActionResult> DeleteAccountAdmin(int idAdmin)
         {
             if(idAdmin == 0) return BadRequest();
-            
+
+            var tiendas = await tiendasService.GetTiendasOnlyAdmin(idAdmin);
+
+            foreach (var tienda in tiendas)
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    // Asume que este es el endpoint de tu misma aplicación
+                    var response = await httpClient.GetAsync($"https://ustoreapi.azurewebsites.net/api/Tiendas/DeleteTienda?id={tienda.IdTienda}");
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var responseData = await response.Content.ReadAsStringAsync();
+                    }
+                    else
+                    {
+                        return Conflict($"Error al eliminar la tienda: {tienda.NombreTienda}");
+                    }
+                }
+            }
+
             CuentaAdministrador? cuentaAdmin = await service.GetCuentaAdminTienda(idAdmin);
 
             if(cuentaAdmin == null) return NotFound("No se encontro la cuenta de admin");
@@ -196,11 +217,17 @@ namespace uStoreAPI.Controllers
             Dato? datosAdmin = await service.GetDatoAdmin(detallesAdmin.IdDatos);
 
             if (datosAdmin == null) return NotFound("No se encontro datosAdmin");
+            try
+            {
+                await service.DeleteAccountAdmin(cuentaAdmin, detallesCuentaAdmin, imgPerfilAdmin, adminTienda, detallesAdmin, datosAdmin);
+                await uploadService.DeleteImageAdmins(idAdmin.ToString());
 
-            await service.DeleteAccountAdmin(cuentaAdmin, detallesCuentaAdmin, imgPerfilAdmin, adminTienda, detallesAdmin, datosAdmin);
-            await uploadService.DeleteImageAdmins(idAdmin.ToString());
-
-            return NoContent();
+                return NoContent();
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
 

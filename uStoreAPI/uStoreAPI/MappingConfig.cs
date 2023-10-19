@@ -27,6 +27,9 @@ namespace uStoreAPI
             CreateMap<Publicacione, PublicacionesDto>().ReverseMap();
             CreateMap<Usuario, UsuarioDto>().ReverseMap();
             CreateMap<CuentaUsuario, CuentaUsuarioDto>().ReverseMap();
+            CreateMap<CuentaGerente, CuentaGerenteDto>().ReverseMap();
+            CreateMap<Chat, ChatDto>().ReverseMap();
+            CreateMap<Mensaje, MensajeDto>().ReverseMap();
         }
     }
 }

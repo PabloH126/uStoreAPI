@@ -25,8 +25,9 @@ namespace uStoreAPI.Controllers
         private readonly ProductosService productosService;
         private readonly PublicacionesService publicacionesService;
         private readonly SolicitudesApartadoService solicitudesService;
+        private readonly GerentesService gerentesService;
         private IMapper mapper;
-        public TiendasController(SolicitudesApartadoService _solicitudesService, PublicacionesService _publicacionesService, CalificacionesService _calificacionesService, PeriodosPredeterminadosService _periodosPredeterminadosService,HorariosService _horariosService,TiendasService _tiendasService, IMapper _mapper, UploadService _uploadService, PlazasService _plazasService, CategoriasService _categoriasService, ProductosService _productosService)
+        public TiendasController(GerentesService _gerentesService, SolicitudesApartadoService _solicitudesService, PublicacionesService _publicacionesService, CalificacionesService _calificacionesService, PeriodosPredeterminadosService _periodosPredeterminadosService,HorariosService _horariosService,TiendasService _tiendasService, IMapper _mapper, UploadService _uploadService, PlazasService _plazasService, CategoriasService _categoriasService, ProductosService _productosService)
         {
             tiendasService = _tiendasService;
             mapper = _mapper;
@@ -39,6 +40,7 @@ namespace uStoreAPI.Controllers
             productosService = _productosService;
             publicacionesService = _publicacionesService;
             solicitudesService = _solicitudesService;
+            gerentesService = _gerentesService;
         }
 
         [HttpGet("GetTiendas")]
@@ -71,12 +73,15 @@ namespace uStoreAPI.Controllers
         {
             var user = HttpContext.User;
             var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+            string? idTiendaClaim = user.Claims.FirstOrDefault(u => u.Type == "IdTienda")?.Value;
+            int idTiendaClaimValue = 0;
+            int.TryParse(idTiendaClaim, out idTiendaClaimValue);
             var tienda = await tiendasService.GetOneTienda(idTienda);
             if (tienda is null)
             {
                 return BadRequest("No hay una tienda registrada con ese id");
             }
-            else if(tienda.IdAdministrador != idUser)
+            else if(tienda.IdAdministrador != idUser && idTiendaClaimValue != tienda.IdTienda)
             {
                 return Unauthorized("Tienda no autorizada");
             }
@@ -100,12 +105,15 @@ namespace uStoreAPI.Controllers
         {
             var user = HttpContext.User;
             var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+            string? idTiendaClaim = user.Claims.FirstOrDefault(u => u.Type == "IdTienda")?.Value;
+            int idTiendaClaimValue = 0;
+            int.TryParse(idTiendaClaim, out idTiendaClaimValue);
             var tienda = await tiendasService.GetOneTienda(id);
             if(tienda is null) 
             { 
                 return NotFound("Tienda no encontrada");
             }
-            else if(tienda.IdAdministrador != idUser)
+            else if(tienda.IdAdministrador != idUser && idTiendaClaimValue != tienda.IdTienda)
             {
                 return Unauthorized("Tienda no autorizada");
             }
@@ -315,6 +323,8 @@ namespace uStoreAPI.Controllers
                 await categoriasService.DeleteAllCategoriasProducto(producto.IdProductos);
                 await productosService.DeleteProducto(producto);
             }
+
+            await gerentesService.DeleteAccountGerente(null, tienda.IdTienda);
             await solicitudesService.DeleteSolicitudesTienda(tienda.IdTienda);
             await publicacionesService.DeleteAllPublicaciones(tienda.IdTienda);
             await uploadService.DeleteImagenesTiendas($"{tienda.IdTienda}");

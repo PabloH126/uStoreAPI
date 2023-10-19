@@ -1689,6 +1689,704 @@
         }
       }
     },
+    "/api/Chat/GetChats": {
+      "get": {
+        "tags": [
+          "Chat"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "typeChat",
+            "type": "string",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Chat"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          }
+        }
+      }
+    },
+    "/api/Chat/GetChat": {
+      "get": {
+        "tags": [
+          "Chat"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "idChat",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/MensajeDto"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          }
+        }
+      }
+    },
+    "/api/Chat/CreateChat": {
+      "post": {
+        "tags": [
+          "Chat"
+        ],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "idMiembro2",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          },
+          {
+            "in": "query",
+            "name": "typeMiembro2",
+            "type": "string",
+            "collectionFormat": "multi"
+          },
+          {
+            "in": "formData",
+            "name": "image",
+            "type": "file"
+          },
+          {
+            "in": "formData",
+            "name": "IdMensaje",
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "formData",
+            "name": "FechaMensaje",
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "in": "formData",
+            "name": "Contenido",
+            "type": "string"
+          },
+          {
+            "in": "formData",
+            "name": "IsImage",
+            "type": "boolean"
+          },
+          {
+            "in": "formData",
+            "name": "IdRemitente",
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "formData",
+            "name": "IsRead",
+            "type": "boolean"
+          },
+          {
+            "in": "formData",
+            "name": "IdChat",
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "formData",
+            "name": "isRecieved",
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/Chat"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Chat/CreateMensaje": {
+      "post": {
+        "tags": [
+          "Chat"
+        ],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "idChat",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          },
+          {
+            "in": "formData",
+            "name": "image",
+            "type": "file"
+          },
+          {
+            "in": "formData",
+            "name": "IdMensaje",
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "formData",
+            "name": "FechaMensaje",
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "in": "formData",
+            "name": "Contenido",
+            "type": "string"
+          },
+          {
+            "in": "formData",
+            "name": "IsImage",
+            "type": "boolean"
+          },
+          {
+            "in": "formData",
+            "name": "IdRemitente",
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "formData",
+            "name": "IsRead",
+            "type": "boolean"
+          },
+          {
+            "in": "formData",
+            "name": "IdChat",
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "formData",
+            "name": "isRecieved",
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/Mensaje"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Gerentes/Account": {
+      "get": {
+        "tags": [
+          "Gerentes"
+        ],
+        "operationId": "GetCuentaGerente",
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/CuentaGerenteDto"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          }
+        }
+      }
+    },
+    "/api/Gerentes/Gerente": {
+      "get": {
+        "tags": [
+          "Gerentes"
+        ],
+        "operationId": "GetGerente",
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/GerenteDto"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          }
+        }
+      }
+    },
+    "/api/Gerentes/GetUpdateGerente": {
+      "get": {
+        "tags": [
+          "Gerentes"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/GerenteUpdateDto"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          }
+        }
+      }
+    },
+    "/api/Gerentes/Gerentes": {
+      "get": {
+        "tags": [
+          "Gerentes"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/GerenteDto"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          }
+        }
+      }
+    },
+    "/api/Gerentes/VerifyEmail": {
+      "get": {
+        "tags": [
+          "Gerentes"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "email",
+            "type": "string",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          }
+        }
+      }
+    },
+    "/api/Gerentes/UpdateProfileImage": {
+      "post": {
+        "tags": [
+          "Gerentes"
+        ],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "idGerente",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          },
+          {
+            "in": "formData",
+            "name": "image",
+            "type": "file"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Gerentes/UpdatePass": {
+      "patch": {
+        "tags": [
+          "Gerentes"
+        ],
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Operation"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Gerentes/UpdateGerente": {
+      "put": {
+        "tags": [
+          "Gerentes"
+        ],
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/GerenteUpdateDto"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          }
+        }
+      }
+    },
+    "/api/Gerentes/DeleteAccount": {
+      "delete": {
+        "tags": [
+          "Gerentes"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "idGerente",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          }
+        }
+      }
+    },
+    "/api/Gerentes/DeleteGerente": {
+      "delete": {
+        "tags": [
+          "Gerentes"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "idGerente",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          }
+        }
+      }
+    },
     "/api/Horarios/GetHorarios": {
       "get": {
         "tags": [
@@ -3372,6 +4070,63 @@
         }
       }
     },
+    "/api/Register/RegisterGerente": {
+      "post": {
+        "tags": [
+          "Register"
+        ],
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "idTienda",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/RegisterDto"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/CuentaAdministradorDto"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          },
+          "409": {
+            "description": "Conflict",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          }
+        }
+      }
+    },
     "/api/Register/RegisterUser": {
       "post": {
         "tags": [
@@ -3467,6 +4222,50 @@
       }
     },
     "/api/Register/RecoverUser": {
+      "post": {
+        "tags": [
+          "Register"
+        ],
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/RecoverDto"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          }
+        }
+      }
+    },
+    "/api/Register/RecoverGerente": {
       "post": {
         "tags": [
           "Register"
@@ -4406,12 +5205,6 @@
           "format": "int32",
           "type": "integer"
         },
-        "chats": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Chat"
-          }
-        },
         "cuentaAdministradors": {
           "type": "array",
           "items": {
@@ -4426,12 +5219,6 @@
         },
         "idDetallesAdministradorNavigation": {
           "$ref": "#/definitions/DetallesAdministrador"
-        },
-        "mensajeAdministradors": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/MensajeAdministrador"
-          }
         },
         "tienda": {
           "type": "array",
@@ -4789,32 +5576,25 @@
           "format": "date-time",
           "type": "string"
         },
-        "idUsuario": {
+        "idMiembro1": {
           "format": "int32",
           "type": "integer"
         },
-        "idGerente": {
+        "typeMiembro1": {
+          "type": "string"
+        },
+        "idMiembro2": {
           "format": "int32",
           "type": "integer"
         },
-        "idAdministrador": {
-          "format": "int32",
-          "type": "integer"
+        "typeMiembro2": {
+          "type": "string"
         },
-        "detallesMensajes": {
+        "mensajes": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/DetallesMensaje"
+            "$ref": "#/definitions/Mensaje"
           }
-        },
-        "idAdministradorNavigation": {
-          "$ref": "#/definitions/AdministradorTiendum"
-        },
-        "idGerenteNavigation": {
-          "$ref": "#/definitions/Gerente"
-        },
-        "idUsuarioNavigation": {
-          "$ref": "#/definitions/Usuario"
         }
       },
       "additionalProperties": false
@@ -4936,6 +5716,37 @@
         },
         "idGerenteNavigation": {
           "$ref": "#/definitions/Gerente"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CuentaGerenteDto": {
+      "required": [
+        "email",
+        "idGerente",
+        "password"
+      ],
+      "type": "object",
+      "properties": {
+        "idCuentaGerente": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "password": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "email": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "idDetallesCuentaGerente": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idGerente": {
+          "format": "int32",
+          "type": "integer"
         }
       },
       "additionalProperties": false
@@ -5135,55 +5946,6 @@
       },
       "additionalProperties": false
     },
-    "DetallesMensaje": {
-      "type": "object",
-      "properties": {
-        "idDetallesMensaje": {
-          "format": "int32",
-          "type": "integer"
-        },
-        "contenido": {
-          "type": "string"
-        },
-        "fechaMensaje": {
-          "format": "date-time",
-          "type": "string"
-        },
-        "idChat": {
-          "format": "int32",
-          "type": "integer"
-        },
-        "idImagenesMensaje": {
-          "format": "int32",
-          "type": "integer"
-        },
-        "idChatNavigation": {
-          "$ref": "#/definitions/Chat"
-        },
-        "idImagenesMensajeNavigation": {
-          "$ref": "#/definitions/ImagenesMensaje"
-        },
-        "mensajeAdministradors": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/MensajeAdministrador"
-          }
-        },
-        "mensajeGerentes": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/MensajeGerente"
-          }
-        },
-        "mensajeUsuarios": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/MensajeUsuario"
-          }
-        }
-      },
-      "additionalProperties": false
-    },
     "DetallesUsuario": {
       "type": "object",
       "properties": {
@@ -5275,12 +6037,6 @@
           "format": "int32",
           "type": "integer"
         },
-        "chats": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Chat"
-          }
-        },
         "cuentaGerentes": {
           "type": "array",
           "items": {
@@ -5295,12 +6051,62 @@
         },
         "idTiendaNavigation": {
           "$ref": "#/definitions/Tiendum"
+        }
+      },
+      "additionalProperties": false
+    },
+    "GerenteDto": {
+      "type": "object",
+      "properties": {
+        "idGerente": {
+          "format": "int32",
+          "type": "integer"
         },
-        "mensajeGerentes": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/MensajeGerente"
-          }
+        "idDatos": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idAdministrador": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idTienda": {
+          "format": "int32",
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false
+    },
+    "GerenteUpdateDto": {
+      "required": [
+        "idCuentaGerente",
+        "idTienda",
+        "primerApellido",
+        "primerNombre"
+      ],
+      "type": "object",
+      "properties": {
+        "idCuentaGerente": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "primerNombre": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "primerApellido": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "idTienda": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "iconoPerfil": {
+          "type": "string"
         }
       },
       "additionalProperties": false
@@ -5429,25 +6235,6 @@
       },
       "additionalProperties": false
     },
-    "ImagenesMensaje": {
-      "type": "object",
-      "properties": {
-        "idImagenesMensaje": {
-          "format": "int32",
-          "type": "integer"
-        },
-        "imagenMensaje": {
-          "type": "string"
-        },
-        "detallesMensajes": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/DetallesMensaje"
-          }
-        }
-      },
-      "additionalProperties": false
-    },
     "ImagenesProducto": {
       "type": "object",
       "properties": {
@@ -5510,74 +6297,70 @@
       },
       "additionalProperties": false
     },
-    "MensajeAdministrador": {
+    "Mensaje": {
       "type": "object",
       "properties": {
-        "idMensajeAdministrador": {
+        "idMensaje": {
           "format": "int32",
           "type": "integer"
         },
-        "idDetallesMensaje": {
+        "fechaMensaje": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "contenido": {
+          "type": "string"
+        },
+        "isImage": {
+          "type": "boolean"
+        },
+        "idRemitente": {
           "format": "int32",
           "type": "integer"
         },
-        "idAdministrador": {
+        "isRead": {
+          "type": "boolean"
+        },
+        "idChat": {
           "format": "int32",
           "type": "integer"
         },
-        "idAdministradorNavigation": {
-          "$ref": "#/definitions/AdministradorTiendum"
-        },
-        "idDetallesMensajeNavigation": {
-          "$ref": "#/definitions/DetallesMensaje"
+        "idChatNavigation": {
+          "$ref": "#/definitions/Chat"
         }
       },
       "additionalProperties": false
     },
-    "MensajeGerente": {
+    "MensajeDto": {
       "type": "object",
       "properties": {
-        "idMensajeGerente": {
+        "idMensaje": {
           "format": "int32",
           "type": "integer"
         },
-        "idDetallesMensaje": {
+        "fechaMensaje": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "contenido": {
+          "type": "string"
+        },
+        "isImage": {
+          "type": "boolean"
+        },
+        "idRemitente": {
           "format": "int32",
           "type": "integer"
         },
-        "idGerente": {
+        "isRead": {
+          "type": "boolean"
+        },
+        "idChat": {
           "format": "int32",
           "type": "integer"
         },
-        "idDetallesMensajeNavigation": {
-          "$ref": "#/definitions/DetallesMensaje"
-        },
-        "idGerenteNavigation": {
-          "$ref": "#/definitions/Gerente"
-        }
-      },
-      "additionalProperties": false
-    },
-    "MensajeUsuario": {
-      "type": "object",
-      "properties": {
-        "idMensajeUsuario": {
-          "format": "int32",
-          "type": "integer"
-        },
-        "idDetallesMensaje": {
-          "format": "int32",
-          "type": "integer"
-        },
-        "idUsuario": {
-          "format": "int32",
-          "type": "integer"
-        },
-        "idDetallesMensajeNavigation": {
-          "$ref": "#/definitions/DetallesMensaje"
-        },
-        "idUsuarioNavigation": {
-          "$ref": "#/definitions/Usuario"
+        "isRecieved": {
+          "type": "boolean"
         }
       },
       "additionalProperties": false
@@ -6442,12 +7225,6 @@
             "$ref": "#/definitions/CalificacionTiendum"
           }
         },
-        "chats": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Chat"
-          }
-        },
         "comentarios": {
           "type": "array",
           "items": {
@@ -6474,12 +7251,6 @@
         },
         "idDetallesUsuarioNavigation": {
           "$ref": "#/definitions/DetallesUsuario"
-        },
-        "mensajeUsuarios": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/MensajeUsuario"
-          }
         },
         "solicitudesApartados": {
           "type": "array",

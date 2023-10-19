@@ -17,6 +17,8 @@ public partial class UstoreContext : DbContext
 
     public virtual DbSet<AdministradorTiendum> AdministradorTienda { get; set; }
 
+    public virtual DbSet<AggregatedCounter> AggregatedCounters { get; set; }
+
     public virtual DbSet<AlertaApartado> AlertaApartados { get; set; }
 
     public virtual DbSet<CalificacionProducto> CalificacionProductos { get; set; }
@@ -35,6 +37,8 @@ public partial class UstoreContext : DbContext
 
     public virtual DbSet<Comentario> Comentarios { get; set; }
 
+    public virtual DbSet<Counter> Counters { get; set; }
+
     public virtual DbSet<CuentaAdministrador> CuentaAdministradors { get; set; }
 
     public virtual DbSet<CuentaGerente> CuentaGerentes { get; set; }
@@ -51,13 +55,13 @@ public partial class UstoreContext : DbContext
 
     public virtual DbSet<DetallesCuentaUsuario> DetallesCuentaUsuarios { get; set; }
 
-    public virtual DbSet<DetallesMensaje> DetallesMensajes { get; set; }
-
     public virtual DbSet<DetallesUsuario> DetallesUsuarios { get; set; }
 
     public virtual DbSet<Favorito> Favoritos { get; set; }
 
     public virtual DbSet<Gerente> Gerentes { get; set; }
+
+    public virtual DbSet<Hash> Hashes { get; set; }
 
     public virtual DbSet<Historial> Historials { get; set; }
 
@@ -65,17 +69,19 @@ public partial class UstoreContext : DbContext
 
     public virtual DbSet<ImagenPerfil> ImagenPerfils { get; set; }
 
-    public virtual DbSet<ImagenesMensaje> ImagenesMensajes { get; set; }
-
     public virtual DbSet<ImagenesProducto> ImagenesProductos { get; set; }
 
     public virtual DbSet<ImagenesTienda> ImagenesTiendas { get; set; }
 
-    public virtual DbSet<MensajeAdministrador> MensajeAdministradors { get; set; }
+    public virtual DbSet<Job> Jobs { get; set; }
 
-    public virtual DbSet<MensajeGerente> MensajeGerentes { get; set; }
+    public virtual DbSet<JobParameter> JobParameters { get; set; }
 
-    public virtual DbSet<MensajeUsuario> MensajeUsuarios { get; set; }
+    public virtual DbSet<JobQueue> JobQueues { get; set; }
+
+    public virtual DbSet<List> Lists { get; set; }
+
+    public virtual DbSet<Mensaje> Mensajes { get; set; }
 
     public virtual DbSet<PenalizacionUsuario> PenalizacionUsuarios { get; set; }
 
@@ -85,13 +91,25 @@ public partial class UstoreContext : DbContext
 
     public virtual DbSet<Publicacione> Publicaciones { get; set; }
 
+    public virtual DbSet<Schema> Schemas { get; set; }
+
+    public virtual DbSet<Server> Servers { get; set; }
+
+    public virtual DbSet<Set> Sets { get; set; }
+
     public virtual DbSet<SolicitudesApartado> SolicitudesApartados { get; set; }
+
+    public virtual DbSet<State> States { get; set; }
 
     public virtual DbSet<TendenciasVentum> TendenciasVenta { get; set; }
 
     public virtual DbSet<Tiendum> Tienda { get; set; }
 
     public virtual DbSet<Usuario> Usuarios { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Server=tcp:ustoreserver.database.windows.net,1433;Initial Catalog=ustore;Persist Security Info=False;User ID=adminUstore;Password=ProyectoTitulo2023;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -106,6 +124,18 @@ public partial class UstoreContext : DbContext
             entity.HasOne(d => d.IdDetallesAdministradorNavigation).WithMany(p => p.AdministradorTienda)
                 .HasForeignKey(d => d.IdDetallesAdministrador)
                 .HasConstraintName("administrador_tienda_ibfk_detalles_administrador");
+        });
+
+        modelBuilder.Entity<AggregatedCounter>(entity =>
+        {
+            entity.HasKey(e => e.Key).HasName("PK_HangFire_CounterAggregated");
+
+            entity.ToTable("AggregatedCounter", "HangFire");
+
+            entity.HasIndex(e => e.ExpireAt, "IX_HangFire_AggregatedCounter_ExpireAt").HasFilter("([ExpireAt] IS NOT NULL)");
+
+            entity.Property(e => e.Key).HasMaxLength(100);
+            entity.Property(e => e.ExpireAt).HasColumnType("datetime");
         });
 
         modelBuilder.Entity<AlertaApartado>(entity =>
@@ -228,23 +258,19 @@ public partial class UstoreContext : DbContext
 
         modelBuilder.Entity<Chat>(entity =>
         {
-            entity.HasKey(e => e.IdChat).HasName("PK__chat__3817F38CB2461E0A");
+            entity.HasKey(e => e.IdChat).HasName("PK__chat__3817F38C0DA7FF04");
 
             entity.ToTable("chat");
 
+            entity.HasIndex(e => new { e.IdMiembro1, e.TypeMiembro1, e.IdMiembro2, e.TypeMiembro2 }, "Unique_Chat_Combination").IsUnique();
+
             entity.Property(e => e.FechaCreacion).HasColumnType("datetime");
-
-            entity.HasOne(d => d.IdAdministradorNavigation).WithMany(p => p.Chats)
-                .HasForeignKey(d => d.IdAdministrador)
-                .HasConstraintName("chat_ibfk_administrador_tienda");
-
-            entity.HasOne(d => d.IdGerenteNavigation).WithMany(p => p.Chats)
-                .HasForeignKey(d => d.IdGerente)
-                .HasConstraintName("chat_ibfk_gerente");
-
-            entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.Chats)
-                .HasForeignKey(d => d.IdUsuario)
-                .HasConstraintName("chat_ibfk_usuarios");
+            entity.Property(e => e.TypeMiembro1)
+                .HasMaxLength(30)
+                .IsUnicode(false);
+            entity.Property(e => e.TypeMiembro2)
+                .HasMaxLength(30)
+                .IsUnicode(false);
         });
 
         modelBuilder.Entity<Comentario>(entity =>
@@ -268,6 +294,17 @@ public partial class UstoreContext : DbContext
             entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.Comentarios)
                 .HasForeignKey(d => d.IdUsuario)
                 .HasConstraintName("comentarios_ibfk_usuarios");
+        });
+
+        modelBuilder.Entity<Counter>(entity =>
+        {
+            entity.HasKey(e => new { e.Key, e.Id }).HasName("PK_HangFire_Counter");
+
+            entity.ToTable("Counter", "HangFire");
+
+            entity.Property(e => e.Key).HasMaxLength(100);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.ExpireAt).HasColumnType("datetime");
         });
 
         modelBuilder.Entity<CuentaAdministrador>(entity =>
@@ -400,24 +437,6 @@ public partial class UstoreContext : DbContext
                 .HasConstraintName("detalles_cuenta_usuario_ibfk_imagen_perfil");
         });
 
-        modelBuilder.Entity<DetallesMensaje>(entity =>
-        {
-            entity.HasKey(e => e.IdDetallesMensaje).HasName("PK__detalles__10722F5E482777DD");
-
-            entity.ToTable("detalles_mensaje");
-
-            entity.Property(e => e.Contenido).HasColumnType("text");
-            entity.Property(e => e.FechaMensaje).HasColumnType("datetime");
-
-            entity.HasOne(d => d.IdChatNavigation).WithMany(p => p.DetallesMensajes)
-                .HasForeignKey(d => d.IdChat)
-                .HasConstraintName("detalles_mensaje_ibfk_chat");
-
-            entity.HasOne(d => d.IdImagenesMensajeNavigation).WithMany(p => p.DetallesMensajes)
-                .HasForeignKey(d => d.IdImagenesMensaje)
-                .HasConstraintName("detalles_mensaje_ibfk_imagenes_mensaje");
-        });
-
         modelBuilder.Entity<DetallesUsuario>(entity =>
         {
             entity.HasKey(e => e.IdDetallesUsuario).HasName("PK__detalles__4892D961D130A1DE");
@@ -477,6 +496,18 @@ public partial class UstoreContext : DbContext
                 .HasConstraintName("gerente_ibfk_tienda");
         });
 
+        modelBuilder.Entity<Hash>(entity =>
+        {
+            entity.HasKey(e => new { e.Key, e.Field }).HasName("PK_HangFire_Hash");
+
+            entity.ToTable("Hash", "HangFire");
+
+            entity.HasIndex(e => e.ExpireAt, "IX_HangFire_Hash_ExpireAt").HasFilter("([ExpireAt] IS NOT NULL)");
+
+            entity.Property(e => e.Key).HasMaxLength(100);
+            entity.Property(e => e.Field).HasMaxLength(100);
+        });
+
         modelBuilder.Entity<Historial>(entity =>
         {
             entity.HasKey(e => e.IdHistorial).HasName("PK__historia__9CC7DBB455B4EF9D");
@@ -530,17 +561,6 @@ public partial class UstoreContext : DbContext
                 .IsUnicode(false);
         });
 
-        modelBuilder.Entity<ImagenesMensaje>(entity =>
-        {
-            entity.HasKey(e => e.IdImagenesMensaje).HasName("PK__imagenes__3446ACF1FF24AE23");
-
-            entity.ToTable("imagenes_mensaje");
-
-            entity.Property(e => e.ImagenMensaje)
-                .HasMaxLength(255)
-                .IsUnicode(false);
-        });
-
         modelBuilder.Entity<ImagenesProducto>(entity =>
         {
             entity.HasKey(e => e.IdImagenesProductos).HasName("PK__imagenes__99684703E299853E");
@@ -571,49 +591,70 @@ public partial class UstoreContext : DbContext
                 .HasConstraintName("imagenes_tiendas_ibfk_tienda");
         });
 
-        modelBuilder.Entity<MensajeAdministrador>(entity =>
+        modelBuilder.Entity<Job>(entity =>
         {
-            entity.HasKey(e => e.IdMensajeAdministrador).HasName("PK__mensaje___8654F5EECB00812A");
+            entity.HasKey(e => e.Id).HasName("PK_HangFire_Job");
 
-            entity.ToTable("mensaje_administrador");
+            entity.ToTable("Job", "HangFire");
 
-            entity.HasOne(d => d.IdAdministradorNavigation).WithMany(p => p.MensajeAdministradors)
-                .HasForeignKey(d => d.IdAdministrador)
-                .HasConstraintName("mensaje_administrador_ibfk_administrador_tienda");
+            entity.HasIndex(e => e.ExpireAt, "IX_HangFire_Job_ExpireAt").HasFilter("([ExpireAt] IS NOT NULL)");
 
-            entity.HasOne(d => d.IdDetallesMensajeNavigation).WithMany(p => p.MensajeAdministradors)
-                .HasForeignKey(d => d.IdDetallesMensaje)
-                .HasConstraintName("mensaje_administrador_ibfk_detalles_mensaje");
+            entity.HasIndex(e => e.StateName, "IX_HangFire_Job_StateName").HasFilter("([StateName] IS NOT NULL)");
+
+            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+            entity.Property(e => e.ExpireAt).HasColumnType("datetime");
+            entity.Property(e => e.StateName).HasMaxLength(20);
         });
 
-        modelBuilder.Entity<MensajeGerente>(entity =>
+        modelBuilder.Entity<JobParameter>(entity =>
         {
-            entity.HasKey(e => e.IdMensajeGerente).HasName("PK__mensaje___D9B2149B877478AB");
+            entity.HasKey(e => new { e.JobId, e.Name }).HasName("PK_HangFire_JobParameter");
 
-            entity.ToTable("mensaje_gerente");
+            entity.ToTable("JobParameter", "HangFire");
 
-            entity.HasOne(d => d.IdDetallesMensajeNavigation).WithMany(p => p.MensajeGerentes)
-                .HasForeignKey(d => d.IdDetallesMensaje)
-                .HasConstraintName("mensaje_gerente_ibfk_detalles_mensaje");
+            entity.Property(e => e.Name).HasMaxLength(40);
 
-            entity.HasOne(d => d.IdGerenteNavigation).WithMany(p => p.MensajeGerentes)
-                .HasForeignKey(d => d.IdGerente)
-                .HasConstraintName("mensaje_gerente_ibfk_gerente");
+            entity.HasOne(d => d.Job).WithMany(p => p.JobParameters)
+                .HasForeignKey(d => d.JobId)
+                .HasConstraintName("FK_HangFire_JobParameter_Job");
         });
 
-        modelBuilder.Entity<MensajeUsuario>(entity =>
+        modelBuilder.Entity<JobQueue>(entity =>
         {
-            entity.HasKey(e => e.IdMensajeUsuario).HasName("PK__mensaje___8350592BDFBABF16");
+            entity.HasKey(e => new { e.Queue, e.Id }).HasName("PK_HangFire_JobQueue");
 
-            entity.ToTable("mensaje_usuario");
+            entity.ToTable("JobQueue", "HangFire");
 
-            entity.HasOne(d => d.IdDetallesMensajeNavigation).WithMany(p => p.MensajeUsuarios)
-                .HasForeignKey(d => d.IdDetallesMensaje)
-                .HasConstraintName("mensaje_usuario_ibfk_detalles_mensaje");
+            entity.Property(e => e.Queue).HasMaxLength(50);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.FetchedAt).HasColumnType("datetime");
+        });
 
-            entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.MensajeUsuarios)
-                .HasForeignKey(d => d.IdUsuario)
-                .HasConstraintName("mensaje_usuario_ibfk_usuarios");
+        modelBuilder.Entity<List>(entity =>
+        {
+            entity.HasKey(e => new { e.Key, e.Id }).HasName("PK_HangFire_List");
+
+            entity.ToTable("List", "HangFire");
+
+            entity.HasIndex(e => e.ExpireAt, "IX_HangFire_List_ExpireAt").HasFilter("([ExpireAt] IS NOT NULL)");
+
+            entity.Property(e => e.Key).HasMaxLength(100);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.ExpireAt).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<Mensaje>(entity =>
+        {
+            entity.HasKey(e => e.IdMensaje).HasName("PK__mensaje__E4D2A47F757B4B08");
+
+            entity.ToTable("mensaje");
+
+            entity.Property(e => e.FechaMensaje).HasColumnType("datetime");
+
+            entity.HasOne(d => d.IdChatNavigation).WithMany(p => p.Mensajes)
+                .HasForeignKey(d => d.IdChat)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_IdChat");
         });
 
         modelBuilder.Entity<PenalizacionUsuario>(entity =>
@@ -675,6 +716,42 @@ public partial class UstoreContext : DbContext
                 .HasConstraintName("publicaciones_ibfk_tienda");
         });
 
+        modelBuilder.Entity<Schema>(entity =>
+        {
+            entity.HasKey(e => e.Version).HasName("PK_HangFire_Schema");
+
+            entity.ToTable("Schema", "HangFire");
+
+            entity.Property(e => e.Version).ValueGeneratedNever();
+        });
+
+        modelBuilder.Entity<Server>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_HangFire_Server");
+
+            entity.ToTable("Server", "HangFire");
+
+            entity.HasIndex(e => e.LastHeartbeat, "IX_HangFire_Server_LastHeartbeat");
+
+            entity.Property(e => e.Id).HasMaxLength(200);
+            entity.Property(e => e.LastHeartbeat).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<Set>(entity =>
+        {
+            entity.HasKey(e => new { e.Key, e.Value }).HasName("PK_HangFire_Set");
+
+            entity.ToTable("Set", "HangFire");
+
+            entity.HasIndex(e => e.ExpireAt, "IX_HangFire_Set_ExpireAt").HasFilter("([ExpireAt] IS NOT NULL)");
+
+            entity.HasIndex(e => new { e.Key, e.Score }, "IX_HangFire_Set_Score");
+
+            entity.Property(e => e.Key).HasMaxLength(100);
+            entity.Property(e => e.Value).HasMaxLength(256);
+            entity.Property(e => e.ExpireAt).HasColumnType("datetime");
+        });
+
         modelBuilder.Entity<SolicitudesApartado>(entity =>
         {
             entity.HasKey(e => e.IdSolicitud).HasName("PK__solicitu__36899CEF46DF2058");
@@ -703,6 +780,24 @@ public partial class UstoreContext : DbContext
             entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.SolicitudesApartados)
                 .HasForeignKey(d => d.IdUsuario)
                 .HasConstraintName("solicitudes_apartado_ibfk_usuarios");
+        });
+
+        modelBuilder.Entity<State>(entity =>
+        {
+            entity.HasKey(e => new { e.JobId, e.Id }).HasName("PK_HangFire_State");
+
+            entity.ToTable("State", "HangFire");
+
+            entity.HasIndex(e => e.CreatedAt, "IX_HangFire_State_CreatedAt");
+
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+            entity.Property(e => e.Name).HasMaxLength(20);
+            entity.Property(e => e.Reason).HasMaxLength(100);
+
+            entity.HasOne(d => d.Job).WithMany(p => p.States)
+                .HasForeignKey(d => d.JobId)
+                .HasConstraintName("FK_HangFire_State_Job");
         });
 
         modelBuilder.Entity<TendenciasVentum>(entity =>

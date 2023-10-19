@@ -14,12 +14,14 @@ namespace uStoreAPI.Controllers
     {
         private readonly TendenciasService tendenciasService;
         private readonly AdminService adminService;
-        private  readonly UserService userService;
-        public PerfilController(TendenciasService _ts, AdminService _as, UserService _us)
+        private readonly UserService userService;
+        private readonly GerentesService gerentesService;
+        public PerfilController(TendenciasService _ts, AdminService _as, UserService _us, GerentesService _gs)
         {
             tendenciasService = _ts;
             adminService = _as;
             userService = _us;
+            gerentesService = _gs;
         }
 
         [Authorize]
@@ -31,9 +33,23 @@ namespace uStoreAPI.Controllers
         {
             var user = HttpContext.User;
             var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
-
-            var perfilAdmin = await adminService.GetPerfilAdmin(idUser);
-            return Ok(perfilAdmin);
+            var typeUser = user.Claims.FirstOrDefault(u => u.Type == "UserType")!.Value;
+            if(typeUser == null)
+            {
+                return BadRequest();
+            }
+            else if (typeUser == "Administrador")
+            {
+                return await adminService.GetPerfilAdmin(idUser);
+            }
+            else if (typeUser == "Gerente")
+            {
+                return await gerentesService.GetPerfilGerente(idUser);
+            }
+            else
+            {
+                return NotFound();
+            }
         }
     }
 }

@@ -15,8 +15,6 @@ public partial class Usuario
 
     public virtual ICollection<CalificacionTiendum> CalificacionTienda { get; set; } = new List<CalificacionTiendum>();
 
-    public virtual ICollection<Chat> Chats { get; set; } = new List<Chat>();
-
     public virtual ICollection<Comentario> Comentarios { get; set; } = new List<Comentario>();
 
     public virtual ICollection<CuentaUsuario> CuentaUsuarios { get; set; } = new List<CuentaUsuario>();
@@ -26,8 +24,6 @@ public partial class Usuario
     public virtual ICollection<Historial> Historials { get; set; } = new List<Historial>();
 
     public virtual DetallesUsuario? IdDetallesUsuarioNavigation { get; set; }
-
-    public virtual ICollection<MensajeUsuario> MensajeUsuarios { get; set; } = new List<MensajeUsuario>();
 
     public virtual ICollection<SolicitudesApartado> SolicitudesApartados { get; set; } = new List<SolicitudesApartado>();
 }

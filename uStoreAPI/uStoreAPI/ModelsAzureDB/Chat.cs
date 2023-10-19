@@ -9,17 +9,13 @@ public partial class Chat
 
     public DateTime? FechaCreacion { get; set; }
 
-    public int? IdUsuario { get; set; }
+    public int IdMiembro1 { get; set; }
 
-    public int? IdGerente { get; set; }
+    public string? TypeMiembro1 { get; set; }
 
-    public int? IdAdministrador { get; set; }
+    public int IdMiembro2 { get; set; }
 
-    public virtual ICollection<DetallesMensaje> DetallesMensajes { get; set; } = new List<DetallesMensaje>();
+    public string? TypeMiembro2 { get; set; }
 
-    public virtual AdministradorTiendum? IdAdministradorNavigation { get; set; }
-
-    public virtual Gerente? IdGerenteNavigation { get; set; }
-
-    public virtual Usuario? IdUsuarioNavigation { get; set; }
+    public virtual ICollection<Mensaje> Mensajes { get; set; } = new List<Mensaje>();
 }

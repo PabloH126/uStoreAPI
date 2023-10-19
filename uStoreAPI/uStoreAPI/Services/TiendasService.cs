@@ -27,6 +27,15 @@ namespace uStoreAPI.Services
             return tiendas;
         }
 
+        public async Task<IEnumerable<Tiendum>> GetTiendasOnlyAdmin(int idAdministrador)
+        {
+            var tiendas = await context.Tienda.Where(t =>
+                                                t.IdAdministrador == idAdministrador)
+                                                .AsNoTracking()
+                                                .ToListAsync();
+            return tiendas;
+        }
+
         public async Task<IEnumerable<ImagenesTienda>> GetImagenesTienda(int idTienda)
         {
             return await context.ImagenesTiendas.Where(p => p.IdTienda == idTienda).AsNoTracking().ToListAsync();
