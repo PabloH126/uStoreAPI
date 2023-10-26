@@ -7,6 +7,7 @@
         public string? Nombre { get; set; }
         public string? Email { get; set; }
         public string? TiendaName { get; set; }
+        public string? TiendaImage { get; set; }
         public string? iconoPerfil { get; set; }
 
     }

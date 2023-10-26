@@ -47,13 +47,20 @@ namespace uStoreAPI.Controllers
         {
             var user = HttpContext.User;
             var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+            var userType = user.Claims.FirstOrDefault(u => u.Type == "UserType")!.Value;
+            string? idTiendaGerente = null;
+            if(userType == "Gerente")
+            {
+                idTiendaGerente = user.Claims.FirstOrDefault(u => u.Type == "IdTienda")!.Value;
+            }
+
             var tienda = await tiendasService.GetOneTienda(idTienda);
             var periodos = await periodosService.GetPeriodosPredeterminados(idTienda);
             if(tienda is null)
             {
                 return BadRequest("Tienda no registrada");
             }
-            else if(tienda.IdAdministrador != idUser)
+            else if((tienda.IdAdministrador != idUser) && !(userType == "Gerente" && int.Parse(idTiendaGerente!) == tienda.IdTienda))
             {
                 return Unauthorized("Tienda no autorizada");
             }
@@ -111,13 +118,20 @@ namespace uStoreAPI.Controllers
         {
             var user = HttpContext.User;
             var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+            var userType = user.Claims.FirstOrDefault(u => u.Type == "UserType")!.Value;
+            string? idTiendaGerente = null;
+            if (userType == "Gerente")
+            {
+                idTiendaGerente = user.Claims.FirstOrDefault(u => u.Type == "IdTienda")!.Value;
+            }
+
             var tienda = await tiendasService.GetOneTienda(idTienda);
             var periodos = await periodosService.GetPeriodosPredeterminados(idTienda);
             if (tienda is null)
             {
                 return BadRequest("Tienda no registrada");
             }
-            else if (tienda.IdAdministrador != idUser)
+            else if ((tienda.IdAdministrador != idUser) && !(userType == "Gerente" && int.Parse(idTiendaGerente!) == tienda.IdTienda))
             {
                 return Unauthorized("Tienda no autorizada");
             }

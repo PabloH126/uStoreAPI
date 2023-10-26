@@ -271,6 +271,10 @@ public partial class UstoreContext : DbContext
             entity.Property(e => e.TypeMiembro2)
                 .HasMaxLength(30)
                 .IsUnicode(false);
+
+            entity.HasOne(d => d.IdTiendaNavigation).WithMany(p => p.Chats)
+                .HasForeignKey(d => d.IdTienda)
+                .HasConstraintName("FK_Chats_IdTienda");
         });
 
         modelBuilder.Entity<Comentario>(entity =>
@@ -650,6 +654,9 @@ public partial class UstoreContext : DbContext
             entity.ToTable("mensaje");
 
             entity.Property(e => e.FechaMensaje).HasColumnType("datetime");
+            entity.Property(e => e.TypeRemitente)
+                .HasMaxLength(20)
+                .IsUnicode(false);
 
             entity.HasOne(d => d.IdChatNavigation).WithMany(p => p.Mensajes)
                 .HasForeignKey(d => d.IdChat)

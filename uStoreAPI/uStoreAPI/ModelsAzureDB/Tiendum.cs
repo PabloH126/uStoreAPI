@@ -25,6 +25,8 @@ public partial class Tiendum
 
     public virtual ICollection<CategoriasTienda> CategoriasTienda { get; set; } = new List<CategoriasTienda>();
 
+    public virtual ICollection<Chat> Chats { get; set; } = new List<Chat>();
+
     public virtual ICollection<Comentario> Comentarios { get; set; } = new List<Comentario>();
 
     public virtual ICollection<Favorito> Favoritos { get; set; } = new List<Favorito>();

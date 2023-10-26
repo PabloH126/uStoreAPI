@@ -1804,6 +1804,13 @@
             "collectionFormat": "multi"
           },
           {
+            "in": "query",
+            "name": "idTienda",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          },
+          {
             "in": "formData",
             "name": "image",
             "type": "file"
@@ -1851,6 +1858,11 @@
             "in": "formData",
             "name": "isRecieved",
             "type": "boolean"
+          },
+          {
+            "in": "formData",
+            "name": "TypeRemitente",
+            "type": "string"
           }
         ],
         "responses": {
@@ -1947,6 +1959,11 @@
             "in": "formData",
             "name": "isRecieved",
             "type": "boolean"
+          },
+          {
+            "in": "formData",
+            "name": "TypeRemitente",
+            "type": "string"
           }
         ],
         "responses": {
@@ -2113,7 +2130,7 @@
           "200": {
             "description": "Success",
             "schema": {
-              "$ref": "#/definitions/GerenteDto"
+              "$ref": "#/definitions/GerenteListaDto"
             }
           },
           "400": {
@@ -3869,7 +3886,6 @@
           {
             "in": "formData",
             "name": "IdCentroComercial",
-            "required": true,
             "type": "integer",
             "format": "int32"
           },
@@ -5590,6 +5606,13 @@
         "typeMiembro2": {
           "type": "string"
         },
+        "idTienda": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idTiendaNavigation": {
+          "$ref": "#/definitions/Tiendum"
+        },
         "mensajes": {
           "type": "array",
           "items": {
@@ -6077,6 +6100,35 @@
       },
       "additionalProperties": false
     },
+    "GerenteListaDto": {
+      "type": "object",
+      "properties": {
+        "idGerente": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idTienda": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "nombre": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "tiendaName": {
+          "type": "string"
+        },
+        "tiendaImage": {
+          "type": "string"
+        },
+        "iconoPerfil": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
     "GerenteUpdateDto": {
       "required": [
         "idCuentaGerente",
@@ -6325,6 +6377,9 @@
           "format": "int32",
           "type": "integer"
         },
+        "typeRemitente": {
+          "type": "string"
+        },
         "idChatNavigation": {
           "$ref": "#/definitions/Chat"
         }
@@ -6361,6 +6416,9 @@
         },
         "isRecieved": {
           "type": "boolean"
+        },
+        "typeRemitente": {
+          "type": "string"
         }
       },
       "additionalProperties": false
@@ -6700,7 +6758,6 @@
     "PublicacionesDto": {
       "required": [
         "contenido",
-        "idCentroComercial",
         "idTienda"
       ],
       "type": "object",
@@ -7039,6 +7096,12 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/CategoriasTienda"
+          }
+        },
+        "chats": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Chat"
           }
         },
         "comentarios": {

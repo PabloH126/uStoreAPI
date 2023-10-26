@@ -16,19 +16,23 @@ namespace uStoreAPI.Hubs
         {
             chatService = _cS;
         }
-        
+
+        public override async Task OnConnectedAsync()
+        {
+            var user = Context.User;
+            var idUser = user!.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            if (idUser != null)
+            {
+                await Groups.AddToGroupAsync(Context.ConnectionId, $"{idUser}Chats");
+                await Clients.Group($"{idUser}Chats").SendAsync("Notify", $"{Context.ConnectionId} se ha unido al chat: {idUser}Chats");
+            }
+            await base.OnConnectedAsync();
+        }
+
         public async Task JoinGroupChat(string idChat)
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, $"Chat{idChat}");
         }
-
-        public async Task JoinUserChats()
-        {
-            var user = Context.User;
-            var idUser = user!.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value!;
-            await Groups.AddToGroupAsync(Context.ConnectionId, $"{idUser}Chats");
-            await Clients.Groups($"{idUser}Chats").SendAsync("NameGroup", $"{idUser}Chats");
-        }
-        
     }
 }

@@ -181,7 +181,6 @@ namespace uStoreAPI.Controllers
             {
                 using (var httpClient = new HttpClient())
                 {
-                    // Asume que este es el endpoint de tu misma aplicación
                     var response = await httpClient.GetAsync($"https://ustoreapi.azurewebsites.net/api/Tiendas/DeleteTienda?id={tienda.IdTienda}");
                     if (response.IsSuccessStatusCode)
                     {

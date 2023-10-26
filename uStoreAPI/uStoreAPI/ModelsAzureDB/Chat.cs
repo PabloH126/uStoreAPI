@@ -17,5 +17,9 @@ public partial class Chat
 
     public string? TypeMiembro2 { get; set; }
 
+    public int? IdTienda { get; set; }
+
+    public virtual Tiendum? IdTiendaNavigation { get; set; }
+
     public virtual ICollection<Mensaje> Mensajes { get; set; } = new List<Mensaje>();
 }

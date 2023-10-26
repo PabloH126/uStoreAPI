@@ -46,6 +46,7 @@ namespace uStoreAPI.Services
                                       Nombre = $"{datos.PrimerNombre} {datos.PrimerApellido}",
                                       Email = cG.Email,
                                       TiendaName = t.NombreTienda,
+                                      TiendaImage = t.LogoTienda,
                                       iconoPerfil = iP.IconoPerfil,
                                   }).ToListAsync();
             return gerentes;
@@ -199,18 +200,21 @@ namespace uStoreAPI.Services
                 gerente = await context.Gerentes.FindAsync(idGerente);
             }
 
-            var cuentaGerente = await context.CuentaGerentes.FirstOrDefaultAsync(p => p.IdGerente == gerente!.IdGerente);
-            var detallesCuentaGerente = await context.DetallesCuentaGerentes.FindAsync(cuentaGerente!.IdDetallesCuentaGerente);
-            var imagenGerente = await context.ImagenPerfils.FindAsync(detallesCuentaGerente!.IdImagenPerfil);
-            var datosGerente = await context.Datos.FindAsync(gerente!.IdDatos);
+            if(gerente is not null)
+            {
+                var cuentaGerente = await context.CuentaGerentes.FirstOrDefaultAsync(p => p.IdGerente == gerente!.IdGerente);
+                var detallesCuentaGerente = await context.DetallesCuentaGerentes.FindAsync(cuentaGerente!.IdDetallesCuentaGerente);
+                var imagenGerente = await context.ImagenPerfils.FindAsync(detallesCuentaGerente!.IdImagenPerfil);
+                var datosGerente = await context.Datos.FindAsync(gerente!.IdDatos);
 
-            context.CuentaGerentes.Remove(cuentaGerente);
-            context.DetallesCuentaGerentes.Remove(detallesCuentaGerente);
-            context.ImagenPerfils.Remove(imagenGerente!);
-            context.Gerentes.Remove(gerente);
-            context.Datos.Remove(datosGerente!);
+                context.CuentaGerentes.Remove(cuentaGerente);
+                context.DetallesCuentaGerentes.Remove(detallesCuentaGerente);
+                context.ImagenPerfils.Remove(imagenGerente!);
+                context.Gerentes.Remove(gerente);
+                context.Datos.Remove(datosGerente!);
 
-            await context.SaveChangesAsync();
+                await context.SaveChangesAsync();
+            }
         }
 
         public async Task DeleteGerente(Gerente gerente)          

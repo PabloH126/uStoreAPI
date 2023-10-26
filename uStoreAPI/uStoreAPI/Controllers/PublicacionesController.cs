@@ -86,20 +86,25 @@ namespace uStoreAPI.Controllers
             {
                 return BadRequest(ModelState);
             }
-            
             var user = HttpContext.User;
             var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
             var tienda = await tiendasService.GetOneTienda(publicacion.IdTienda);
+            if (tienda is null)
+            {
+                return BadRequest("No se encontró la tienda");
+            }
+            else if (publicacion.IdCentroComercial is null)
+            {
+                publicacion.IdCentroComercial = tienda!.IdCentroComercial;
+            }
+
             var plaza = await plazasService.GetOneMall(publicacion.IdCentroComercial);
 
             if(plaza is null)
             {
                 return BadRequest("No se encontró el centro comercial");
             }
-            else if(tienda is null)
-            {
-                return BadRequest("No se encontró la tienda");
-            }
+
             publicacion.FechaPublicacion = DateTime.Now.Date;
             
             var publicacionGuardada = mapper.Map<Publicacione>(publicacion);

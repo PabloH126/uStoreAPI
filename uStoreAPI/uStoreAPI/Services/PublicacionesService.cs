@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using uStoreAPI.ModelsAzureDB;
 
 namespace uStoreAPI.Services
@@ -51,12 +52,15 @@ namespace uStoreAPI.Services
         public async Task DeleteAllPublicaciones(int idTienda)
         {
             var publicaciones = await context.Publicaciones.Where(p => p.IdTienda == idTienda).ToListAsync();
-            foreach (var publicacion in publicaciones)
+            if (!publicaciones.IsNullOrEmpty())
             {
-                await uploadService.DeleteImagePublicacion(publicacion.IdPublicacion.ToString());
-                context.Publicaciones.Remove(publicacion);
+                foreach (var publicacion in publicaciones)
+                {
+                    await uploadService.DeleteImagePublicacion(publicacion.IdPublicacion.ToString());
+                    context.Publicaciones.Remove(publicacion);
+                }
+                await context.SaveChangesAsync();
             }
-            await context.SaveChangesAsync();
         }
     }
 }

@@ -16,5 +16,6 @@
 
         public int IdChat { get; set; }
         public bool isRecieved {  get; set; }
+        public string? TypeRemitente { get; set; }
     }
 }

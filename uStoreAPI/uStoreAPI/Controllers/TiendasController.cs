@@ -26,8 +26,9 @@ namespace uStoreAPI.Controllers
         private readonly PublicacionesService publicacionesService;
         private readonly SolicitudesApartadoService solicitudesService;
         private readonly GerentesService gerentesService;
+        private readonly ChatService chatService;
         private IMapper mapper;
-        public TiendasController(GerentesService _gerentesService, SolicitudesApartadoService _solicitudesService, PublicacionesService _publicacionesService, CalificacionesService _calificacionesService, PeriodosPredeterminadosService _periodosPredeterminadosService,HorariosService _horariosService,TiendasService _tiendasService, IMapper _mapper, UploadService _uploadService, PlazasService _plazasService, CategoriasService _categoriasService, ProductosService _productosService)
+        public TiendasController(ChatService _chatService, GerentesService _gerentesService, SolicitudesApartadoService _solicitudesService, PublicacionesService _publicacionesService, CalificacionesService _calificacionesService, PeriodosPredeterminadosService _periodosPredeterminadosService,HorariosService _horariosService,TiendasService _tiendasService, IMapper _mapper, UploadService _uploadService, PlazasService _plazasService, CategoriasService _categoriasService, ProductosService _productosService)
         {
             tiendasService = _tiendasService;
             mapper = _mapper;
@@ -41,6 +42,7 @@ namespace uStoreAPI.Controllers
             publicacionesService = _publicacionesService;
             solicitudesService = _solicitudesService;
             gerentesService = _gerentesService;
+            chatService = _chatService;
         }
 
         [HttpGet("GetTiendas")]
@@ -316,16 +318,22 @@ namespace uStoreAPI.Controllers
 
             var productosTienda = await productosService.GetProductos(tienda.IdTienda);
 
-            foreach(var producto in productosTienda)
+            await solicitudesService.DeleteSolicitudesTienda(tienda.IdTienda);
+
+            if (!productosTienda.IsNullOrEmpty())
             {
-                await uploadService.DeleteImagenesProductos($"{producto.IdProductos}");
-                await productosService.DeleteImagenesProductoWithId(producto.IdProductos);
-                await categoriasService.DeleteAllCategoriasProducto(producto.IdProductos);
-                await productosService.DeleteProducto(producto);
+                foreach (var producto in productosTienda)
+                {
+                    await uploadService.DeleteImagenesProductos($"{producto.IdProductos}");
+                    await productosService.DeleteImagenesProductoWithId(producto.IdProductos);
+                    await calificacionesService.DeleteAllCalificacionesProducto(producto.IdProductos);
+                    await categoriasService.DeleteAllCategoriasProducto(producto.IdProductos);
+                    await productosService.DeleteProducto(producto);  
+                }
             }
 
+            await chatService.DeleteChatWithIdTienda(tienda.IdTienda);
             await gerentesService.DeleteAccountGerente(null, tienda.IdTienda);
-            await solicitudesService.DeleteSolicitudesTienda(tienda.IdTienda);
             await publicacionesService.DeleteAllPublicaciones(tienda.IdTienda);
             await uploadService.DeleteImagenesTiendas($"{tienda.IdTienda}");
             await horariosService.DeleteAllHorarios(tienda.IdTienda);

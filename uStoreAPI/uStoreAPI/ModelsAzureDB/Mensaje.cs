@@ -19,5 +19,7 @@ public partial class Mensaje
 
     public int IdChat { get; set; }
 
+    public string? TypeRemitente { get; set; }
+
     public virtual Chat IdChatNavigation { get; set; } = null!;
 }

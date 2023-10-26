@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using uStoreAPI.ModelsAzureDB;
 
 namespace uStoreAPI.Services
@@ -75,8 +76,11 @@ namespace uStoreAPI.Services
         public async Task DeleteSolicitudesTienda(int idTienda)
         {
             var solicitudes = await context.SolicitudesApartados.Where(p => p.IdTienda == idTienda).ToListAsync();
-            context.SolicitudesApartados.RemoveRange(solicitudes);
-            await context.SaveChangesAsync();
+            if (!solicitudes.IsNullOrEmpty())
+            {
+                context.SolicitudesApartados.RemoveRange(solicitudes);
+                await context.SaveChangesAsync();
+            }
         }
 
         public async Task MarcarComoVencida(int idSolicitud)
