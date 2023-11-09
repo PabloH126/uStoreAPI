@@ -35,7 +35,9 @@ public partial class UstoreContext : DbContext
 
     public virtual DbSet<Chat> Chats { get; set; }
 
-    public virtual DbSet<Comentario> Comentarios { get; set; }
+    public virtual DbSet<ComentariosProducto> ComentariosProductos { get; set; }
+
+    public virtual DbSet<ComentariosTienda> ComentariosTiendas { get; set; }
 
     public virtual DbSet<Counter> Counters { get; set; }
 
@@ -106,10 +108,6 @@ public partial class UstoreContext : DbContext
     public virtual DbSet<Tiendum> Tienda { get; set; }
 
     public virtual DbSet<Usuario> Usuarios { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=tcp:ustoreserver.database.windows.net,1433;Initial Catalog=ustore;Persist Security Info=False;User ID=adminUstore;Password=ProyectoTitulo2023;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -277,27 +275,48 @@ public partial class UstoreContext : DbContext
                 .HasConstraintName("FK_Chats_IdTienda");
         });
 
-        modelBuilder.Entity<Comentario>(entity =>
+        modelBuilder.Entity<ComentariosProducto>(entity =>
         {
-            entity.HasKey(e => e.IdComentarios).HasName("PK__comentar__3A900588B2B70FBF");
+            entity.HasKey(e => e.IdComentarioProducto).HasName("PK__comentar__A2E1FF5AEC6D261F");
 
-            entity.ToTable("comentarios");
+            entity.ToTable("comentarios_productos");
 
-            entity.Property(e => e.Comentario1)
-                .HasColumnType("text")
-                .HasColumnName("Comentario");
+            entity.Property(e => e.Comentario)
+                .HasMaxLength(200)
+                .IsUnicode(false);
+            entity.Property(e => e.FechaComentario).HasColumnType("datetime");
 
-            entity.HasOne(d => d.IdProductosNavigation).WithMany(p => p.Comentarios)
-                .HasForeignKey(d => d.IdProductos)
-                .HasConstraintName("comentarios_ibfk_productos");
+            entity.HasOne(d => d.IdProductoNavigation).WithMany(p => p.ComentariosProductos)
+                .HasForeignKey(d => d.IdProducto)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Comentarios_productos");
 
-            entity.HasOne(d => d.IdTiendaNavigation).WithMany(p => p.Comentarios)
-                .HasForeignKey(d => d.IdTienda)
-                .HasConstraintName("comentarios_ibfk_tienda");
-
-            entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.Comentarios)
+            entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.ComentariosProductos)
                 .HasForeignKey(d => d.IdUsuario)
-                .HasConstraintName("comentarios_ibfk_usuarios");
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Comentarios_productos_usuarios");
+        });
+
+        modelBuilder.Entity<ComentariosTienda>(entity =>
+        {
+            entity.HasKey(e => e.IdComentarioTienda).HasName("PK__comentar__164286A018EBD231");
+
+            entity.ToTable("comentarios_tiendas");
+
+            entity.Property(e => e.Comentario)
+                .HasMaxLength(200)
+                .IsUnicode(false);
+            entity.Property(e => e.FechaComentario).HasColumnType("datetime");
+
+            entity.HasOne(d => d.IdTiendaNavigation).WithMany(p => p.ComentariosTienda)
+                .HasForeignKey(d => d.IdTienda)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Comentarios_tiendas");
+
+            entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.ComentariosTienda)
+                .HasForeignKey(d => d.IdUsuario)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Comentarios_tiendas_usuarios");
         });
 
         modelBuilder.Entity<Counter>(entity =>

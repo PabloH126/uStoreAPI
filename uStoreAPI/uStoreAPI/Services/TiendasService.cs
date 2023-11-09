@@ -16,6 +16,33 @@ namespace uStoreAPI.Services
             mapper = _mapper;
         }
 
+        public async Task<IEnumerable<ListaTiendasAppDto>> GetAllTiendas(int idCentroComercial)
+        {
+            var tiendas = mapper.Map<IEnumerable<ListaTiendasAppDto>>(
+                            await context.Tienda.Where(t => t.IdCentroComercial == idCentroComercial)
+                            .AsNoTracking()
+                            .ToListAsync());
+            foreach (var tiendaDto in tiendas)
+            {
+                tiendaDto.Horario = mapper.Map<IEnumerable<HorarioDto>>(await context.Horarios.Where(p => p.IdTienda == tiendaDto.IdTienda).AsNoTracking().ToListAsync());
+            }
+            foreach (var tiendaDto in tiendas)
+            {
+                tiendaDto.CategoriasTienda = await (from catTienda in context.CategoriasTiendas
+                                                    join cat in context.Categorias on catTienda.IdCategoria equals cat.IdCategoria
+                                                    where (catTienda.IdTienda == tiendaDto.IdTienda)
+                                                    select new CategoriasTiendaDto
+                                                    {
+                                                        IdCategoria = cat.IdCategoria,
+                                                        IdTienda = tiendaDto.IdTienda,
+                                                        NameCategoria = cat.Categoria1
+                                                    })
+                                                    .AsNoTracking()
+                                                    .ToListAsync();
+            }
+            return tiendas;
+        }
+
         public async Task<IEnumerable<TiendaDto>> GetTiendas(int idCentroComercial, int idAdministrador)
         {
             var tiendas = mapper.Map<IEnumerable<TiendaDto>>(
@@ -49,6 +76,54 @@ namespace uStoreAPI.Services
         public async Task<Tiendum?> GetOneTienda(int? idTienda)
         {
             return await context.Tienda.FindAsync(idTienda);
+        }
+
+        public async Task<TiendaAppDto?> GetTiendaApp(int idTienda)
+        {
+            List<ProductoDto> productosPopulares = new List<ProductoDto>();
+            var tienda = await context.Tienda.FindAsync(idTienda);
+            if (tienda is null)
+            {
+                return null;
+            }
+            var tiendaAppDto = mapper.Map<TiendaAppDto>(tienda);
+            tiendaAppDto.CategoriasTienda = await (from catT in context.CategoriasTiendas
+                                             join cat in context.Categorias on catT.IdTienda equals cat.IdCategoria
+                                             where catT.IdTienda == tienda.IdTienda
+                                             select new CategoriasTiendaDto
+                                             {
+                                                 IdCt = catT.IdCt,
+                                                 IdCategoria = catT.IdCategoria,
+                                                 IdTienda = catT.IdTienda,
+                                                 NameCategoria = cat.Categoria1
+                                             })
+                                             .AsNoTracking()
+                                             .ToListAsync();
+            tiendaAppDto.Horario = mapper.Map<IEnumerable<HorarioDto>>(await context.Horarios.Where(p => p.IdTienda == tienda.IdTienda).AsNoTracking().ToListAsync());
+            tiendaAppDto.CalificacionesTienda = mapper.Map<IEnumerable<CalificacionTiendaDto>>(await context.CalificacionTienda.Where(p => p.IdTienda == tienda.IdTienda).AsNoTracking().ToListAsync());
+            tiendaAppDto.ComentariosTienda = mapper.Map<IEnumerable<ComentariosTiendaDto>>(await context.ComentariosTiendas.Where(p => p.IdTienda == tienda.IdTienda).AsNoTracking().ToListAsync());
+
+            var solicitudesTienda = context.SolicitudesApartados.Where(p => p.IdTienda == tienda.IdTienda);
+
+            var usuariosEnSolicitudes = await solicitudesTienda
+                                                            .GroupBy(p => p.IdProductos)
+                                                            .Select(g => new
+                                                            {
+                                                                Id = g.Key,
+                                                                CantidadUsuarios = g.Select(s => s.IdUsuario).Distinct().Count()
+                                                            })
+                                                            .OrderByDescending(p => p.CantidadUsuarios)
+                                                            .Take(16)
+                                                            .ToListAsync();
+            foreach(var usuario in usuariosEnSolicitudes)
+            {
+                var producto = mapper.Map<ProductoDto>(await context.Productos.FindAsync(usuario.Id));
+                productosPopulares.Add(producto);
+            }
+            tiendaAppDto.ProductosPopularesTienda = productosPopulares;
+
+            tiendaAppDto.PublicacionesTienda = mapper.Map<IEnumerable<PublicacionesDto>>(await context.Publicaciones.Where(p => p.IdTienda == tiendaAppDto.IdTienda).AsNoTracking().ToListAsync());
+            return tiendaAppDto;
         }
 
         public async Task<Tiendum> CreateTienda(Tiendum tienda)

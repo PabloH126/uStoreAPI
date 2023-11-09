@@ -18,5 +18,6 @@
         public string? TiendaNameChat {  get; set; }
         public string? ImagenUsuario {  get; set; }
         public string? NombreUsuario { get; set; }
+        public int? IdTienda { get; set; }
     }
 }

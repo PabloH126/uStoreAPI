@@ -12,7 +12,6 @@ namespace uStoreAPI.Dtos
         public string? StatusSolicitud { get; set; }
         [Required]
         public int? IdProductos { get; set; }
-        [Required]
         public int? IdUsuario { get; set; }
         [Required]
         public int? IdTienda { get; set; }

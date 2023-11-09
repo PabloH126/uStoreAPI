@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Reflection.Metadata.Ecma335;
+using System.Threading.Tasks.Dataflow;
 using uStoreAPI.Dtos;
 using uStoreAPI.ModelsAzureDB;
 
@@ -217,9 +218,10 @@ namespace uStoreAPI.Services
             return await context.Mensajes.Where(p => p.IdChat == idChat).AsNoTracking().ToListAsync();
         }
 
-        public async Task<Chat> CreateChat(int idSolicitante, string typeSolicitante, int idMiembro2, string typeMiembro2, int? idTienda)
+        public async Task<ChatDto?> CreateChat(int idSolicitante, string typeSolicitante, int idMiembro2, string typeMiembro2, int? idTienda)
         {
             Chat newChat = new Chat();
+            ChatDto? chatCreadoDto = new ChatDto();
             if (typeSolicitante == "Usuario")
             {
                 var tienda = await context.Tienda.FindAsync(idTienda);
@@ -231,6 +233,29 @@ namespace uStoreAPI.Services
                     newChat.IdMiembro2 = idSolicitante;
                     newChat.TypeMiembro2 = typeSolicitante;
                     newChat.IdTienda = tienda.IdTienda;
+
+                    chatCreadoDto.FechaCreacion = newChat.FechaCreacion;
+                    chatCreadoDto.IdMiembro1 = newChat.IdMiembro1;
+                    chatCreadoDto.TypeMiembro1 = newChat.TypeMiembro1;
+                    chatCreadoDto.IdMiembro2 = newChat.IdMiembro2;
+                    chatCreadoDto.TypeMiembro2 = newChat.TypeMiembro2;
+                    chatCreadoDto.IdTienda = newChat.IdTienda;
+
+                    var usuario = await (from cU in context.CuentaUsuarios
+                                            join dCU in context.DetallesCuentaUsuarios on cU.IdDetallesCuentaUsuario equals dCU.IdDetallesCuentaUsuario
+                                            join iP in context.ImagenPerfils on dCU.IdImagenPerfil equals iP.IdImagenPerfil
+                                            join u in context.Usuarios on cU.IdUsuario equals u.IdUsuario
+                                            join dU in context.DetallesUsuarios on u.IdDetallesUsuario equals dU.IdDetallesUsuario
+                                            join datosU in context.Datos on dU.IdDatos equals datosU.IdDatos
+                                            where (u.IdUsuario == idSolicitante)
+                                            select new 
+                                            {
+                                                NombreUsuario = $"{datosU.PrimerNombre} {datosU.PrimerApellido}",
+                                                ImagenUsuario = iP.IconoPerfil
+                                            }).FirstOrDefaultAsync();
+
+                    chatCreadoDto.NombreUsuario = usuario!.NombreUsuario;
+                    chatCreadoDto.ImagenUsuario = usuario!.ImagenUsuario;
                 }
             }
             else 
@@ -251,11 +276,20 @@ namespace uStoreAPI.Services
                 newChat.IdMiembro2 = idMiembro2;
                 newChat.TypeMiembro2 = typeMiembro2;
                 newChat.IdTienda = gerente!.IdTienda;
+
+                chatCreadoDto.FechaCreacion = newChat.FechaCreacion;
+                chatCreadoDto.IdMiembro1 = newChat.IdMiembro1;
+                chatCreadoDto.TypeMiembro1 = newChat.TypeMiembro1;
+                chatCreadoDto.IdMiembro2 = newChat.IdMiembro2;
+                chatCreadoDto.TypeMiembro2 = newChat.TypeMiembro2;
+                chatCreadoDto.IdTienda = newChat.IdTienda;
             }
 
             await context.Chats.AddAsync(newChat);
             await context.SaveChangesAsync();
-            return newChat;
+
+            chatCreadoDto.IdChat = newChat.IdChat;
+            return chatCreadoDto!;
         }
 
         public async Task<Mensaje> CreateMensaje(Mensaje newMensaje)

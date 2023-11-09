@@ -27,8 +27,9 @@ namespace uStoreAPI.Controllers
         private readonly SolicitudesApartadoService solicitudesService;
         private readonly GerentesService gerentesService;
         private readonly ChatService chatService;
+        private readonly ComentariosService comentariosService;
         private IMapper mapper;
-        public TiendasController(ChatService _chatService, GerentesService _gerentesService, SolicitudesApartadoService _solicitudesService, PublicacionesService _publicacionesService, CalificacionesService _calificacionesService, PeriodosPredeterminadosService _periodosPredeterminadosService,HorariosService _horariosService,TiendasService _tiendasService, IMapper _mapper, UploadService _uploadService, PlazasService _plazasService, CategoriasService _categoriasService, ProductosService _productosService)
+        public TiendasController(ComentariosService _comentariosService, ChatService _chatService, GerentesService _gerentesService, SolicitudesApartadoService _solicitudesService, PublicacionesService _publicacionesService, CalificacionesService _calificacionesService, PeriodosPredeterminadosService _periodosPredeterminadosService,HorariosService _horariosService,TiendasService _tiendasService, IMapper _mapper, UploadService _uploadService, PlazasService _plazasService, CategoriasService _categoriasService, ProductosService _productosService)
         {
             tiendasService = _tiendasService;
             mapper = _mapper;
@@ -43,6 +44,67 @@ namespace uStoreAPI.Controllers
             solicitudesService = _solicitudesService;
             gerentesService = _gerentesService;
             chatService = _chatService;
+            comentariosService = _comentariosService;
+        }
+
+        [HttpGet("GetAllTiendas")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<IEnumerable<ListaTiendasAppDto>>> GetAllTiendas(int idCentroComercial)
+        {
+            var user = HttpContext.User;
+            var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+            if (await plazasService.GetOneMall(idCentroComercial) is null)
+            {
+                return BadRequest("No hay una plaza registrada con ese id");
+            }
+            try
+            {
+                var tiendas = await tiendasService.GetAllTiendas(idCentroComercial);
+                if (tiendas.IsNullOrEmpty())
+                {
+                    return NotFound("No hay tiendas registradas en esta plaza");
+                }
+                return Ok(tiendas);
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpGet("GetTiendaApp")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<TiendaAppDto>> GetTiendaApp(int idTienda)
+        {
+            var user = HttpContext.User;
+            var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+            var typeUser = user.Claims.FirstOrDefault(u => u.Type == "UserType")!.Value;
+            string? idTiendaClaim = user.Claims.FirstOrDefault(u => u.Type == "IdTienda")?.Value;
+            int idTiendaClaimValue = 0;
+            int.TryParse(idTiendaClaim, out idTiendaClaimValue);
+            try {
+                var tienda = await tiendasService.GetTiendaApp(idTienda);
+                if (tienda is null)
+                {
+                    return NotFound("Tienda no encontrada");
+                }
+                else if (typeUser != "Usuario" && typeUser != "Invitado" && tienda.IdAdministrador != idUser && idTiendaClaimValue != tienda.IdTienda)
+                {
+                    return Unauthorized("Tienda no autorizada");
+                }
+                return Ok(tienda);
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpGet("GetTiendas")]
@@ -107,6 +169,7 @@ namespace uStoreAPI.Controllers
         {
             var user = HttpContext.User;
             var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+            var typeUser = user.Claims.FirstOrDefault(u => u.Type == "UserType")!.Value;
             string? idTiendaClaim = user.Claims.FirstOrDefault(u => u.Type == "IdTienda")?.Value;
             int idTiendaClaimValue = 0;
             int.TryParse(idTiendaClaim, out idTiendaClaimValue);
@@ -115,7 +178,7 @@ namespace uStoreAPI.Controllers
             { 
                 return NotFound("Tienda no encontrada");
             }
-            else if(tienda.IdAdministrador != idUser && idTiendaClaimValue != tienda.IdTienda)
+            else if(typeUser != "Usuario" && tienda.IdAdministrador != idUser && idTiendaClaimValue != tienda.IdTienda)
             {
                 return Unauthorized("Tienda no autorizada");
             }
@@ -327,11 +390,12 @@ namespace uStoreAPI.Controllers
                     await uploadService.DeleteImagenesProductos($"{producto.IdProductos}");
                     await productosService.DeleteImagenesProductoWithId(producto.IdProductos);
                     await calificacionesService.DeleteAllCalificacionesProducto(producto.IdProductos);
+                    await comentariosService.DeleteAllComentariosProducto(producto.IdProductos);
                     await categoriasService.DeleteAllCategoriasProducto(producto.IdProductos);
                     await productosService.DeleteProducto(producto);  
                 }
             }
-
+            await comentariosService.DeleteAllComentariosTienda(tienda.IdTienda);
             await chatService.DeleteChatWithIdTienda(tienda.IdTienda);
             await gerentesService.DeleteAccountGerente(null, tienda.IdTienda);
             await publicacionesService.DeleteAllPublicaciones(tienda.IdTienda);

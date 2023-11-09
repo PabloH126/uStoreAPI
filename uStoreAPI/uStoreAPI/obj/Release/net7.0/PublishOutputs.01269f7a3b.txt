@@ -92,6 +92,8 @@ C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp
 C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp\Out\NuGet.Protocol.dll
 C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp\Out\NuGet.Versioning.dll
 C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp\Out\Owin.dll
+C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp\Out\SendGrid.dll
+C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp\Out\StarkbankEcdsa.dll
 C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp\Out\Swashbuckle.AspNetCore.Swagger.dll
 C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp\Out\Swashbuckle.AspNetCore.SwaggerGen.dll
 C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Release\net7.0\PubTmp\Out\Swashbuckle.AspNetCore.SwaggerUI.dll

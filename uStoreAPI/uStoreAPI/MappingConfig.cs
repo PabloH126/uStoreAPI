@@ -30,6 +30,10 @@ namespace uStoreAPI
             CreateMap<CuentaGerente, CuentaGerenteDto>().ReverseMap();
             CreateMap<Chat, ChatDto>().ReverseMap();
             CreateMap<Mensaje, MensajeDto>().ReverseMap();
+            CreateMap<Tiendum, ListaTiendasAppDto>().ReverseMap();
+            CreateMap<Tiendum, TiendaAppDto>().ReverseMap();
+            CreateMap<ComentariosTienda, ComentariosTiendaDto>().ReverseMap();
+            CreateMap<ComentariosProducto, ComentariosProductoDto>().ReverseMap();
         }
     }
 }

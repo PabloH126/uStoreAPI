@@ -246,6 +246,7 @@ namespace uStoreAPI.Controllers
             var solicitudApartado = mapper.Map<SolicitudesApartado>(solicitud);
             solicitudApartado.StatusSolicitud = "pendiente";
             solicitudApartado.FechaSolicitud = DateTime.UtcNow;
+            solicitudApartado.IdUsuario = idUser;
             await solicitudesApartadoService.CreateSolicitud(solicitudApartado);
 
             var solicitudApartadoDto = mapper.Map<SolicitudesApartadoDto>(solicitudApartado);

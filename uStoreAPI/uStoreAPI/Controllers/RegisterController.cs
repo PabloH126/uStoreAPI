@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 using uStoreAPI.Dtos;
 using uStoreAPI.Services;
 
@@ -18,7 +20,8 @@ namespace uStoreAPI.Controllers
         private readonly GerentesService gerentesService;
         private readonly TiendasService tiendasService;
         private readonly TokenService tokenService;
-        public RegisterController(IMapper _mapper, AdminService _adminService, TokenService _tokenService, UserService _userService, GerentesService _gerentesService, TiendasService _tiendasService)
+        private readonly EmailService emailService;
+        public RegisterController(IMapper _mapper, AdminService _adminService, TokenService _tokenService, UserService _userService, GerentesService _gerentesService, TiendasService _tiendasService, EmailService _emailService)
         {
             mapper = _mapper;
             adminService = _adminService;
@@ -26,6 +29,7 @@ namespace uStoreAPI.Controllers
             userService = _userService;
             gerentesService = _gerentesService;
             tiendasService = _tiendasService;
+            emailService = _emailService;
         }
         //Crear administradores de tienda y cuenta de administrador
         [HttpPost("RegisterAdmin")]
@@ -106,23 +110,70 @@ namespace uStoreAPI.Controllers
             }
         }
 
-        //Crear usuarios y cuenta de usuario
-        [HttpPost("RegisterUser")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [HttpPost("ConfirmEmailUser")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public async Task<ActionResult<CuentaUsuarioDto>> CreateUser([FromBody] RegisterDto datos)
+        public async Task<IActionResult> ConfirmUser([FromBody] RegisterDto datos)
         {
             if (datos is null || !ModelState.IsValid)
             {
                 return BadRequest(datos);
             }
 
-            if (await userService.VerifyEmail(datos.Email!) is not null)
+            if (await userService.VerifyEmailRegistro(datos.Email!))
             {
                 return Conflict("Ese email ya esta registrado");
             }
+            else
+            {
+                var token = tokenService.tokenGeneratorRegisterUser(datos);
+                Dictionary<string, string> templateData = new Dictionary<string, string>
+                {
+                    {"name", datos.PrimerNombre! },
+                    {"link", $"https://ustoree.azurewebsites.net/users/registro_user.php?token={token}" }
+                };
+                var response = await emailService.SendEmailConfirmacionCuentaUser(datos.Email!, "Confirmación de cuenta", templateData);
+                if(response)
+                {
+                    return Ok("Cuenta confirmada");
+                }    
+                else
+                {
+                    return StatusCode(500, "Hubo un error al mandar el correo de confirmacion");
+                }
+
+
+            }
+        }
+        
+        [Authorize]
+        //Crear usuarios y cuenta de usuario
+        [HttpPost("RegisterUser")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        public async Task<ActionResult<CuentaUsuarioDto>> CreateUser()
+        {
+            var user = HttpContext.User;
+            var emailUser = user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.Email)!.Value;
+            var primerNombre = user.Claims.FirstOrDefault(u => u.Type == "PrimerNombre")!.Value;
+            var primerApellido = user.Claims.FirstOrDefault(u => u.Type == "PrimerApellido")!.Value;
+            var password = user.Claims.FirstOrDefault(u => u.Type == "Password")!.Value;
+            if (await userService.VerifyEmailRegistro(emailUser))
+            {
+                return Conflict("Ese email ya esta registrado");
+            }
+
+            var datos = new RegisterDto
+            {
+                Email = emailUser,
+                PrimerNombre = primerNombre,
+                PrimerApellido = primerApellido,
+                Password = password,
+            };
 
             var cuentaUser = await userService.CreateUsuario(datos);
 
@@ -184,10 +235,22 @@ namespace uStoreAPI.Controllers
             else
             {
                 var detallesUser = await userService.GetDetallesUsuario(user!.IdUsuario);
-                var datoAdmin = await userService.GetDatoUsuario(detallesUser!.IdDatos);
-                string token = tokenService.tokenGeneratorMailUser(user, datoAdmin!);
-
-                return Ok(new { token });
+                var datoUsuario = await userService.GetDatoUsuario(detallesUser!.IdDatos);
+                string token = tokenService.tokenGeneratorMailUser(user, datoUsuario!);
+                Dictionary<string, string> templateData = new Dictionary<string, string>
+                {
+                    {"name", datoUsuario!.PrimerNombre! },
+                    {"link", $"https://ustoree.azurewebsites.net/users/recuperacionCuenta.php?token={token}"}
+                };
+                var response = await emailService.SendEmailRecoverCuentaUser(recoverDto.email!, "Recuperación de cuenta", templateData);
+                if (response)
+                {
+                    return Ok("Correo de recuperacion enviado");
+                }
+                else
+                {
+                    return StatusCode(500, "Hubo un error al mandar el correo de recuperacion de cuenta");
+                }
             }
         }
 

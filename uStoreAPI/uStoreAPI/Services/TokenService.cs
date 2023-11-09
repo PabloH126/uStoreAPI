@@ -80,6 +80,27 @@ namespace uStoreAPI.Services
             }
         }
 
+        public string TokenGeneratorGuestUser()
+        {
+            var idGuest = GenerateRandomAlphaNumeric();
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.Name, $"Guest{idGuest}"),
+                new Claim("UserType", "Invitado"),
+                new Claim(ClaimTypes.NameIdentifier, idGuest)
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.GetSection("Jwt:Key").Value!));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+
+            var token = new JwtSecurityToken(
+                                    claims: claims,
+                                    expires: DateTime.UtcNow.Date.AddDays(1),
+                                    signingCredentials: creds);
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
         public string TokenGeneratorGerente(CuentaGerente gerente, Dato gerenteData, bool remember, string idTienda)
         {
             var claims = new[]
@@ -175,6 +196,39 @@ namespace uStoreAPI.Services
                          signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public string tokenGeneratorRegisterUser(RegisterDto datos)
+        {
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.Email, datos.Email!),
+                new Claim("PrimerNombre", datos.PrimerNombre!),
+                new Claim("PrimerApellido", datos.PrimerApellido!),
+                new Claim("Password", datos.Password!)
+            };
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.GetSection("Jwt:Key").Value!));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+            var token = new JwtSecurityToken(
+                         claims: claims,
+                         expires: DateTime.UtcNow.AddMinutes(5),
+                         signingCredentials: creds);
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public static string GenerateRandomAlphaNumeric()
+        {
+            Random random = new Random();
+            const string chars = "0123456789";
+            var stringChars = new char[6];
+
+            for (int i = 0; i < stringChars.Length; i++)
+            {
+                stringChars[i] = chars[random.Next(chars.Length)];
+            }
+
+            return new String(stringChars);
         }
     }
 }

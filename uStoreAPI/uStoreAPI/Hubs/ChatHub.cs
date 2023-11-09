@@ -21,11 +21,12 @@ namespace uStoreAPI.Hubs
         {
             var user = Context.User;
             var idUser = user!.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            var userType = user!.Claims.FirstOrDefault(c => c.Type == "UserType")?.Value;
 
             if (idUser != null)
             {
-                await Groups.AddToGroupAsync(Context.ConnectionId, $"{idUser}Chats");
-                await Clients.Group($"{idUser}Chats").SendAsync("Notify", $"{Context.ConnectionId} se ha unido al chat: {idUser}Chats");
+                await Groups.AddToGroupAsync(Context.ConnectionId, $"{idUser}{userType}Chats");
+                await Clients.Group($"{idUser}{userType}Chats").SendAsync("Notify", $"{Context.ConnectionId} se ha unido al chat: {idUser}{userType}Chats");
             }
             await base.OnConnectedAsync();
         }
@@ -33,6 +34,13 @@ namespace uStoreAPI.Hubs
         public async Task JoinGroupChat(string idChat)
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, $"Chat{idChat}");
+            await Clients.Group($"Chat{idChat}").SendAsync("Leave", $"Se ha ingresado al chat {idChat}");
+        }
+
+        public async Task LeaveGroupChat(string idChat)
+        {
+            await Clients.Group($"Chat{idChat}").SendAsync("Leave", $"Se ha abandonado el chat {idChat}");
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"Chat{idChat}");
         }
     }
 }

@@ -93,6 +93,11 @@ namespace uStoreAPI.Services
             return await context.Gerentes.FindAsync(id);
         }
 
+        public async Task<Gerente?> GetGerenteTienda(int? idTienda)
+        {
+            return await context.Gerentes.FirstOrDefaultAsync(p => p.IdTienda == idTienda);
+        }
+
         public async Task<ImagenPerfil?> GetImagenPerfil(int? id)
         {
             return await context.ImagenPerfils.FindAsync(id);

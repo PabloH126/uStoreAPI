@@ -43,6 +43,8 @@ builder.Services.AddScoped<PublicacionesService>();
 builder.Services.AddScoped<TendenciasService>();
 builder.Services.AddScoped<GerentesService>();
 builder.Services.AddScoped<ChatService>();
+builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<ComentariosService>();
 
 builder.Services.AddSingleton<NotificacionesApartadoService>();
 

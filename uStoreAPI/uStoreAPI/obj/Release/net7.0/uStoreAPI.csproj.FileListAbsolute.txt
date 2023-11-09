@@ -562,3 +562,5 @@ C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\bin\Release\net7.0\Micros
 C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\bin\Release\net7.0\Microsoft.Extensions.Features.dll
 C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\bin\Release\net7.0\Microsoft.Extensions.Logging.Abstractions.dll
 C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\bin\Release\net7.0\Microsoft.Extensions.Options.dll
+C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\bin\Release\net7.0\SendGrid.dll
+C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\bin\Release\net7.0\StarkbankEcdsa.dll

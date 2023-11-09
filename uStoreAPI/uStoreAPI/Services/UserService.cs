@@ -155,5 +155,24 @@ namespace uStoreAPI.Services
         {
             return await context.CuentaUsuarios.FirstOrDefaultAsync(p => p.Email == email);
         }
+
+        public async Task<bool> VerifyEmailRegistro(string email)
+        {
+            bool emailExistente = false;
+            if (await context.CuentaUsuarios.FirstOrDefaultAsync(p => p.Email == email) is not null)
+            {
+                emailExistente = true;
+            }
+            else if (await context.CuentaAdministradors.FirstOrDefaultAsync(p => p.Email == email) is not null)
+            {
+                emailExistente = true;
+            }
+            else if (await context.CuentaGerentes.FirstOrDefaultAsync(p => p.Email == email) is not null)
+            {
+                emailExistente = true;
+            }
+
+            return emailExistente;
+        }
     }
 }

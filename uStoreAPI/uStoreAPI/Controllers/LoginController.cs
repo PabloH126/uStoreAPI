@@ -103,6 +103,18 @@ namespace uStoreAPI.Controllers
             }
         }
 
+        [HttpPost("GuestAuthenticate")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> LoginGuest()
+        {
+                string token = tokenService.TokenGeneratorGuestUser();
+                return Ok(new { token });
+        }
+
         [Authorize]
         [HttpPost("getClaims")]
         [ProducesResponseType(StatusCodes.Status200OK)]

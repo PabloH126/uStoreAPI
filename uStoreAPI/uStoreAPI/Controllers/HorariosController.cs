@@ -35,6 +35,7 @@ namespace uStoreAPI.Controllers
         {
             var user = HttpContext.User;
             var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+            var typeUser = user.Claims.FirstOrDefault(u => u.Type == "UserType")!.Value;
             string? idTiendaClaim = user.Claims.FirstOrDefault(u => u.Type == "IdTienda")?.Value;
             int idTiendaClaimValue = 0;
             int.TryParse(idTiendaClaim, out idTiendaClaimValue);
@@ -44,7 +45,7 @@ namespace uStoreAPI.Controllers
             {
                 return BadRequest("No hay una tienda registrada con ese id");
             }
-            else if (tienda.IdAdministrador != idUser && idTiendaClaimValue != tienda.IdTienda)
+            else if (typeUser != "Usuario" && tienda.IdAdministrador != idUser && idTiendaClaimValue != tienda.IdTienda)
             {
                 return Unauthorized("Tienda no autorizada");
             }

@@ -9,5 +9,6 @@ namespace uStoreAPI.Dtos
         public int? IdTienda { get; set; }
         [Required]
         public int? IdCategoria { get; set; }
+        public string? NameCategoria { get; set; }
     }
 }
