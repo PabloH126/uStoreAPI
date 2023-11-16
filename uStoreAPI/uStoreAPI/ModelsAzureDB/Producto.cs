@@ -19,6 +19,8 @@ public partial class Producto
 
     public int? IdTienda { get; set; }
 
+    public DateTime? FechaCreacion { get; set; }
+
     public virtual ICollection<AlertaApartado> AlertaApartados { get; set; } = new List<AlertaApartado>();
 
     public virtual ICollection<CalificacionProducto> CalificacionProductos { get; set; } = new List<CalificacionProducto>();

@@ -83,6 +83,16 @@ namespace uStoreAPI.Services
             }
         }
 
+        public async Task DeleteSolicitudesProducto(int idProducto)
+        {
+            var solicitudes = await context.SolicitudesApartados.Where(p => p.IdProductos == idProducto).ToListAsync();
+            if (!solicitudes.IsNullOrEmpty())
+            {
+                context.SolicitudesApartados.RemoveRange(solicitudes);
+                await context.SaveChangesAsync();
+            }
+        }
+
         public async Task MarcarComoVencida(int idSolicitud)
         {
             var solicitud = await context.SolicitudesApartados.FindAsync(idSolicitud);

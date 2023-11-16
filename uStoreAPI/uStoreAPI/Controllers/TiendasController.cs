@@ -99,6 +99,7 @@ namespace uStoreAPI.Controllers
                 {
                     return Unauthorized("Tienda no autorizada");
                 }
+                tienda.ComentariosTienda = await comentariosService.GetAllComentariosTienda(tienda.IdTienda);
                 return Ok(tienda);
             }
             catch(Exception ex)

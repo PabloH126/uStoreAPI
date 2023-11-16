@@ -37,27 +37,51 @@ namespace uStoreAPI.Services
 
         public async Task<CalificacionTiendum> CreateCalificacionTienda(CalificacionTiendum calificacion)
         {
-            await context.CalificacionTienda.AddAsync(calificacion);
-            await context.SaveChangesAsync();
-            return calificacion;
+            var calificacionExistente = await context.CalificacionTienda.FirstOrDefaultAsync(p => p.IdTienda == calificacion.IdTienda && p.IdUsuario ==  calificacion.IdUsuario);
+            if (calificacionExistente is not null)
+            {
+                calificacionExistente.Calificacion = calificacion.Calificacion;
+                await UpdateCalificacionTienda(calificacion);
+                return calificacionExistente;
+            }
+            else
+            {
+                await context.CalificacionTienda.AddAsync(calificacion);
+                await context.SaveChangesAsync();
+                return calificacion;
+            }
         }
 
         public async Task<CalificacionProducto> CreateCalificacionProducto(CalificacionProducto calificacion)
         {
-            await context.CalificacionProductos.AddAsync(calificacion);
-            await context.SaveChangesAsync();
-            return calificacion;
+            var calificacionExistente = await context.CalificacionProductos.FirstOrDefaultAsync(p => p.IdProductos == calificacion.IdProductos && p.IdUsuario == calificacion.IdUsuario);
+            if (calificacionExistente is not null)
+            {
+                calificacionExistente.Calificacion = calificacion.Calificacion;
+                await UpdateCalificacionProducto(calificacion);
+                return calificacion;
+            }
+            else
+            {
+                await context.CalificacionProductos.AddAsync(calificacion);
+                await context.SaveChangesAsync();
+                return calificacion;
+            }
         }
 
         public async Task UpdateCalificacionTienda(CalificacionTiendum calificacion)
         {
-            context.CalificacionTienda.Update(calificacion);
+            var calificacionExistente = await context.CalificacionTienda.FirstOrDefaultAsync(p => p.IdUsuario == calificacion.IdUsuario && p.IdTienda == calificacion.IdTienda);
+            calificacionExistente!.Calificacion = calificacion.Calificacion;
+            context.CalificacionTienda.Update(calificacionExistente!);
             await context.SaveChangesAsync();
         }
 
         public async Task UpdateCalificacionProducto(CalificacionProducto calificacion)
         {
-            context.CalificacionProductos.Update(calificacion);
+            var calificacionExistente = await context.CalificacionProductos.FirstOrDefaultAsync(p => p.IdUsuario == calificacion.IdUsuario && p.IdProductos == calificacion.IdProductos);
+            calificacionExistente!.Calificacion = calificacion.Calificacion;
+            context.CalificacionProductos.Update(calificacionExistente!);
             await context.SaveChangesAsync();
         }
 

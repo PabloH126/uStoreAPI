@@ -20,7 +20,7 @@ namespace uStoreAPI.Dtos
         public IEnumerable<CalificacionTiendaDto>? CalificacionesTienda { get; set; }
         public IEnumerable<ComentariosTiendaDto>? ComentariosTienda { get; set; }
         public IEnumerable<ProductoDto>? ProductosPopularesTienda {  get; set; }
-        public IEnumerable<PublicacionesDto>? PublicacionesTienda { get; set; }
+        public IEnumerable<ImagenesTiendaDto>? ImagenesTienda { get; set; }
         public string? HorarioDiaTienda { get; set; }
     }
 }

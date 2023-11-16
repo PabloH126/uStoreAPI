@@ -21,9 +21,10 @@ namespace uStoreAPI.Controllers
         private readonly CategoriasService categoriasService;
         private readonly ComentariosService comentariosService;
         private readonly CalificacionesService calificacionesService;
+        private readonly SolicitudesApartadoService solicitudesService;
         private readonly UploadService uploadService;
         private IMapper mapper;
-        public ProductosController(ComentariosService _comentariosService, CalificacionesService _calificacionesService, ProductosService _productosService, TiendasService _tiendasService, IMapper _mapper, UploadService _uploadService, CategoriasService _categoriasService)
+        public ProductosController(SolicitudesApartadoService _solicitudesService, ComentariosService _comentariosService, CalificacionesService _calificacionesService, ProductosService _productosService, TiendasService _tiendasService, IMapper _mapper, UploadService _uploadService, CategoriasService _categoriasService)
         {
             productosService = _productosService;
             tiendasService = _tiendasService;
@@ -32,6 +33,7 @@ namespace uStoreAPI.Controllers
             categoriasService = _categoriasService;
             comentariosService = _comentariosService;
             calificacionesService = _calificacionesService;
+            solicitudesService = _solicitudesService;
         }
 
         [HttpGet("GetProductos")]
@@ -87,6 +89,26 @@ namespace uStoreAPI.Controllers
                 productoDto.ImageProducto = imagenProducto.ImagenProducto;
             }
             return Ok(productoDto);
+        }
+
+        [HttpGet("GetAllProductoApp")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<IEnumerable<ListaProductosAppDto>>> GetAllProductosApp(int idTienda)
+        {
+            if (await tiendasService.GetOneTienda(idTienda) is null)
+            {
+                return BadRequest("No se encontró una tienda con ese id");
+            }
+            var producto = await productosService.GetAllProductosTiendaApp(idTienda);
+            if (producto is null)
+            {
+                return NotFound("No hay productos registrados en esta tienda");
+            }
+            return Ok(producto);
         }
 
         [HttpGet("GetImagenesProducto")]
@@ -148,7 +170,8 @@ namespace uStoreAPI.Controllers
                 CantidadApartado = productoDto.CantidadApartado,
                 Descripcion = productoDto.Descripcion,
                 Stock = productoDto.Stock,
-                IdTienda = productoDto.IdTienda
+                IdTienda = productoDto.IdTienda,
+                FechaCreacion = DateTime.UtcNow
             };
 
 
@@ -350,7 +373,14 @@ namespace uStoreAPI.Controllers
             {
                 return Unauthorized("Producto no autorizado");
             }
-
+            try
+            {
+                await solicitudesService.DeleteSolicitudesProducto(producto.IdProductos);
+            }
+            catch(Exception ex)
+            {
+                return Ok(ex.Message);
+            }
             await uploadService.DeleteImagenesProductos($"{producto.IdProductos}");
             await productosService.DeleteImagenesProductoWithId(producto.IdProductos);
             await comentariosService.DeleteAllComentariosProducto(producto.IdProductos);

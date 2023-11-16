@@ -88,7 +88,7 @@ namespace uStoreAPI.Services
             }
             var tiendaAppDto = mapper.Map<TiendaAppDto>(tienda);
             tiendaAppDto.CategoriasTienda = await (from catT in context.CategoriasTiendas
-                                             join cat in context.Categorias on catT.IdTienda equals cat.IdCategoria
+                                             join cat in context.Categorias on catT.IdCategoria equals cat.IdCategoria
                                              where catT.IdTienda == tienda.IdTienda
                                              select new CategoriasTiendaDto
                                              {
@@ -105,7 +105,7 @@ namespace uStoreAPI.Services
 
             var solicitudesTienda = context.SolicitudesApartados.Where(p => p.IdTienda == tienda.IdTienda);
 
-            var usuariosEnSolicitudes = await solicitudesTienda
+            var listaProductosPopulares = await solicitudesTienda
                                                             .GroupBy(p => p.IdProductos)
                                                             .Select(g => new
                                                             {
@@ -115,14 +115,15 @@ namespace uStoreAPI.Services
                                                             .OrderByDescending(p => p.CantidadUsuarios)
                                                             .Take(16)
                                                             .ToListAsync();
-            foreach(var usuario in usuariosEnSolicitudes)
+            foreach(var usuario in listaProductosPopulares)
             {
                 var producto = mapper.Map<ProductoDto>(await context.Productos.FindAsync(usuario.Id));
+                producto.ImageProducto = await context.ImagenesProductos.Where(p => p.IdProductos == producto.IdProductos).Select(p => p.ImagenProducto).FirstOrDefaultAsync();
                 productosPopulares.Add(producto);
             }
             tiendaAppDto.ProductosPopularesTienda = productosPopulares;
 
-            tiendaAppDto.PublicacionesTienda = mapper.Map<IEnumerable<PublicacionesDto>>(await context.Publicaciones.Where(p => p.IdTienda == tiendaAppDto.IdTienda).AsNoTracking().ToListAsync());
+            tiendaAppDto.ImagenesTienda = mapper.Map<IEnumerable<ImagenesTiendaDto>>(await context.ImagenesTiendas.Where(p => p.IdTienda == tiendaAppDto.IdTienda).AsNoTracking().ToListAsync());
             return tiendaAppDto;
         }
 

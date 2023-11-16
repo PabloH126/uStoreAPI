@@ -810,7 +810,7 @@
           "201": {
             "description": "Created",
             "schema": {
-              "$ref": "#/definitions/CalificacionTiendum"
+              "$ref": "#/definitions/CalificacionTiendaDto"
             }
           },
           "400": {
@@ -2091,7 +2091,10 @@
           "Comentarios"
         ],
         "consumes": [
-          "multipart/form-data"
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
         ],
         "produces": [
           "text/plain",
@@ -2100,35 +2103,11 @@
         ],
         "parameters": [
           {
-            "in": "formData",
-            "name": "IdComentarioTienda",
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "in": "formData",
-            "name": "Comentario",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "in": "formData",
-            "name": "FechaComentario",
-            "type": "string",
-            "format": "date-time"
-          },
-          {
-            "in": "formData",
-            "name": "IdUsuario",
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "in": "formData",
-            "name": "IdTienda",
-            "required": true,
-            "type": "integer",
-            "format": "int32"
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/ComentariosTiendaDto"
+            }
           }
         ],
         "responses": {
@@ -2162,7 +2141,10 @@
           "Comentarios"
         ],
         "consumes": [
-          "multipart/form-data"
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
         ],
         "produces": [
           "text/plain",
@@ -2171,33 +2153,11 @@
         ],
         "parameters": [
           {
-            "in": "formData",
-            "name": "IdComentarioProducto",
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "in": "formData",
-            "name": "Comentario",
-            "type": "string"
-          },
-          {
-            "in": "formData",
-            "name": "FechaComentario",
-            "type": "string",
-            "format": "date-time"
-          },
-          {
-            "in": "formData",
-            "name": "IdUsuario",
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "in": "formData",
-            "name": "IdProducto",
-            "type": "integer",
-            "format": "int32"
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/ComentariosProductoDto"
+            }
           }
         ],
         "responses": {
@@ -3610,6 +3570,59 @@
             "description": "Success",
             "schema": {
               "$ref": "#/definitions/ProductoDto"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ProblemDetails"
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Productos/GetAllProductoApp": {
+      "get": {
+        "tags": [
+          "Productos"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "idTienda",
+            "type": "integer",
+            "format": "int32",
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ListaProductosAppDto"
+              }
             }
           },
           "400": {
@@ -6078,6 +6091,16 @@
         "idProducto": {
           "format": "int32",
           "type": "integer"
+        },
+        "imagenUsuario": {
+          "type": "string"
+        },
+        "nombreUsuario": {
+          "type": "string"
+        },
+        "calificacionEstrellas": {
+          "format": "int32",
+          "type": "integer"
         }
       },
       "additionalProperties": false
@@ -6137,6 +6160,16 @@
           "type": "integer"
         },
         "idTienda": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "imagenUsuario": {
+          "type": "string"
+        },
+        "nombreUsuario": {
+          "type": "string"
+        },
+        "calificacionEstrellas": {
           "format": "int32",
           "type": "integer"
         }
@@ -6814,6 +6847,80 @@
       },
       "additionalProperties": false
     },
+    "ImagenesTiendaDto": {
+      "required": [
+        "idTienda",
+        "imagenTienda"
+      ],
+      "type": "object",
+      "properties": {
+        "idImagenesTiendas": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "imagenTienda": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "idTienda": {
+          "format": "int32",
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ListaProductosAppDto": {
+      "required": [
+        "cantidadApartado",
+        "descripcion",
+        "idTienda",
+        "nombreProducto",
+        "precioProducto"
+      ],
+      "type": "object",
+      "properties": {
+        "idProductos": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "nombreProducto": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "precioProducto": {
+          "format": "double",
+          "type": "number"
+        },
+        "cantidadApartado": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "descripcion": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "stock": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "idTienda": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "imageProducto": {
+          "type": "string"
+        },
+        "fechaCreacion": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "numeroSolicitudes": {
+          "format": "int32",
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false
+    },
     "ListaTiendasAppDto": {
       "required": [
         "idCentroComercial",
@@ -7132,6 +7239,10 @@
           "format": "int32",
           "type": "integer"
         },
+        "fechaCreacion": {
+          "format": "date-time",
+          "type": "string"
+        },
         "alertaApartados": {
           "type": "array",
           "items": {
@@ -7231,6 +7342,10 @@
           "type": "integer"
         },
         "imageProducto": {
+          "type": "string"
+        },
+        "fechaCreacion": {
+          "format": "date-time",
           "type": "string"
         }
       },
@@ -7626,10 +7741,10 @@
             "$ref": "#/definitions/ProductoDto"
           }
         },
-        "publicacionesTienda": {
+        "imagenesTienda": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/PublicacionesDto"
+            "$ref": "#/definitions/ImagenesTiendaDto"
           }
         },
         "horarioDiaTienda": {

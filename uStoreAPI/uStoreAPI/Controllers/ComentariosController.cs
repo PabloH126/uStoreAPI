@@ -89,7 +89,7 @@ namespace uStoreAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<ComentariosTiendaDto>> CreateComentarioTienda([FromForm] ComentariosTiendaDto comentarioDto)
+        public async Task<ActionResult<ComentariosTiendaDto>> CreateComentarioTienda([FromBody] ComentariosTiendaDto comentarioDto)
         {
             if (!ModelState.IsValid)
             {
@@ -112,6 +112,7 @@ namespace uStoreAPI.Controllers
                 {
                     var comentario = mapper.Map<ComentariosTienda>(comentarioDto);
                     comentario.FechaComentario = DateTime.UtcNow;
+                    comentario.IdUsuario = idUser;
                     var comentarioCreado = mapper.Map<ComentariosTiendaDto>(await comentariosService.CreateComentarioTienda(comentario));
                     return Ok(comentarioCreado);
                 }
@@ -127,7 +128,7 @@ namespace uStoreAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<ComentariosProductoDto>> CreateComentarioProducto([FromForm] ComentariosProductoDto comentarioDto)
+        public async Task<ActionResult<ComentariosProductoDto>> CreateComentarioProducto([FromBody] ComentariosProductoDto comentarioDto)
         {
             if (!ModelState.IsValid)
             {
@@ -149,6 +150,8 @@ namespace uStoreAPI.Controllers
                 try
                 {
                     var comentario = mapper.Map<ComentariosProducto>(comentarioDto);
+                    comentario.FechaComentario = DateTime.UtcNow;
+                    comentario.IdUsuario = idUser;
                     var comentarioCreado = mapper.Map<ComentariosProductoDto>(await comentariosService.CreateComentarioProducto(comentario));
                     return Ok(comentarioCreado);
                 }

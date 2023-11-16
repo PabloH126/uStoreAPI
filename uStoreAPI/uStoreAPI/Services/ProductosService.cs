@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using uStoreAPI.Dtos;
 using uStoreAPI.ModelsAzureDB;
 
 namespace uStoreAPI.Services
@@ -6,15 +8,51 @@ namespace uStoreAPI.Services
     public class ProductosService
     {
         private readonly UstoreContext context;
+        private IMapper mapper;
 
-        public ProductosService(UstoreContext _context)
+        public ProductosService(UstoreContext _context, IMapper _mapper)
         {
             context = _context;
+            mapper = _mapper;
         }
 
         public async Task<IEnumerable<Producto>> GetProductos(int? idTienda)
         {
             return await context.Productos.Where(p => p.IdTienda == idTienda).AsNoTracking().ToListAsync();
+        }
+
+        public async Task<IEnumerable<ListaProductosAppDto>> GetAllProductosTiendaApp(int idTienda)
+        {
+            var listaProductosTiendaApp = new List<ListaProductosAppDto>();
+            var solicitudesTienda = context.SolicitudesApartados.Where(p => p.IdTienda == idTienda);
+            var listaProductosPopulares = await solicitudesTienda
+                                                            .GroupBy(p => p.IdProductos)
+                                                            .Select(g => new
+                                                            {
+                                                                Id = g.Key,
+                                                                CantidadUsuarios = g.Select(s => s.IdUsuario).Distinct().Count()
+                                                            })
+                                                            .OrderByDescending(p => p.CantidadUsuarios)
+                                                            .ToListAsync();
+            foreach(var productoPopular in listaProductosPopulares)
+            {
+                 var producto = mapper.Map<ListaProductosAppDto>(await context.Productos.FindAsync(productoPopular.Id));
+                 producto.ImageProducto = await context.ImagenesProductos.Where(p => p.IdProductos == producto.IdProductos).Select(p => p.ImagenProducto).FirstOrDefaultAsync();
+                 producto.NumeroSolicitudes = productoPopular.CantidadUsuarios;
+                 listaProductosTiendaApp.Add(producto);
+            }
+            var idProductosPopulares = listaProductosPopulares.Select(p => p.Id).ToList();
+            var allProductsList = await context.Productos
+                                                    .Where(p => !idProductosPopulares.Contains(p.IdProductos) && p.IdTienda == idTienda)
+                                                    .ToListAsync();
+            foreach (var producto in allProductsList)
+            {
+                var productoDto = mapper.Map<ListaProductosAppDto>(await context.Productos.FindAsync(producto.IdProductos));
+                productoDto.ImageProducto = await context.ImagenesProductos.Where(p => p.IdProductos == producto.IdProductos).Select(p => p.ImagenProducto).FirstOrDefaultAsync();
+                productoDto.NumeroSolicitudes = 0;
+                listaProductosTiendaApp.Add(productoDto);
+            }
+            return listaProductosTiendaApp;
         }
 
         public async Task<Producto?> GetOneProducto(int? id)

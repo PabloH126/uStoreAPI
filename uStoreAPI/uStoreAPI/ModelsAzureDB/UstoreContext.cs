@@ -712,6 +712,7 @@ public partial class UstoreContext : DbContext
             entity.ToTable("productos");
 
             entity.Property(e => e.Descripcion).HasColumnType("text");
+            entity.Property(e => e.FechaCreacion).HasColumnType("datetime");
             entity.Property(e => e.NombreProducto)
                 .HasMaxLength(30)
                 .IsUnicode(false);

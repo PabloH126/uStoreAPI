@@ -132,7 +132,7 @@ namespace uStoreAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<CalificacionTiendum>> CreateCalificacionTienda([FromBody] CalificacionTiendaDto calificacion)
+        public async Task<ActionResult<CalificacionTiendaDto>> CreateCalificacionTienda([FromBody] CalificacionTiendaDto calificacion)
         {
             if (!ModelState.IsValid)
             {
@@ -147,8 +147,8 @@ namespace uStoreAPI.Controllers
             calificacion.IdUsuario = idUser;
 
             var calificacionTienda = mapper.Map<CalificacionTiendum>(calificacion);
-            await calificacionesService.CreateCalificacionTienda(calificacionTienda);
-            return CreatedAtRoute("GetCalificacionTienda", new { id = calificacionTienda.IdCalificacionTienda }, calificacionTienda);
+            var calificacionRespuesta = mapper.Map <CalificacionTiendaDto>(await calificacionesService.CreateCalificacionTienda(calificacionTienda));
+            return Ok(calificacionRespuesta);
         }
 
         [HttpPost("CreateCalificacionProducto")]
@@ -171,8 +171,8 @@ namespace uStoreAPI.Controllers
             calificacion.IdUsuario = idUser;
 
             var calificacionProducto = mapper.Map<CalificacionProducto>(calificacion);
-            await calificacionesService.CreateCalificacionProducto(calificacionProducto);
-            return CreatedAtRoute("GetCalificacionProducto", new { id = calificacionProducto.IdCalificacionProducto }, calificacionProducto);
+            var calificacionRespuesta = mapper.Map<CalificacionProductoDto>(await calificacionesService.CreateCalificacionProducto(calificacionProducto));
+            return Ok(mapper.Map<CalificacionProductoDto>(calificacionProducto));
         }
         #endregion
 

@@ -13,5 +13,9 @@ namespace uStoreAPI.Dtos
         public int IdUsuario { get; set; }
         [Required]
         public int IdTienda { get; set; }
+        public string? ImagenUsuario { get; set; }
+        public string? NombreUsuario { get; set; }
+        public int? CalificacionEstrellas {  get; set; }
+
     }
 }
