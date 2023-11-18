@@ -36,6 +36,9 @@ namespace uStoreAPI
             CreateMap<ComentariosProducto, ComentariosProductoDto>().ReverseMap();
             CreateMap<ImagenesTienda, ImagenesTiendaDto>().ReverseMap();
             CreateMap<Producto, ListaProductosAppDto>().ReverseMap();
+            CreateMap<ImagenesProducto, ImagenesProductoDto>().ReverseMap();
+            CreateMap<Producto, ProductoAppDto>().ReverseMap();
+            CreateMap<PenalizacionUsuario, PenalizacionUsuarioDto>().ReverseMap();
         }
     }
 }

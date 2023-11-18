@@ -475,10 +475,6 @@ public partial class UstoreContext : DbContext
             entity.HasOne(d => d.IdDatosNavigation).WithMany(p => p.DetallesUsuarios)
                 .HasForeignKey(d => d.IdDatos)
                 .HasConstraintName("detalles_usuario_ibfk_datos");
-
-            entity.HasOne(d => d.IdPenalizacionUsuarioNavigation).WithMany(p => p.DetallesUsuarios)
-                .HasForeignKey(d => d.IdPenalizacionUsuario)
-                .HasConstraintName("detalles_usuario_ibfk_penalizacion_usuario");
         });
 
         modelBuilder.Entity<Favorito>(entity =>
@@ -685,9 +681,17 @@ public partial class UstoreContext : DbContext
 
         modelBuilder.Entity<PenalizacionUsuario>(entity =>
         {
-            entity.HasKey(e => e.IdPenalizacionUsuario).HasName("PK__penaliza__5B75DF6730E3D5F2");
+            entity.HasKey(e => e.IdPenalizacion).HasName("PK__penaliza__85528AEABB18061B");
 
             entity.ToTable("penalizacion_usuario");
+
+            entity.Property(e => e.FinPenalizacion).HasColumnType("datetime");
+            entity.Property(e => e.IdJob).HasMaxLength(50);
+            entity.Property(e => e.InicioPenalizacion).HasColumnType("datetime");
+
+            entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.PenalizacionUsuarios)
+                .HasForeignKey(d => d.IdUsuario)
+                .HasConstraintName("FK__penalizac__IdUsu__0FB750B3");
         });
 
         modelBuilder.Entity<PeriodosPredeterminado>(entity =>

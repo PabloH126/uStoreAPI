@@ -41,6 +41,11 @@ namespace uStoreAPI.Services
         {
             return await context.Datos.FindAsync(id);
         }
+
+        public async Task<IEnumerable<PenalizacionUsuario>?> GetPenalizacionesUsuario(int idUsuario)
+        {
+            return await context.PenalizacionUsuarios.Where(p => p.IdUsuario == idUsuario).AsNoTracking().ToListAsync();
+        }
         
         public async Task<CuentaUsuario> CreateUsuario(RegisterDto datos)
         {
@@ -97,6 +102,56 @@ namespace uStoreAPI.Services
             return cuentaUser;
         }
 
+        public async Task<PenalizacionUsuario> CreatePenalizacion(int idUsuario)
+        {
+            var penalizacionesUsuario = await context.PenalizacionUsuarios.Where(p => p.IdUsuario ==  idUsuario).ToListAsync();
+            var cantidadPenalizaciones = penalizacionesUsuario.Count();
+            DateTime finPenalizacion;
+
+            switch(cantidadPenalizaciones)
+            {
+                case 0: 
+                    finPenalizacion = DateTime.UtcNow.AddDays(1); 
+                    break;
+
+                case 1:
+                    finPenalizacion = DateTime.UtcNow.AddDays(7);
+                    break;
+
+                case 2:
+                    finPenalizacion = DateTime.UtcNow.AddMonths(1);
+                    break;
+
+                case 3:
+                    finPenalizacion = DateTime.UtcNow.AddMonths(6);
+                    break;
+
+                case 4:
+                    finPenalizacion = DateTime.UtcNow.AddYears(100);
+                    break;
+                default:
+                    finPenalizacion = DateTime.UtcNow;
+                    break;
+            }
+
+            var penalizacionUsuario = new PenalizacionUsuario()
+            {
+                IdUsuario = idUsuario,
+                InicioPenalizacion = DateTime.UtcNow,
+                FinPenalizacion = finPenalizacion,
+            };
+
+            await context.PenalizacionUsuarios.AddAsync(penalizacionUsuario);
+            await context.SaveChangesAsync();
+            return penalizacionUsuario;
+        }
+
+        public async Task PatchPenalizacionUsuario(PenalizacionUsuario penalizacion)
+        {
+            context.PenalizacionUsuarios.Update(penalizacion);
+            await context.SaveChangesAsync();
+        }
+
         public async Task PatchUserPassword(CuentaUsuario user)
         {
             context.CuentaUsuarios.Update(user);
@@ -148,6 +203,13 @@ namespace uStoreAPI.Services
             context.DetallesUsuarios.Remove(detallesUser);
             context.Datos.Remove(datosUser);
 
+            await context.SaveChangesAsync();
+        }
+
+        public async Task DeletePenalizacionesUser(int idUsuario)
+        {
+            var penalizacionesUsuario = await context.PenalizacionUsuarios.Where(p => p.IdUsuario == idUsuario).ToListAsync();
+            context.PenalizacionUsuarios.RemoveRange(penalizacionesUsuario);
             await context.SaveChangesAsync();
         }
 

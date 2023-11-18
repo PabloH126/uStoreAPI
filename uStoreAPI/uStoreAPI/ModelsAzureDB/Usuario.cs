@@ -27,5 +27,7 @@ public partial class Usuario
 
     public virtual DetallesUsuario? IdDetallesUsuarioNavigation { get; set; }
 
+    public virtual ICollection<PenalizacionUsuario> PenalizacionUsuarios { get; set; } = new List<PenalizacionUsuario>();
+
     public virtual ICollection<SolicitudesApartado> SolicitudesApartados { get; set; } = new List<SolicitudesApartado>();
 }

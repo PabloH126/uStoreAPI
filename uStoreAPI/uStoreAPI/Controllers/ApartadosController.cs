@@ -232,63 +232,90 @@ namespace uStoreAPI.Controllers
 
             var user = HttpContext.User;
             var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
-
-            if (productoSolicitado.CantidadApartado < solicitud.UnidadesProducto)
+            try
             {
-                return BadRequest("La cantidad de unidades del producto es mayor a las disponibles actualmente");
-            }
-            else
-            {
-                productoSolicitado.CantidadApartado -= solicitud.UnidadesProducto;
-                await productosService.UpdateProducto(productoSolicitado);
-            }
-
-            var solicitudApartado = mapper.Map<SolicitudesApartado>(solicitud);
-            solicitudApartado.StatusSolicitud = "pendiente";
-            solicitudApartado.FechaSolicitud = DateTime.UtcNow;
-            solicitudApartado.IdUsuario = idUser;
-            await solicitudesApartadoService.CreateSolicitud(solicitudApartado);
-
-            var solicitudApartadoDto = mapper.Map<SolicitudesApartadoDto>(solicitudApartado);
-
-            var producto = mapper.Map<ProductoDto>(productoSolicitado);
-
-            var periodos = await periodosService.GetPeriodosPredeterminados(solicitudApartado.IdTienda);
-
-            var usuario = await userService.GetUsuario(solicitud.IdUsuario);
-            var detallesUser = await userService.GetDetallesUsuario(usuario!.IdDetallesUsuario);
-
-            solicitudApartadoDto.RatioUsuario = $"{detallesUser!.ApartadosExitosos}/{detallesUser.ApartadosFallidos + detallesUser.ApartadosExitosos}";
-
-            if (producto is not null)
-            {
-                var imagenProducto = await productosService.GetPrincipalImageProducto(producto.IdProductos);
-                if (imagenProducto is not null)
+                var penalizacionesUsuario = await userService.GetPenalizacionesUsuario(idUser);
+                if (!penalizacionesUsuario.IsNullOrEmpty())
                 {
-                    solicitudApartadoDto.ImageProducto = imagenProducto.ImagenProducto;
+                    foreach (var penalizacion in penalizacionesUsuario)
+                    {
+                        if (penalizacion.FinPenalizacion >= DateTime.UtcNow)
+                        {
+                            TimeSpan tiempoRestante = (DateTime)penalizacion.FinPenalizacion - DateTime.UtcNow;
+                            string? mensajeTiempoRestante = null;
+                            if (tiempoRestante.TotalHours < 24)
+                            {
+                                mensajeTiempoRestante = $"{tiempoRestante.Hours} horas, {tiempoRestante.Minutes} minutos y {tiempoRestante.Seconds} segundos";
+                            }
+                            else
+                            {
+                                mensajeTiempoRestante = $"{tiempoRestante.Days} días, {tiempoRestante.Hours} horas, {tiempoRestante.Minutes} minutos y {tiempoRestante.Seconds} segundos";
+                            }
+                            return Unauthorized($"Cuenta penalizada, tiempo restante: {mensajeTiempoRestante}");
+                        }
+                    }
                 }
-                solicitudApartadoDto.NombreProducto = producto.NombreProducto;
-                solicitudApartadoDto.PrecioProducto = producto.PrecioProducto;
-            }
-            foreach (var periodo in periodos)
-            {
-                if (solicitudApartadoDto.PeriodoApartado == periodo.ApartadoPredeterminado)
+                if (productoSolicitado.CantidadApartado < solicitud.UnidadesProducto)
                 {
-                    solicitudApartadoDto.personalizado = false;
+                    return BadRequest("La cantidad de unidades del producto es mayor a las disponibles actualmente");
                 }
                 else
                 {
-                    solicitudApartadoDto.personalizado = true;
+                    productoSolicitado.CantidadApartado -= solicitud.UnidadesProducto;
+                    await productosService.UpdateProducto(productoSolicitado);
                 }
+
+                var solicitudApartado = mapper.Map<SolicitudesApartado>(solicitud);
+                solicitudApartado.StatusSolicitud = "pendiente";
+                solicitudApartado.FechaSolicitud = DateTime.UtcNow;
+                solicitudApartado.IdUsuario = idUser;
+                await solicitudesApartadoService.CreateSolicitud(solicitudApartado);
+
+                var solicitudApartadoDto = mapper.Map<SolicitudesApartadoDto>(solicitudApartado);
+
+                var producto = mapper.Map<ProductoDto>(productoSolicitado);
+
+                var periodos = await periodosService.GetPeriodosPredeterminados(solicitudApartado.IdTienda);
+
+                var usuario = await userService.GetUsuario(idUser);
+                var detallesUser = await userService.GetDetallesUsuario(usuario!.IdDetallesUsuario);
+
+                solicitudApartadoDto.RatioUsuario = $"{detallesUser!.ApartadosExitosos}/{detallesUser.ApartadosFallidos + detallesUser.ApartadosExitosos}";
+
+                if (producto is not null)
+                {
+                    var imagenProducto = await productosService.GetPrincipalImageProducto(producto.IdProductos);
+                    if (imagenProducto is not null)
+                    {
+                        solicitudApartadoDto.ImageProducto = imagenProducto.ImagenProducto;
+                    }
+                    solicitudApartadoDto.NombreProducto = producto.NombreProducto;
+                    solicitudApartadoDto.PrecioProducto = producto.PrecioProducto;
+                }
+                foreach (var periodo in periodos)
+                {
+                    if (solicitudApartadoDto.PeriodoApartado == periodo.ApartadoPredeterminado)
+                    {
+                        solicitudApartadoDto.personalizado = false;
+                    }
+                    else
+                    {
+                        solicitudApartadoDto.personalizado = true;
+                    }
+                }
+
+                notificacionesApartadoService.CreateSolicitud(solicitudApartadoDto);
+
+                var idAdmin = tienda.IdAdministrador;
+                var solicitudesCount = await solicitudesApartadoService.GetSolicitudesApartadoTiendas((int)idAdmin!);
+                await hubContext.Clients.Group(idAdmin.ToString()!).SendAsync("RecieveUpdateNotificaciones", solicitudesCount);
+
+                return Ok(solicitudApartadoDto);
             }
-
-            notificacionesApartadoService.CreateSolicitud(solicitudApartadoDto);
-
-            var idAdmin = tienda.IdAdministrador;
-            var solicitudesCount = await solicitudesApartadoService.GetSolicitudesApartadoTiendas((int)idAdmin!);
-            await hubContext.Clients.Group(idAdmin.ToString()!).SendAsync("RecieveUpdateNotificaciones", solicitudesCount);
-
-            return Ok(solicitudApartadoDto);
+            catch(Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpPut("UpdateSolicitud")]
@@ -306,6 +333,7 @@ namespace uStoreAPI.Controllers
             var user = HttpContext.User;
             var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
 
+            var penalizacionesUsuario = await userService.GetPenalizacionesUsuario(idUser);
             var solicitudApartado = await solicitudesApartadoService.GetOneSolicitudApartado(solicitud.IdSolicitud);
             
             if(solicitudApartado is null)
@@ -390,12 +418,27 @@ namespace uStoreAPI.Controllers
             else if (solicitud.StatusSolicitud == "cancelada")
             {
                 solicitudApartado.StatusSolicitud = "cancelada";
-
+                var penalizacionNueva = await userService.CreatePenalizacion(idUser);
                 if (!string.IsNullOrEmpty(solicitudApartado.IdJob))
                 {
                     BackgroundJob.Delete(solicitudApartado.IdJob);
                     solicitudApartado.IdJob = null;
                 }
+
+                if (!penalizacionesUsuario.IsNullOrEmpty())
+                {
+                    foreach(var penalizacion in penalizacionesUsuario)
+                    {
+                        if (!string.IsNullOrEmpty(penalizacion.IdJob))
+                        {
+                            BackgroundJob.Delete(penalizacion.IdJob);
+                            penalizacion.IdJob = null;
+                        }
+                    }
+                }
+                var jobId = BackgroundJob.Schedule(() => userService.DeletePenalizacionesUser(idUser), penalizacionNueva.FinPenalizacion!.Value.AddMonths(1));
+                penalizacionNueva.IdJob = jobId;
+                await userService.PatchPenalizacionUsuario(penalizacionNueva);
 
                 productoSolicitado!.CantidadApartado += solicitudApartado.UnidadesProducto;
                 await productosService.UpdateProducto(productoSolicitado);

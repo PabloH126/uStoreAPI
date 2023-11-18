@@ -45,7 +45,7 @@ namespace uStoreAPI.Controllers
                 var comentarios = await comentariosService.GetAllComentariosTienda(idTienda);
                 if (comentarios.IsNullOrEmpty())
                 {
-                    return NotFound("No hay comentarios registrados en esta tienda");
+                    return Ok("No hay comentarios registrados en esta tienda");
                 }
                 return Ok(comentarios);
             }
@@ -73,7 +73,7 @@ namespace uStoreAPI.Controllers
                 var comentarios = await comentariosService.GetAllComentariosProducto(idProducto);
                 if (comentarios.IsNullOrEmpty())
                 {
-                    return NotFound("No hay comentarios registrados en este producto");
+                    return Ok("No hay comentarios registrados en este producto");
                 }
                 return Ok(comentarios);
             }

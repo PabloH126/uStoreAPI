@@ -19,7 +19,5 @@ public partial class DetallesUsuario
 
     public virtual Dato? IdDatosNavigation { get; set; }
 
-    public virtual PenalizacionUsuario? IdPenalizacionUsuarioNavigation { get; set; }
-
     public virtual ICollection<Usuario> Usuarios { get; set; } = new List<Usuario>();
 }

@@ -91,6 +91,31 @@ namespace uStoreAPI.Controllers
             return Ok(productoDto);
         }
 
+
+        [HttpGet("GetProductoApp")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ProductoAppDto>> GetProductoApp(int id)
+        {
+            try
+            {
+                var producto = await productosService.GetProductoApp(id);
+                if (producto is null)
+                {
+                    return NotFound("Producto no registrado");
+                }
+                producto.ComentariosProducto = await comentariosService.GetAllComentariosProducto(id);
+                return Ok(producto);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpGet("GetAllProductoApp")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

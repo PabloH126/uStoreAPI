@@ -327,31 +327,38 @@ namespace uStoreAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdateTienda([FromForm] TiendaUpdateDto tiendaDto, IFormFile? logoTienda)
         {
-            var user = HttpContext.User;
-            var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
-
-            var tienda = await tiendasService.GetOneTienda(tiendaDto.IdTienda);
-
-            if (tienda is null)
+            try
             {
-                return NotFound("Tienda no registrada");
-            }
+                var user = HttpContext.User;
+                var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
 
-            if (tienda!.IdAdministrador != idUser)
+                var tienda = await tiendasService.GetOneTienda(tiendaDto.IdTienda);
+
+                if (tienda is null)
+                {
+                    return NotFound("Tienda no registrada");
+                }
+
+                if (tienda!.IdAdministrador != idUser)
+                {
+                    return Unauthorized("Tienda no autorizada");
+                }
+
+                if (logoTienda is not null)
+                {
+                    var logoUrl = await uploadService.UploadImageTiendas(logoTienda, $"{tienda.IdTienda}/{tienda.IdTienda}");
+                    tienda.LogoTienda = logoUrl;
+                }
+
+                tienda.NombreTienda = tiendaDto.NombreTienda;
+                await tiendasService.UpdateTienda(tienda);
+
+                return NoContent();
+            }
+            catch(Exception ex)
             {
-                return Unauthorized("Tienda no autorizada");
+                return StatusCode(500, ex.Message);
             }
-            
-            if (logoTienda is not null)
-            {
-                var logoUrl = await uploadService.UploadImageTiendas(logoTienda, $"{tienda.IdTienda}/{tienda.IdTienda}");
-                tienda.LogoTienda = logoUrl;
-            }
-
-            tienda.NombreTienda = tiendaDto.NombreTienda;
-            await tiendasService.UpdateTienda(tienda);
-
-            return NoContent();
         }
 
         [HttpDelete("DeleteTienda")]

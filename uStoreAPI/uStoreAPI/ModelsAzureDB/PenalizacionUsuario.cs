@@ -5,11 +5,15 @@ namespace uStoreAPI.ModelsAzureDB;
 
 public partial class PenalizacionUsuario
 {
-    public int IdPenalizacionUsuario { get; set; }
+    public int IdPenalizacion { get; set; }
 
-    public TimeSpan? TiempoPenalizacion { get; set; }
+    public DateTime? InicioPenalizacion { get; set; }
 
-    public int? CantidadPenalizaciones { get; set; }
+    public DateTime? FinPenalizacion { get; set; }
 
-    public virtual ICollection<DetallesUsuario> DetallesUsuarios { get; set; } = new List<DetallesUsuario>();
+    public int? IdUsuario { get; set; }
+
+    public string? IdJob { get; set; }
+
+    public virtual Usuario? IdUsuarioNavigation { get; set; }
 }

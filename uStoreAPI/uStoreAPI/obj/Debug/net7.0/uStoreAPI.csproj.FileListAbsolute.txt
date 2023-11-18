@@ -564,3 +564,4 @@ C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\bin\Debug\net7.0\Microsof
 C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\bin\Debug\net7.0\Microsoft.Extensions.Options.dll
 C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\bin\Debug\net7.0\SendGrid.dll
 C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\bin\Debug\net7.0\StarkbankEcdsa.dll
+C:\Users\PABLOPC\Desktop\uStoreAPI\uStoreAPI\uStoreAPI\obj\Debug\net7.0\uStoreAPI.sourcelink.json

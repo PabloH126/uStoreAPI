@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "xERzHWrkh1NWNRglBaEGb2tv0qhChHiZZ9fJIWXi6X5f4NlD7gBS9zRbvXbJsgxfx3LECxlJpDR4I8fiR/FfAg==",
+  "dgSpecHash": "Q5cJFiUhR3skcCK5fYvhMkyVhDDFPyIh/acJqypSM2dL1oaflNNCKepXsb74Dw4723O0fjeh4uPp+qpkwYvXVA==",
   "success": true,
   "projectFilePath": "C:\\Users\\PABLOPC\\Desktop\\uStoreAPI\\uStoreAPI\\uStoreAPI\\uStoreAPI.csproj",
   "expectedPackageFiles": [
@@ -279,6 +279,16 @@
     "C:\\Users\\PABLOPC\\.nuget\\packages\\system.xml.xdocument\\4.3.0\\system.xml.xdocument.4.3.0.nupkg.sha512"
   ],
   "logs": [
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "El paquete \"Azure.Identity\" 1.9.0 tiene una vulnerabilidad de gravedad alta conocida, https://github.com/advisories/GHSA-5mfx-4wcx-rv27",
+      "libraryId": "Azure.Identity",
+      "targetGraphs": [
+        "net7.0"
+      ]
+    },
     {
       "code": "NU1701",
       "level": "Warning",

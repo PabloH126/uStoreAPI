@@ -55,6 +55,64 @@ namespace uStoreAPI.Services
             return listaProductosTiendaApp;
         }
 
+        public async Task<ProductoAppDto?> GetProductoApp(int idProducto)
+        {
+            var producto = await context.Productos.FindAsync(idProducto);
+            if (producto is null)
+            {
+                return null;
+            }
+            var productoAppDto = mapper.Map<ProductoAppDto>(producto);
+            productoAppDto.CategoriasProducto = await (from catP in context.CategoriasProductos
+                                                       join cat in context.Categorias on catP.IdCategoria equals cat.IdCategoria
+                                                       where catP.IdProductos == producto.IdProductos
+                                                       select new CategoriasProductoDto
+                                                       {
+                                                           IdCp = catP.IdCp,
+                                                           IdCategoria = catP.IdCategoria,
+                                                           IdProductos = catP.IdProductos,
+                                                           NameCategoria = cat.Categoria1
+                                                       })
+                                                       .AsNoTracking()
+                                                       .ToListAsync();
+            productoAppDto.CalificacionesProducto = mapper.Map<IEnumerable<CalificacionProductoDto>>(await context.CalificacionProductos.Where(p => p.IdProductos == producto.IdProductos).AsNoTracking().ToListAsync());
+            productoAppDto.ComentariosProducto = mapper.Map<IEnumerable<ComentariosProductoDto>>(await context.ComentariosProductos.Where(p => p.IdProducto == producto.IdProductos).AsNoTracking().ToListAsync());
+            productoAppDto.ImagenesProducto = mapper.Map<IEnumerable<ImagenesProductoDto>>(await context.ImagenesProductos.Where(p => p.IdProductos == producto.IdProductos).AsNoTracking().ToListAsync());
+            productoAppDto.ImageProducto = productoAppDto.ImagenesProducto.First().ImagenProducto;
+
+            var categoriasProducto = productoAppDto.CategoriasProducto.Select(p => p.IdCategoria).ToList();
+            
+            var productosRelacionados = await (from p in context.Productos
+                                               join cP in context.CategoriasProductos on p.IdProductos equals cP.IdProductos
+                                               join cat in context.Categorias on cP.IdCategoria equals cat.IdCategoria
+                                               where p.IdTienda == producto.IdTienda
+                                               group cP by p.IdProductos into grupoProductos
+                                               select new
+                                               {
+                                                   idProducto = grupoProductos.Key,
+                                                   Coincidencias = grupoProductos.Count(g => categoriasProducto.Contains(g.IdCategoria))
+                                               })
+                                               .OrderByDescending(p => p.Coincidencias)
+                                               .AsNoTracking()
+                                               .ToListAsync();
+            var idsProductosRelacionados = productosRelacionados.Select(p => p.idProducto).ToList();
+            var productosRelacionadosTemp = await context.Productos.Where(p => idsProductosRelacionados.Contains(p.IdProductos)).AsNoTracking().ToListAsync();
+            var productosRelacionadosOrdenados = productosRelacionadosTemp
+                                                    .Where(p => p.IdProductos != producto.IdProductos)
+                                                    .OrderBy(p => idsProductosRelacionados.IndexOf(p.IdProductos))
+                                                    .Select(p => mapper.Map<ProductoDto>(p))
+                                                    .ToList();
+
+            foreach(var productoRelacionado in productosRelacionadosOrdenados)
+            {
+                productoRelacionado.ImageProducto = await context.ImagenesProductos.Where(p => p.IdProductos == productoRelacionado.IdProductos).Select(p => p.ImagenProducto).FirstAsync();
+            }
+
+            productoAppDto.ProductosRelacionados = productosRelacionadosOrdenados;
+            
+            return productoAppDto;
+        }
+
         public async Task<Producto?> GetOneProducto(int? id)
         {
             return await context.Productos.FindAsync(id);

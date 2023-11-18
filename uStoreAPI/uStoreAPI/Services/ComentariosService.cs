@@ -34,7 +34,7 @@ namespace uStoreAPI.Services
                                          IdTienda = comentario.IdTienda,
                                          ImagenUsuario = iP.IconoPerfil,
                                          NombreUsuario = $"{datosU.PrimerNombre} {datosU.PrimerApellido}"
-                                     }).AsNoTracking().ToListAsync();
+                                     }).OrderByDescending(p => p.FechaComentario).AsNoTracking().ToListAsync();
             foreach(var comentario in comentarios)
             {
                 comentario.CalificacionEstrellas = await context.CalificacionTienda.Where(p => p.IdTienda == comentario.IdTienda && p.IdUsuario == comentario.IdUsuario).Select(p => p.Calificacion).FirstOrDefaultAsync();
@@ -61,7 +61,7 @@ namespace uStoreAPI.Services
                                          IdProducto = comentario.IdProducto,
                                          ImagenUsuario = iP.IconoPerfil,
                                          NombreUsuario = $"{datosU.PrimerNombre} {datosU.PrimerApellido}"
-                                     }).AsNoTracking().ToListAsync();
+                                     }).OrderByDescending(p => p.FechaComentario).AsNoTracking().ToListAsync();
             foreach (var comentario in comentarios)
             {
                 comentario.CalificacionEstrellas = await context.CalificacionProductos.Where(p => p.IdProductos == comentario.IdProducto && p.IdUsuario == comentario.IdUsuario).Select(p => p.Calificacion).FirstOrDefaultAsync();
