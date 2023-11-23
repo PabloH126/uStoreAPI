@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using uStoreAPI.Dtos;
 using uStoreAPI.ModelsAzureDB;
@@ -22,6 +23,21 @@ namespace uStoreAPI.Controllers
             plazasService = _plazasService;
             uploadService = _uploadService;
             mapper = _mapper;
+        }
+
+        [HttpGet("GetProductosMall")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<ActionResult<IEnumerable<ProductoDto>>> GetProductosPopularesMall(int idMall)
+        {
+            var productosPopulares = await plazasService.GetProductosPopulares(idMall);
+            if (productosPopulares.IsNullOrEmpty())
+            {
+                return NotFound("No se encontraron productos populares");
+            }
+            return Ok(productosPopulares);
         }
 
         [HttpGet("GetAllMalls")]

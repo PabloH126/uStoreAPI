@@ -24,5 +24,6 @@ namespace uStoreAPI.Dtos
         public string? ImageProducto { get; set; }
         public string? NombreProducto { get; set; }
         public double? PrecioProducto { get; set; }
+        public string? NombreTienda {  get; set; }
     }
 }

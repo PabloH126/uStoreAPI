@@ -27,6 +27,29 @@ namespace uStoreAPI.Controllers
             uploadService = _uploadService;
         }
 
+        [HttpGet("GetPublicacionesRecientesApp")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<IEnumerable<PublicacionesDto>>> GetPublicacionesRecientesApp(int idMall)
+        {
+            var publicaciones = await publicacionesService.GetPublicacionesRecientesApp(idMall);
+
+            if (publicaciones.IsNullOrEmpty())
+            {
+                return NotFound("No hay ninguna publicacion para esta plaza");
+            }
+            var publicacionesDto = mapper.Map<IEnumerable<PublicacionesDto>>(publicaciones);
+            foreach (var publicacion in publicacionesDto)
+            {
+                var tienda = await tiendasService.GetOneTienda(publicacion.IdTienda);
+                publicacion.NombreTienda = tienda!.NombreTienda;
+                publicacion.LogoTienda = tienda!.LogoTienda;
+            }
+            return Ok(publicacionesDto);
+        }
+
         [HttpGet("GetPublicacionesRecientes")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

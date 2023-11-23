@@ -98,6 +98,7 @@ namespace uStoreAPI.Controllers
                     if(solicitud.PeriodoApartado == periodo.ApartadoPredeterminado)
                     {
                         solicitud.personalizado = false;
+                        break;
                     }
                     else
                     {
@@ -166,11 +167,56 @@ namespace uStoreAPI.Controllers
                     if (solicitud.PeriodoApartado == periodo.ApartadoPredeterminado)
                     {
                         solicitud.personalizado = false;
+                        break;
                     }
                     else
                     {
                         solicitud.personalizado = true;
                     }
+                }
+            }
+
+            return Ok(solicitudesApartado);
+        }
+
+        [HttpGet("GetSolicitudesUsuario")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<SolicitudesApartadoDto>> GetSolicitudesApartadoUsuario()
+        {
+            var user = HttpContext.User;
+            var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+            var userType = user.Claims.FirstOrDefault(u => u.Type == "UserType")!.Value;
+            if (userType != "Usuario")
+            {
+                return Unauthorized("No es una cuenta de usuario");
+            }
+
+            var solicitudesApartado = mapper.Map<IEnumerable<SolicitudesApartadoDto>>(await solicitudesApartadoService.GetSolicitudesApartadoUsuario(idUser));
+
+            if (solicitudesApartado.IsNullOrEmpty())
+            {
+                return NotFound("No hay solicitudes activas");
+            }
+
+            foreach (var solicitud in solicitudesApartado)
+            {
+                var producto = mapper.Map<ProductoDto>(await productosService.GetOneProducto(solicitud.IdProductos));
+                if (producto is not null)
+                {
+                    var imagenProducto = await productosService.GetPrincipalImageProducto(producto.IdProductos);
+                    if (imagenProducto is not null)
+                    {
+                        solicitud.ImageProducto = imagenProducto.ImagenProducto;
+                    }
+                    solicitud.NombreProducto = producto.NombreProducto;
+                    solicitud.PrecioProducto = producto.PrecioProducto;
+                }
+                else
+                {
+                    return BadRequest("Hubo un error en la obtencion del producto");
                 }
             }
 
@@ -201,6 +247,24 @@ namespace uStoreAPI.Controllers
         {
             var solicitud = await solicitudesApartadoService.GetOneSolicitudApartado(id);
             return Ok(mapper.Map<SolicitudesApartadoDto>(solicitud));
+        }
+
+        [HttpGet("GetPenalizacion")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<SolicitudesApartadoDto>> GetPenalizacionUsuario()
+        {
+            var user = HttpContext.User;
+            var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+            var penalizacion = await userService.GetPenalizacionActualUsuario(idUser);
+            if (penalizacion is null)
+            {
+                return NotFound("Esta cuenta no se encuentra penalizada");
+            }
+            return Ok(mapper.Map<PenalizacionUsuarioDto>(penalizacion));
         }
         #endregion
 
@@ -237,7 +301,7 @@ namespace uStoreAPI.Controllers
                 var penalizacionesUsuario = await userService.GetPenalizacionesUsuario(idUser);
                 if (!penalizacionesUsuario.IsNullOrEmpty())
                 {
-                    foreach (var penalizacion in penalizacionesUsuario)
+                    foreach (var penalizacion in penalizacionesUsuario!)
                     {
                         if (penalizacion.FinPenalizacion >= DateTime.UtcNow)
                         {
@@ -297,6 +361,7 @@ namespace uStoreAPI.Controllers
                     if (solicitudApartadoDto.PeriodoApartado == periodo.ApartadoPredeterminado)
                     {
                         solicitudApartadoDto.personalizado = false;
+                        break;
                     }
                     else
                     {
@@ -332,8 +397,7 @@ namespace uStoreAPI.Controllers
 
             var user = HttpContext.User;
             var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
-
-            var penalizacionesUsuario = await userService.GetPenalizacionesUsuario(idUser);
+            var userType = user.Claims.FirstOrDefault(u => u.Type == "UserType")!.Value;
             var solicitudApartado = await solicitudesApartadoService.GetOneSolicitudApartado(solicitud.IdSolicitud);
             
             if(solicitudApartado is null)
@@ -418,30 +482,53 @@ namespace uStoreAPI.Controllers
             else if (solicitud.StatusSolicitud == "cancelada")
             {
                 solicitudApartado.StatusSolicitud = "cancelada";
-                var penalizacionNueva = await userService.CreatePenalizacion(idUser);
                 if (!string.IsNullOrEmpty(solicitudApartado.IdJob))
                 {
                     BackgroundJob.Delete(solicitudApartado.IdJob);
                     solicitudApartado.IdJob = null;
                 }
 
-                if (!penalizacionesUsuario.IsNullOrEmpty())
+                if (userType == "Usuario")
                 {
-                    foreach(var penalizacion in penalizacionesUsuario)
+                    var usuario = await userService.GetUsuario(solicitudApartado.IdUsuario);
+                    if (usuario is not null)
                     {
-                        if (!string.IsNullOrEmpty(penalizacion.IdJob))
+                        var detallesUsuario = await userService.GetDetallesUsuario(usuario.IdDetallesUsuario);
+                        if (detallesUsuario is not null)
                         {
-                            BackgroundJob.Delete(penalizacion.IdJob);
-                            penalizacion.IdJob = null;
+                            detallesUsuario.ApartadosFallidos += 1;
+                            await userService.PatchUserApartados(detallesUsuario);
                         }
                     }
+                    var penalizacionesUsuario = await userService.GetPenalizacionesUsuario(idUser);
+                    var penalizacionNueva = await userService.CreatePenalizacion(idUser);
+                    if (!penalizacionesUsuario.IsNullOrEmpty())
+                    {
+                        foreach (var penalizacion in penalizacionesUsuario!)
+                        {
+                            if (!string.IsNullOrEmpty(penalizacion.IdJob))
+                            {
+                                BackgroundJob.Delete(penalizacion.IdJob);
+                                penalizacion.IdJob = null;
+                            }
+                        }
+                    }
+                    var jobId = BackgroundJob.Schedule(() => userService.DeletePenalizacionesUser(idUser), penalizacionNueva.FinPenalizacion!.Value.AddMonths(1));
+                    penalizacionNueva.IdJob = jobId;
+                    await userService.PatchPenalizacionUsuario(penalizacionNueva);
                 }
-                var jobId = BackgroundJob.Schedule(() => userService.DeletePenalizacionesUser(idUser), penalizacionNueva.FinPenalizacion!.Value.AddMonths(1));
-                penalizacionNueva.IdJob = jobId;
-                await userService.PatchPenalizacionUsuario(penalizacionNueva);
 
                 productoSolicitado!.CantidadApartado += solicitudApartado.UnidadesProducto;
                 await productosService.UpdateProducto(productoSolicitado);
+            }
+            if (solicitud.StatusSolicitud == "recogida")
+            {
+                solicitudApartado.StatusSolicitud = solicitud.StatusSolicitud;
+                if (!string.IsNullOrEmpty(solicitudApartado.IdJob))
+                {
+                    BackgroundJob.Delete(solicitudApartado.IdJob);
+                    solicitudApartado.IdJob = null;
+                }
             }
 
             await solicitudesApartadoService.UpdateSolicitud(solicitudApartado);

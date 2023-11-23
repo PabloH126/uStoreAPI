@@ -100,6 +100,33 @@ namespace uStoreAPI.Controllers
         }
 
         [Authorize]
+        [HttpPost("CreateFavorito")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> CreateFavorito(int idProducto = 0, int idTienda = 0)
+        {
+            var user = HttpContext.User;
+            var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+
+            if (idProducto == 0 && idTienda == 0)
+            {
+                return BadRequest("No pueden ser ambos id de cero");
+            }
+
+            try
+            {
+                await usersService.CreateFavorito(idUser, idTienda, idProducto);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            return Ok();
+        }
+
+        [Authorize]
         [HttpPatch("UpdatePass")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

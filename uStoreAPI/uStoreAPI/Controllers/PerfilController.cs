@@ -16,12 +16,16 @@ namespace uStoreAPI.Controllers
         private readonly AdminService adminService;
         private readonly UserService userService;
         private readonly GerentesService gerentesService;
-        public PerfilController(TendenciasService _ts, AdminService _as, UserService _us, GerentesService _gs)
+        private readonly SolicitudesApartadoService solicitudesService;
+        private IMapper mapper;
+        public PerfilController(IMapper _mapper, SolicitudesApartadoService _sS, TendenciasService _ts, AdminService _as, UserService _us, GerentesService _gs)
         {
             tendenciasService = _ts;
             adminService = _as;
             userService = _us;
             gerentesService = _gs;
+            solicitudesService = _sS;
+            mapper = _mapper;
         }
 
         [Authorize]
@@ -29,7 +33,7 @@ namespace uStoreAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<PerfilDto>> GetPerfil()
+        public async Task<ActionResult<object>> GetPerfil()
         {
             var user = HttpContext.User;
             var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
@@ -46,10 +50,41 @@ namespace uStoreAPI.Controllers
             {
                 return await gerentesService.GetPerfilGerente(idUser);
             }
+            else if (typeUser == "Usuario")
+            {
+                var perfilUsuario = await userService.GetPerfilUsuario(idUser);
+                perfilUsuario!.ProductosApartados = await solicitudesService.GetSolicitudesApartadoUsuario(idUser);
+                perfilUsuario!.FavoritosUsuario = await userService.GetFavoritosUsuario(idUser);
+                perfilUsuario!.HistorialUsuario = await userService.GetHistorialUsuario(idUser);
+
+                return Ok(perfilUsuario);
+            }
             else
             {
                 return NotFound();
             }
+        }
+
+        [Authorize]
+        [HttpGet("GetHistorialUsuario")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<HistorialUsuarioDto>> GetHistorialUsuario()
+        {
+            var user = HttpContext.User;
+            var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+            var typeUser = user.Claims.FirstOrDefault(u => u.Type == "UserType")!.Value;
+            if (typeUser != "Usuario")
+            {
+                return Unauthorized("Debe ser una cuenta de usuario");
+            }
+            var historial = await userService.GetHistorialUsuario(idUser);
+            if (historial == null)
+            {
+                return NotFound();
+            }
+            return Ok(historial);
         }
     }
 }

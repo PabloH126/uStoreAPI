@@ -59,7 +59,9 @@ public partial class UstoreContext : DbContext
 
     public virtual DbSet<DetallesUsuario> DetallesUsuarios { get; set; }
 
-    public virtual DbSet<Favorito> Favoritos { get; set; }
+    public virtual DbSet<FavoritosProducto> FavoritosProductos { get; set; }
+
+    public virtual DbSet<FavoritosTiendum> FavoritosTienda { get; set; }
 
     public virtual DbSet<Gerente> Gerentes { get; set; }
 
@@ -477,23 +479,42 @@ public partial class UstoreContext : DbContext
                 .HasConstraintName("detalles_usuario_ibfk_datos");
         });
 
-        modelBuilder.Entity<Favorito>(entity =>
+        modelBuilder.Entity<FavoritosProducto>(entity =>
         {
-            entity.HasKey(e => e.IdFavoritos).HasName("PK__favorito__085B60776BFB2CBE");
+            entity
+                .HasNoKey()
+                .ToTable("favoritos_producto");
 
-            entity.ToTable("favoritos");
+            entity.Property(e => e.IdFavoritoProducto).ValueGeneratedOnAdd();
 
-            entity.HasOne(d => d.IdProductosNavigation).WithMany(p => p.Favoritos)
-                .HasForeignKey(d => d.IdProductos)
-                .HasConstraintName("favoritos_ibfk_productos");
+            entity.HasOne(d => d.IdProductoNavigation).WithMany()
+                .HasForeignKey(d => d.IdProducto)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_IdProducto");
 
-            entity.HasOne(d => d.IdTiendaNavigation).WithMany(p => p.Favoritos)
-                .HasForeignKey(d => d.IdTienda)
-                .HasConstraintName("favoritos_ibfk_tienda");
-
-            entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.Favoritos)
+            entity.HasOne(d => d.IdUsuarioNavigation).WithMany()
                 .HasForeignKey(d => d.IdUsuario)
-                .HasConstraintName("favoritos_ibfk_usuarios");
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_IdUsuario_Favoritos_Producto");
+        });
+
+        modelBuilder.Entity<FavoritosTiendum>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("favoritos_tienda");
+
+            entity.Property(e => e.IdFavoritoTienda).ValueGeneratedOnAdd();
+
+            entity.HasOne(d => d.IdTiendaNavigation).WithMany()
+                .HasForeignKey(d => d.IdTienda)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_IdTienda");
+
+            entity.HasOne(d => d.IdUsuarioNavigation).WithMany()
+                .HasForeignKey(d => d.IdUsuario)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_IdUsuario");
         });
 
         modelBuilder.Entity<Gerente>(entity =>

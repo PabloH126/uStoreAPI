@@ -1,5 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Hangfire;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using uStoreAPI.Dtos;
 using uStoreAPI.ModelsAzureDB;
 
 namespace uStoreAPI.Services
@@ -7,9 +10,13 @@ namespace uStoreAPI.Services
     public class SolicitudesApartadoService
     {
         private readonly UstoreContext context;
-        public SolicitudesApartadoService(UstoreContext _context)
+        private readonly UserService userService;
+        private IMapper mapper;
+        public SolicitudesApartadoService(UstoreContext _context, IMapper _mapper, UserService _us)
         {
-            context= _context;
+            context = _context;
+            mapper = _mapper;
+            userService = _us;
         }
 
         public async Task<Dictionary<int, int>> GetSolicitudesApartadoTiendas(int idAdministrador)
@@ -41,12 +48,34 @@ namespace uStoreAPI.Services
 
         public async Task<IEnumerable<SolicitudesApartado>> GetSolicitudesApartadoActivasWithIdTienda(int idTienda)
         {
-            return await context.SolicitudesApartados.Where(p => p.IdTienda == idTienda && (p.StatusSolicitud == "activa" || p.StatusSolicitud == "vencida"))
+            return await context.SolicitudesApartados.Where(p => p.IdTienda == idTienda && (p.StatusSolicitud == "activa" || p.StatusSolicitud == "vencida" || p.StatusSolicitud == "recogida"))
                                                      .OrderBy(p => p.StatusSolicitud == "vencida" ? 1 : 0)
                                                      .ThenBy(p => p.FechaVencimiento)
                                                      .ThenBy(p => p.FechaSolicitud)
                                                      .AsNoTracking()
                                                      .ToListAsync();
+        }
+
+        public async Task<IEnumerable<SolicitudesApartadoDto>> GetSolicitudesApartadoUsuario(int idUsuario)
+        {
+            var solicitudes = mapper.Map<List<SolicitudesApartadoDto>>(
+                                await context.SolicitudesApartados.Where(p => p.IdUsuario == idUsuario && (p.StatusSolicitud == "activa" || p.StatusSolicitud == "pendiente"))
+                                                                     .OrderBy(p => p.FechaVencimiento)
+                                                                     .ThenBy(p => p.FechaSolicitud)
+                                                                     .AsNoTracking()
+                                                                     .ToListAsync()
+                              );
+            foreach (var solicitud in solicitudes)
+            {
+                var tiendaSolicitud = await context.Tienda.FindAsync(solicitud.IdTienda);
+                var productoSolicitud = await context.Productos.FindAsync(solicitud.IdProductos);
+                solicitud.ImageProducto = await context.ImagenesProductos.Where(p => p.IdProductos == productoSolicitud!.IdProductos).Select(p => p.ImagenProducto).FirstOrDefaultAsync();
+                solicitud.NombreProducto = productoSolicitud.NombreProducto;
+                solicitud.PrecioProducto = productoSolicitud.PrecioProducto;
+                solicitud.NombreTienda = tiendaSolicitud.NombreTienda;
+            }
+
+            return solicitudes;
         }
 
         public async Task<SolicitudesApartado?> GetOneSolicitudApartado(int idSolicitud)
@@ -107,6 +136,27 @@ namespace uStoreAPI.Services
                 detallesUsuario!.ApartadosFallidos += 1;
                 context.DetallesUsuarios.Update(detallesUsuario);
                 await context.SaveChangesAsync();
+
+                var penalizacionesUsuario = await userService.GetPenalizacionesUsuario((int)solicitud.IdUsuario!);
+                var penalizacionNueva = await userService.CreatePenalizacion((int)solicitud.IdUsuario!);
+
+                if (!penalizacionesUsuario.IsNullOrEmpty())
+                {
+                    foreach (var penalizacion in penalizacionesUsuario)
+                    {
+                        if (!string.IsNullOrEmpty(penalizacion.IdJob))
+                        {
+                            BackgroundJob.Delete(penalizacion.IdJob);
+                            penalizacion.IdJob = null;
+                        }
+                    }
+                }
+
+                var jobId = BackgroundJob.Schedule(() => userService.DeletePenalizacionesUser((int)solicitud.IdUsuario!), 
+                                                                                              penalizacionNueva.FinPenalizacion!.Value.AddMonths(1));
+                
+                penalizacionNueva.IdJob = jobId;
+                await userService.PatchPenalizacionUsuario(penalizacionNueva);
             }
         }
     }
