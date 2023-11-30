@@ -29,6 +29,8 @@ public partial class Producto
 
     public virtual ICollection<ComentariosProducto> ComentariosProductos { get; set; } = new List<ComentariosProducto>();
 
+    public virtual ICollection<FavoritosProducto> FavoritosProductos { get; set; } = new List<FavoritosProducto>();
+
     public virtual ICollection<Historial> Historials { get; set; } = new List<Historial>();
 
     public virtual Tiendum? IdTiendaNavigation { get; set; }

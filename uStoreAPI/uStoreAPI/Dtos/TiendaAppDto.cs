@@ -22,5 +22,8 @@ namespace uStoreAPI.Dtos
         public IEnumerable<ProductoDto>? ProductosPopularesTienda {  get; set; }
         public IEnumerable<ImagenesTiendaDto>? ImagenesTienda { get; set; }
         public string? HorarioDiaTienda { get; set; }
+        public string? IsFavorito { get; set; }
+        public string? IsUsuarioPenalizado {  get; set; }
+        public int? IdChatUsuario { get; set; }
     }
 }

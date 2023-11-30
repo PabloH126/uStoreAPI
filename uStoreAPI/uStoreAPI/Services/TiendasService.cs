@@ -78,7 +78,7 @@ namespace uStoreAPI.Services
             return await context.Tienda.FindAsync(idTienda);
         }
 
-        public async Task<TiendaAppDto?> GetTiendaApp(int idTienda)
+        public async Task<TiendaAppDto?> GetTiendaApp(int idTienda, int idUser)
         {
             List<ProductoDto> productosPopulares = new List<ProductoDto>();
             var tienda = await context.Tienda.FindAsync(idTienda);
@@ -124,7 +124,26 @@ namespace uStoreAPI.Services
             tiendaAppDto.ProductosPopularesTienda = productosPopulares;
 
             tiendaAppDto.ImagenesTienda = mapper.Map<IEnumerable<ImagenesTiendaDto>>(await context.ImagenesTiendas.Where(p => p.IdTienda == tiendaAppDto.IdTienda).AsNoTracking().ToListAsync());
+
+            tiendaAppDto.IdChatUsuario = await context.Chats.Where(p => p.IdTienda == idTienda && p.TypeMiembro2 == "Usuario" && p.IdMiembro2 == idUser).Select(p => p.IdChat).FirstOrDefaultAsync();
             return tiendaAppDto;
+        }
+
+        public async Task<TiendaDto?> GetDatosTienda(int idTienda, int idUser)
+        {
+            var tienda = await context.Tienda.FindAsync(idTienda);
+            if (tienda is null)
+            {
+                return null;
+            }
+            var tiendaDto = new TiendaDto
+            {
+                IdTienda = tienda.IdTienda,
+                NombreTienda = tienda.NombreTienda,
+                LogoTienda = tienda.LogoTienda,
+                IdChatUsuario = await context.Chats.Where(p => p.IdTienda == idTienda && p.TypeMiembro2 == "Usuario" && p.IdMiembro2 == idUser).Select(p => p.IdChat).FirstOrDefaultAsync()
+            };
+            return tiendaDto;
         }
 
         public async Task<Tiendum> CreateTienda(Tiendum tienda)

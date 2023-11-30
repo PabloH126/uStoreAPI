@@ -17,5 +17,6 @@ namespace uStoreAPI.Dtos
         public IEnumerable<CategoriasTiendaDto>? CategoriasTienda { get; set; }
         public IEnumerable<HorarioDto>? Horario { get; set;}
         public string? HorarioDiaTienda { get; set; }
+        public string? IsFavorito {  get; set; }
     }
 }

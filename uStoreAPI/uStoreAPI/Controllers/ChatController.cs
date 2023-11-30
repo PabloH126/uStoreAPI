@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Azure;
 using Microsoft.VisualBasic;
 using System;
 using System.Security.Claims;
@@ -39,7 +40,7 @@ namespace uStoreAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<IEnumerable<Chat?>>> GetChats(string typeChat)
+        public async Task<ActionResult<IEnumerable<ChatDto?>>> GetChats(string typeChat)
         {
             if(typeChat is null)
             {
@@ -102,7 +103,7 @@ namespace uStoreAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Chat?>> CreateChat(IFormFile? image, [FromForm] MensajeDto newMensaje, int idMiembro2, string typeMiembro2, int? idTienda)
+        public async Task<ActionResult<ChatDto?>> CreateChat(IFormFile? image, [FromForm] MensajeDto newMensaje, int idMiembro2, string typeMiembro2, int? idTienda)
         {
             if (idMiembro2 == 0)
             {
@@ -115,63 +116,75 @@ namespace uStoreAPI.Controllers
             {
                 return BadRequest("Es necesario agregar un id de la tienda donde se hace la solicitud");
             }
- 
-            var chatGuardado = await chatService.CreateChat(idUser, typeUser, idMiembro2, typeMiembro2, idTienda);
-            
-            var tiendaChat = await tiendasService.GetOneTienda(chatGuardado!.IdTienda);
-            var mensaje = mapper.Map<Mensaje>(newMensaje);
-            mensaje.IdChat = chatGuardado.IdChat;
-            mensaje.FechaMensaje = DateTime.UtcNow;
-            if (chatGuardado.TypeMiembro1 == "Usuario" || chatGuardado.TypeMiembro2 == "Usuario")
+            try
             {
-                if (typeUser == "Gerente" || typeUser == "Administrador")
+                var chatGuardado = await chatService.CreateChat(idUser, typeUser, idMiembro2, typeMiembro2, idTienda);
+
+                var tiendaChat = await tiendasService.GetOneTienda(chatGuardado!.IdTienda);
+                var mensaje = mapper.Map<Mensaje>(newMensaje);
+                mensaje.IdChat = chatGuardado.IdChat;
+                mensaje.FechaMensaje = DateTime.UtcNow;
+                
+                if (chatGuardado.TypeMiembro1 == "Usuario" || chatGuardado.TypeMiembro2 == "Usuario")
                 {
-                    mensaje.IdRemitente = tiendaChat!.IdTienda;
-                    mensaje.TypeRemitente = "Tienda";
+                    if (typeUser == "Gerente" || typeUser == "Administrador")
+                    {
+                        mensaje.IdRemitente = tiendaChat!.IdTienda;
+                        mensaje.TypeRemitente = "Tienda";
+                    }
+                    else
+                    {
+                        mensaje.IdRemitente = idUser;
+                        mensaje.TypeRemitente = typeUser;
+                    }
                 }
                 else
                 {
                     mensaje.IdRemitente = idUser;
                     mensaje.TypeRemitente = typeUser;
                 }
-            }
-            else
-            {
-                mensaje.IdRemitente = idUser;
-                mensaje.TypeRemitente = typeUser;
-            }
-            var mensajeCreado = await chatService.CreateMensaje(mensaje);
-            
-            if (image is not null)
-            {
-                var imageUrl = await uploadService.UploadImageMensaje(image, mensajeCreado.IdMensaje.ToString());
-                mensajeCreado.Contenido = imageUrl;
-                mensajeCreado.IsImage = true;
-            }
-            else
-            {
-                mensajeCreado.IsImage = false;
-            }
+                var mensajeCreado = await chatService.CreateMensaje(mensaje);
 
-            await chatService.UpdateMensaje(mensajeCreado);
-            
-            var gerenteTienda = await gerentesService.GetGerenteTienda(chatGuardado.IdTienda);
-            chatGuardado.ImagenTienda = tiendaChat!.LogoTienda;
-            chatGuardado.TiendaNameChat = tiendaChat.NombreTienda;
-            chatGuardado.UltimoMensaje = mensajeCreado.Contenido;
-            if (chatGuardado.TypeMiembro1 == "Tienda" || chatGuardado.TypeMiembro2 == "Tienda")
-            {
-                var groupMiembroChat = (chatGuardado.TypeMiembro1 == "Tienda") ? $"{chatGuardado.IdMiembro2}{chatGuardado.TypeMiembro2}Chats" : $"{chatGuardado.IdMiembro1}{chatGuardado.TypeMiembro1}Chats";
-                await hubContext.Clients.Group($"{gerenteTienda!.IdGerente}GerenteChats").SendAsync("ChatCreated", chatGuardado, mapper.Map<MensajeDto>(mensajeCreado));
-                await hubContext.Clients.Group($"{tiendaChat!.IdAdministrador}AdministradorChats").SendAsync("ChatCreated", chatGuardado, mapper.Map<MensajeDto>(mensajeCreado));
-                await hubContext.Clients.Group(groupMiembroChat).SendAsync("ChatCreated", chatGuardado, mapper.Map<MensajeDto>(mensajeCreado));
+                if (image is not null)
+                {
+                    var imageUrl = await uploadService.UploadImageMensaje(image, mensajeCreado.IdMensaje.ToString());
+                    mensajeCreado.Contenido = imageUrl;
+                    mensajeCreado.IsImage = true;
+                }
+                else
+                {
+                    mensajeCreado.IsImage = false;
+                }
+                await chatService.UpdateMensaje(mensajeCreado);
+                var gerenteTienda = await gerentesService.GetGerenteTienda(chatGuardado.IdTienda);
+                chatGuardado.ImagenTienda = tiendaChat!.LogoTienda;
+                chatGuardado.TiendaNameChat = tiendaChat.NombreTienda;
+                chatGuardado.UltimoMensaje = mensajeCreado.Contenido;
+
+                var mensajeCreadoDto = mapper.Map<MensajeDto>(mensajeCreado);
+                
+                if (chatGuardado.TypeMiembro1 == "Tienda" || chatGuardado.TypeMiembro2 == "Tienda")
+                {
+                    var groupMiembroChat = (chatGuardado.TypeMiembro1 == "Tienda") ? $"{chatGuardado.IdMiembro2}{chatGuardado.TypeMiembro2}Chats" : $"{chatGuardado.IdMiembro1}{chatGuardado.TypeMiembro1}Chats";
+                    if (gerenteTienda is not null)
+                    {
+                        await hubContext.Clients.Group($"{gerenteTienda!.IdGerente}GerenteChats").SendAsync("ChatCreated", chatGuardado, mensajeCreadoDto);
+                    }
+                    await hubContext.Clients.Group($"{tiendaChat!.IdAdministrador}AdministradorChats").SendAsync("ChatCreated", chatGuardado, mensajeCreadoDto);
+                    await hubContext.Clients.Group(groupMiembroChat).SendAsync("ChatCreated", chatGuardado, mensajeCreadoDto);
+                }
+                else
+                {
+                    await hubContext.Clients.Group($"{chatGuardado.IdMiembro1}{chatGuardado.TypeMiembro1}Chats").SendAsync("ChatCreated", chatGuardado, mensajeCreadoDto);
+                    await hubContext.Clients.Group($"{chatGuardado.IdMiembro2}{chatGuardado.TypeMiembro2}Chats").SendAsync("ChatCreated", chatGuardado, mensajeCreadoDto);
+                }
+                return Ok(chatGuardado);
+                
             }
-            else
+            catch (Exception ex)
             {
-                await hubContext.Clients.Group($"{chatGuardado.IdMiembro1}{chatGuardado.TypeMiembro1}Chats").SendAsync("ChatCreated", chatGuardado, mapper.Map<MensajeDto>(mensajeCreado));
-                await hubContext.Clients.Group($"{chatGuardado.IdMiembro2}{chatGuardado.TypeMiembro2}Chats").SendAsync("ChatCreated", chatGuardado, mapper.Map<MensajeDto>(mensajeCreado));
+                return BadRequest(ex.Message);
             }    
-            return Ok(chatGuardado);
         }
 
         [HttpPost("CreateMensaje")]
@@ -242,7 +255,10 @@ namespace uStoreAPI.Controllers
                 if (chat.TypeMiembro1 == "Tienda" || chat.TypeMiembro2 == "Tienda")
                 {
                     var groupMiembroChat = (chat.TypeMiembro1 == "Tienda") ? $"{chat.IdMiembro2}{chat.TypeMiembro2}Chats" : $"{chat.IdMiembro1}{chat.TypeMiembro1}Chats";
-                    await hubContext.Clients.Group($"{gerenteTienda!.IdGerente}GerenteChats").SendAsync("NewMessage", mapper.Map<MensajeDto>(mensajeCreado), mapper.Map<ChatDto>(chat));
+                    if (gerenteTienda is not null)
+                    {
+                        await hubContext.Clients.Group($"{gerenteTienda!.IdGerente}GerenteChats").SendAsync("NewMessage", mapper.Map<MensajeDto>(mensajeCreado), mapper.Map<ChatDto>(chat));
+                    }
                     await hubContext.Clients.Group($"{tiendaChat!.IdAdministrador}AdministradorChats").SendAsync("NewMessage", mapper.Map<MensajeDto>(mensajeCreado), mapper.Map<ChatDto>(chat));
                     await hubContext.Clients.Group(groupMiembroChat).SendAsync("NewMessage", mapper.Map<MensajeDto>(mensajeCreado), mapper.Map<ChatDto>(chat));
                     await hubContext.Clients.Group($"Chat{idChat}").SendAsync("RecieveMessage", mapper.Map<MensajeDto>(mensajeCreado), mapper.Map<ChatDto>(chat));

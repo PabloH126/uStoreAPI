@@ -481,18 +481,16 @@ public partial class UstoreContext : DbContext
 
         modelBuilder.Entity<FavoritosProducto>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("favoritos_producto");
+            entity.HasKey(e => e.IdFavoritoProducto);
 
-            entity.Property(e => e.IdFavoritoProducto).ValueGeneratedOnAdd();
+            entity.ToTable("favoritos_producto");
 
-            entity.HasOne(d => d.IdProductoNavigation).WithMany()
+            entity.HasOne(d => d.IdProductoNavigation).WithMany(p => p.FavoritosProductos)
                 .HasForeignKey(d => d.IdProducto)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_IdProducto");
 
-            entity.HasOne(d => d.IdUsuarioNavigation).WithMany()
+            entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.FavoritosProductos)
                 .HasForeignKey(d => d.IdUsuario)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_IdUsuario_Favoritos_Producto");
@@ -500,18 +498,16 @@ public partial class UstoreContext : DbContext
 
         modelBuilder.Entity<FavoritosTiendum>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("favoritos_tienda");
+            entity.HasKey(e => e.IdFavoritoTienda);
 
-            entity.Property(e => e.IdFavoritoTienda).ValueGeneratedOnAdd();
+            entity.ToTable("favoritos_tienda");
 
-            entity.HasOne(d => d.IdTiendaNavigation).WithMany()
+            entity.HasOne(d => d.IdTiendaNavigation).WithMany(p => p.FavoritosTienda)
                 .HasForeignKey(d => d.IdTienda)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_IdTienda");
 
-            entity.HasOne(d => d.IdUsuarioNavigation).WithMany()
+            entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.FavoritosTienda)
                 .HasForeignKey(d => d.IdUsuario)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_IdUsuario");

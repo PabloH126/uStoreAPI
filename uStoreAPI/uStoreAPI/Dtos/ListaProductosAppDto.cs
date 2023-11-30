@@ -21,5 +21,6 @@ namespace uStoreAPI.Dtos
         public int NumeroSolicitudes {  get; set; } 
         public string? NombreTienda { get; set; }
         public string? IconoTienda { get; set;}
+        public string? IsFavorito {  get; set; }
     }
 }

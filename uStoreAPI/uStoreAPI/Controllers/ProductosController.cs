@@ -22,9 +22,10 @@ namespace uStoreAPI.Controllers
         private readonly ComentariosService comentariosService;
         private readonly CalificacionesService calificacionesService;
         private readonly SolicitudesApartadoService solicitudesService;
+        private readonly UserService userService;
         private readonly UploadService uploadService;
         private IMapper mapper;
-        public ProductosController(SolicitudesApartadoService _solicitudesService, ComentariosService _comentariosService, CalificacionesService _calificacionesService, ProductosService _productosService, TiendasService _tiendasService, IMapper _mapper, UploadService _uploadService, CategoriasService _categoriasService)
+        public ProductosController(UserService _userService, SolicitudesApartadoService _solicitudesService, ComentariosService _comentariosService, CalificacionesService _calificacionesService, ProductosService _productosService, TiendasService _tiendasService, IMapper _mapper, UploadService _uploadService, CategoriasService _categoriasService)
         {
             productosService = _productosService;
             tiendasService = _tiendasService;
@@ -34,6 +35,7 @@ namespace uStoreAPI.Controllers
             comentariosService = _comentariosService;
             calificacionesService = _calificacionesService;
             solicitudesService = _solicitudesService;
+            userService = _userService;
         }
 
         [HttpGet("GetProductos")]
@@ -107,7 +109,47 @@ namespace uStoreAPI.Controllers
                 {
                     return NotFound("Producto no registrado");
                 }
+
+                var user = HttpContext.User;
+                var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+
                 producto.ComentariosProducto = await comentariosService.GetAllComentariosProducto(id);
+
+                producto.IsFavorito = (await userService.VerifyFavoritoProducto(idUser, producto.IdProductos)) ? "corazon_lleno.png" : "corazon_vacio.png";
+
+                var penalizacionUsuario = await userService.GetPenalizacionActualUsuario(idUser);
+                if (penalizacionUsuario is not null)
+                {
+                    var tiempoRestante = penalizacionUsuario.FinPenalizacion!.Value - DateTime.UtcNow;
+                    string? mensajeTiempoRestante = null;
+                    if (tiempoRestante.Days > 365)
+                    {
+                        mensajeTiempoRestante = $"Indefinido";
+                    }
+                    else if ((tiempoRestante.Days / 30) > 0)
+                    {
+                        mensajeTiempoRestante = $"{tiempoRestante.Days / 30} meses {tiempoRestante.Days % 30} dias";
+                    }
+                    else if (tiempoRestante.Days > 0)
+                    {
+                        mensajeTiempoRestante = $"{tiempoRestante.Days} dias {tiempoRestante.Hours} horas";
+                    }
+                    else if (tiempoRestante.Hours > 0)
+                    {
+                        mensajeTiempoRestante = $"{tiempoRestante.Hours} horas {tiempoRestante.Minutes} minutos";
+                    } 
+                    else if (tiempoRestante.Minutes > 0)
+                    {
+                        mensajeTiempoRestante = $"{tiempoRestante.Minutes} minutos";
+                    }
+                    else
+                    {
+                        mensajeTiempoRestante = $"{tiempoRestante.Seconds} segundos";
+                    }
+                   
+                    producto.IsUsuarioPenalizado = mensajeTiempoRestante;
+                }
+                
                 return Ok(producto);
             }
             catch(Exception ex)
@@ -128,12 +170,39 @@ namespace uStoreAPI.Controllers
             {
                 return BadRequest("No se encontró una tienda con ese id");
             }
-            var producto = await productosService.GetAllProductosTiendaApp(idTienda);
-            if (producto is null)
+            var user = HttpContext.User;
+            var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+            var productos = await productosService.GetAllProductosTiendaApp(idTienda);
+
+            if (productos is null)
             {
                 return NotFound("No hay productos registrados en esta tienda");
             }
-            return Ok(producto);
+
+            var productosFavoritos = await userService.GetFavoritosProductoUsuario(productos.Select(p => p.IdProductos), idUser);
+
+            if (!productosFavoritos.IsNullOrEmpty())
+            {
+                foreach (var producto in productos)
+                {
+                    if (productosFavoritos.Contains(producto.IdProductos))
+                    {
+                        producto.IsFavorito = "corazon_lleno.png";
+                    }
+                    else
+                    {
+                        producto.IsFavorito = "corazon_vacio.png";
+                    }
+                }
+            }
+            else
+            {
+                foreach (var producto in productos)
+                {
+                    producto.IsFavorito = "corazon_vacio.png";
+                }
+            }
+            return Ok(productos);
         }
 
         [HttpGet("GetImagenesProducto")]

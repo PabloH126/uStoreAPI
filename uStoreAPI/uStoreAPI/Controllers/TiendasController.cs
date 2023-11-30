@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using NuGet.Versioning;
 using System.Security.Claims;
 using uStoreAPI.Dtos;
 using uStoreAPI.ModelsAzureDB;
@@ -28,8 +29,9 @@ namespace uStoreAPI.Controllers
         private readonly GerentesService gerentesService;
         private readonly ChatService chatService;
         private readonly ComentariosService comentariosService;
+        private readonly UserService userService;
         private IMapper mapper;
-        public TiendasController(ComentariosService _comentariosService, ChatService _chatService, GerentesService _gerentesService, SolicitudesApartadoService _solicitudesService, PublicacionesService _publicacionesService, CalificacionesService _calificacionesService, PeriodosPredeterminadosService _periodosPredeterminadosService,HorariosService _horariosService,TiendasService _tiendasService, IMapper _mapper, UploadService _uploadService, PlazasService _plazasService, CategoriasService _categoriasService, ProductosService _productosService)
+        public TiendasController(UserService _userService, ComentariosService _comentariosService, ChatService _chatService, GerentesService _gerentesService, SolicitudesApartadoService _solicitudesService, PublicacionesService _publicacionesService, CalificacionesService _calificacionesService, PeriodosPredeterminadosService _periodosPredeterminadosService,HorariosService _horariosService,TiendasService _tiendasService, IMapper _mapper, UploadService _uploadService, PlazasService _plazasService, CategoriasService _categoriasService, ProductosService _productosService)
         {
             tiendasService = _tiendasService;
             mapper = _mapper;
@@ -45,6 +47,7 @@ namespace uStoreAPI.Controllers
             gerentesService = _gerentesService;
             chatService = _chatService;
             comentariosService = _comentariosService;
+            userService = _userService;
         }
 
         [HttpGet("GetAllTiendas")]
@@ -67,9 +70,57 @@ namespace uStoreAPI.Controllers
                 {
                     return NotFound("No hay tiendas registradas en esta plaza");
                 }
+                var tiendasFavoritas = await userService.GetFavoritosTiendaUsuario(tiendas.Select(p => p.IdTienda), idUser);
+                if (!tiendasFavoritas.IsNullOrEmpty())
+                {
+                    foreach (var tienda in tiendas)
+                    {
+                        if (tiendasFavoritas.Contains(tienda.IdTienda))
+                        {
+                            tienda.IsFavorito = "corazon_lleno.png";
+                        }
+                        else
+                        {
+                            tienda.IsFavorito = "corazon_vacio.png";
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (var tienda in tiendas)
+                    {
+                        tienda.IsFavorito = "corazon_vacio.png";
+                    }
+                }
                 return Ok(tiendas);
             }
             catch(Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpGet("GetDatosTiendaApp")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<TiendaDto>> GetDatosTiendaApp(int idTienda)
+        {
+            var user = HttpContext.User;
+            var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+            var typeUser = user.Claims.FirstOrDefault(u => u.Type == "UserType")!.Value;
+            try
+            {
+                var tienda = await tiendasService.GetDatosTienda(idTienda, idUser);
+                if (tienda is null)
+                {
+                    return NotFound("No se encontró la tienda solicitada");
+                }
+                return Ok(tienda);
+            }
+            catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
@@ -86,20 +137,19 @@ namespace uStoreAPI.Controllers
             var user = HttpContext.User;
             var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
             var typeUser = user.Claims.FirstOrDefault(u => u.Type == "UserType")!.Value;
-            string? idTiendaClaim = user.Claims.FirstOrDefault(u => u.Type == "IdTienda")?.Value;
-            int idTiendaClaimValue = 0;
-            int.TryParse(idTiendaClaim, out idTiendaClaimValue);
             try {
-                var tienda = await tiendasService.GetTiendaApp(idTienda);
+                var tienda = await tiendasService.GetTiendaApp(idTienda, idUser);
                 if (tienda is null)
                 {
                     return NotFound("Tienda no encontrada");
                 }
-                else if (typeUser != "Usuario" && typeUser != "Invitado" && tienda.IdAdministrador != idUser && idTiendaClaimValue != tienda.IdTienda)
+                else if (typeUser != "Usuario")
                 {
                     return Unauthorized("Tienda no autorizada");
                 }
                 tienda.ComentariosTienda = await comentariosService.GetAllComentariosTienda(tienda.IdTienda);
+                tienda.IsFavorito = (await userService.VerifyFavoritoTienda(idUser, tienda.IdTienda)) ? "corazon_lleno.png" : "corazon_vacio.png";
+                
                 return Ok(tienda);
             }
             catch(Exception ex)

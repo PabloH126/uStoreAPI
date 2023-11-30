@@ -14,5 +14,7 @@ namespace uStoreAPI.Dtos
         public int? Apartados { get; set; }
         public int? Vistas { get; set; }
         public string? LogoTienda { get; set; }
+        public string? IsFavorito { get; set; }
+        public int IdChatUsuario { get; set; }
     }
 }

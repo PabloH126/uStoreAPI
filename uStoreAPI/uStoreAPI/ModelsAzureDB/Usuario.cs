@@ -21,6 +21,10 @@ public partial class Usuario
 
     public virtual ICollection<CuentaUsuario> CuentaUsuarios { get; set; } = new List<CuentaUsuario>();
 
+    public virtual ICollection<FavoritosProducto> FavoritosProductos { get; set; } = new List<FavoritosProducto>();
+
+    public virtual ICollection<FavoritosTiendum> FavoritosTienda { get; set; } = new List<FavoritosTiendum>();
+
     public virtual ICollection<Historial> Historials { get; set; } = new List<Historial>();
 
     public virtual DetallesUsuario? IdDetallesUsuarioNavigation { get; set; }

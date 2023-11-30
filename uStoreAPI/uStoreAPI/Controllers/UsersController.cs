@@ -77,6 +77,20 @@ namespace uStoreAPI.Controllers
         }
 
         [Authorize]
+        //Get Administradores de tienda especifico por Id
+        [HttpGet("GetTiempoPenalizacion")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<string>> GetTiempoPenalizacion()
+        {
+            var user = HttpContext.User;
+            var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+            var tiempoPenalizacion = await usersService.GetTiempoPenalizacion(idUser);
+            return Ok(tiempoPenalizacion);
+        }
+
+        [Authorize]
         [HttpPost("UpdateProfileImage")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -211,6 +225,31 @@ namespace uStoreAPI.Controllers
             await usersService.DeleteAccountUser(cuentaUsuario, detallesCuentaUsuario, imgPerfilUsuario, usuario, detallesUsuario, datosUsuario);
             await uploadService.DeleteImageUser(idUser.ToString());
 
+            return NoContent();
+        }
+
+        [Authorize]
+        [HttpDelete("DeleteFavorito")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteFavorito(int idProducto = 0, int idTienda = 0)
+        {
+            var user = HttpContext.User;
+            var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+            if (idProducto == 0 && idTienda == 0)
+            {
+                return BadRequest("No pueden ser ambos id de cero");
+            }
+
+            try
+            {
+                await usersService.DeleteFavorito(idUser, idTienda, idProducto);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
             return NoContent();
         }
 

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 using System.Threading.Tasks.Dataflow;
 using uStoreAPI.Dtos;
 using uStoreAPI.ModelsAzureDB;
@@ -131,6 +132,33 @@ namespace uStoreAPI.Services
                 Tiendas = tiendasSolicitudes
             };
 
+            var favoritosTiendasUsuario = await context.FavoritosTienda.Where(p => idsTiendas.Contains(p.IdTienda) && p.IdUsuario == idUsuario).Select(p => p.IdTienda).ToListAsync();
+            var favoritosProductosUsuario = await context.FavoritosProductos.Where(p => idsProductos.Contains(p.IdProducto) && p.IdUsuario == idUsuario).Select(p => p.IdProducto).ToListAsync();
+
+            foreach (var producto in historial.Productos)
+            {
+                if (favoritosProductosUsuario.Contains(producto.IdProductos))
+                {
+                    producto.IsFavorito = "corazon_lleno.png";
+                }
+                else
+                {
+                    producto.IsFavorito = "corazon_vacio.png";
+                }
+            }
+
+            foreach (var tienda in historial.Tiendas)
+            {
+                if (favoritosTiendasUsuario.Contains(tienda.IdTienda))
+                {
+                    tienda.IsFavorito = "corazon_lleno.png";
+                }
+                else
+                {
+                    tienda.IsFavorito = "corazon_vacio.png";
+                }
+            }
+
             return historial;
         }
 
@@ -154,7 +182,13 @@ namespace uStoreAPI.Services
                                             .ToListAsync();
             foreach (var producto in productosFavoritos)
             {
+                producto.ProductoFavorito!.IsFavorito = "corazon_lleno.png";
+                producto.ProductoFavorito!.NombreTienda = await context.Tienda.Where(p => p.IdTienda == producto.ProductoFavorito!.IdTienda).Select(p => p.NombreTienda).FirstOrDefaultAsync();
                 producto.ProductoFavorito!.ImageProducto = await context.ImagenesProductos.Where(p => p.IdProductos == producto.IdProducto).Select(p => p.ImagenProducto).FirstOrDefaultAsync();
+            }
+            foreach(var tienda in tiendasFavoritas)
+            {
+                tienda.TiendaFavorita!.IsFavorito = "corazon_lleno.png";
             }
 
             var favoritosUsuario = new FavoritosUsuarioDto
@@ -166,7 +200,43 @@ namespace uStoreAPI.Services
 
             return favoritosUsuario;
         }
-        
+
+        public async Task<IEnumerable<int>> GetFavoritosTiendaUsuario(IEnumerable<int> idsTienda, int idUser)
+        {
+            return await context.FavoritosTienda.Where(p => idsTienda.Contains(p.IdTienda) && p.IdUsuario == idUser).Select(p => p.IdTienda).ToListAsync();
+        }
+
+        public async Task<IEnumerable<int>> GetFavoritosProductoUsuario(IEnumerable<int> idsProducto, int idUser)
+        {
+            return await context.FavoritosProductos.Where(p => idsProducto.Contains(p.IdProducto) && p.IdUsuario == idUser).Select(p => p.IdProducto).ToListAsync();
+        }
+
+        public async Task<string> GetTiempoPenalizacion(int idUser)
+        {
+            var penalizacionesUsuario = await context.PenalizacionUsuarios.Where(p => p.IdUsuario == idUser).CountAsync();
+            switch (penalizacionesUsuario)
+            {
+                case 0:
+                    return "24 horas";
+
+                case 1:
+                    return "1 semana";
+
+                case 2:
+                    return "1 mes";
+
+                case 3:
+                    return "6 meses";
+
+                case 4:
+                    return "Indefinida";
+                default:
+                    return "Error";
+            }
+
+
+        }
+
         public async Task<CuentaUsuario> CreateUsuario(RegisterDto datos)
         {
             Dato dato = new Dato()
@@ -366,6 +436,57 @@ namespace uStoreAPI.Services
             var penalizacionesUsuario = await context.PenalizacionUsuarios.Where(p => p.IdUsuario == idUsuario).ToListAsync();
             context.PenalizacionUsuarios.RemoveRange(penalizacionesUsuario);
             await context.SaveChangesAsync();
+        }
+
+        public async Task DeleteFavorito(int idUser, int idTienda, int idProducto)
+        {
+            try
+            {
+                if (idTienda != 0)
+                {
+                    var favorito = await context.FavoritosTienda.FirstAsync(p => p.IdTienda == idTienda && p.IdUsuario == idUser);
+                    context.FavoritosTienda.Remove(favorito);
+                    await context.SaveChangesAsync();
+                }
+                else if (idProducto != 0)
+                {
+                    var favorito = await context.FavoritosProductos.FirstAsync(p => p.IdProducto == idProducto && p.IdUsuario == idUser);
+                    context.FavoritosProductos.Remove(favorito);
+                    await context.SaveChangesAsync();
+                }
+                else
+                {
+                    throw new Exception("No se ingreso ningun id del favorito");
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<bool> VerifyFavoritoTienda(int idUser, int idTienda)
+        {
+            if ((await context.FavoritosTienda.FirstOrDefaultAsync(p => p.IdTienda == idTienda && p.IdUsuario == idUser)) is not null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> VerifyFavoritoProducto(int idUser, int idProducto)
+        {
+            if ((await context.FavoritosProductos.FirstOrDefaultAsync(p => p.IdProducto == idProducto && p.IdUsuario == idUser)) is not null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public async Task<CuentaUsuario?> VerifyEmail(string email)

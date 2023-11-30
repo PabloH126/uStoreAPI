@@ -19,5 +19,7 @@ namespace uStoreAPI.Dtos
         public string? ImageProducto { get; set; }
         public DateTime? FechaCreacion { get; set; }
         public string? NombreTienda { get; set; }
+        public string? LogoTienda { get; set; }
+        public string? IsFavorito { get; set; }
     }
 }

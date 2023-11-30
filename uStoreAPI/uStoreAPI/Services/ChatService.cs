@@ -63,7 +63,8 @@ namespace uStoreAPI.Services
                                        TypeMiembro2 = chat.TypeMiembro2,
                                        UltimoMensaje = mensajeReciente.contenidoMensaje,
                                        ImagenTienda = t.LogoTienda,
-                                       TiendaNameChat = t.NombreTienda
+                                       TiendaNameChat = t.NombreTienda,
+                                       IdTienda = t.IdTienda
                                    }
                  ).ToListAsync();
 
@@ -77,6 +78,51 @@ namespace uStoreAPI.Services
                                          join dU in context.DetallesUsuarios on u.IdDetallesUsuario equals dU.IdDetallesUsuario
                                          join datosU in context.Datos on dU.IdDatos equals datosU.IdDatos
                                          where (u.IdUsuario == id)
+                                         select new
+                                         {
+                                             ImagenUsuario = iP.IconoPerfil,
+                                             NombreUsuario = $"{datosU.PrimerNombre} {datosU.PrimerApellido}"
+                                         }).FirstOrDefaultAsync();
+                    chat.ImagenUsuario = usuario!.ImagenUsuario;
+                    chat.NombreUsuario = usuario!.NombreUsuario;
+                }
+
+                return chats;
+            }
+            else if (typeUsuarioSolicitante == "Usuario")
+            {
+                var chats = await (from chat in context.Chats
+                                   join mR in mensajesRecientes on chat.IdChat equals mR.IdChat
+                                   join t in context.Tienda on chat.IdTienda equals t.IdTienda
+                                   where (
+                                                (chat.IdMiembro1 == idSolicitante && chat.TypeMiembro1 == "Usuario") ||
+                                                (chat.IdMiembro2 == idSolicitante && chat.TypeMiembro2 == "Usuario")
+                                         )
+                                   orderby mR.FechaMensaje descending
+                                   select new ChatDto
+                                   {
+                                       IdChat = chat.IdChat,
+                                       FechaCreacion = chat.FechaCreacion,
+                                       IdMiembro1 = chat.IdMiembro1,
+                                       IdMiembro2 = chat.IdMiembro2,
+                                       TypeMiembro1 = chat.TypeMiembro1,
+                                       TypeMiembro2 = chat.TypeMiembro2,
+                                       UltimoMensaje = mR.contenidoMensaje,
+                                       ImagenTienda = t.LogoTienda,
+                                       TiendaNameChat = t.NombreTienda,
+                                       IdTienda = t.IdTienda
+                                   }
+                                   ).ToListAsync();
+
+                foreach (var chat in chats)
+                {
+                    var usuario = await (from cU in context.CuentaUsuarios
+                                         join dCU in context.DetallesCuentaUsuarios on cU.IdDetallesCuentaUsuario equals dCU.IdDetallesCuentaUsuario
+                                         join iP in context.ImagenPerfils on dCU.IdImagenPerfil equals iP.IdImagenPerfil
+                                         join u in context.Usuarios on cU.IdUsuario equals u.IdUsuario
+                                         join dU in context.DetallesUsuarios on u.IdDetallesUsuario equals dU.IdDetallesUsuario
+                                         join datosU in context.Datos on dU.IdDatos equals datosU.IdDatos
+                                         where (u.IdUsuario == idSolicitante)
                                          select new
                                          {
                                              ImagenUsuario = iP.IconoPerfil,
@@ -108,7 +154,8 @@ namespace uStoreAPI.Services
                                        TypeMiembro2 = chat.TypeMiembro2,
                                        UltimoMensaje = mR.contenidoMensaje,
                                        ImagenTienda = t.LogoTienda,
-                                       TiendaNameChat = t.NombreTienda
+                                       TiendaNameChat = t.NombreTienda,
+                                       IdTienda = t.IdTienda
                                    }
                                    ).ToListAsync();
 
@@ -220,7 +267,10 @@ namespace uStoreAPI.Services
 
         public async Task<ChatDto?> CreateChat(int idSolicitante, string typeSolicitante, int idMiembro2, string typeMiembro2, int? idTienda)
         {
+            //newChat será el chat que se guardará en la base de datos
             Chat newChat = new Chat();
+
+            //chatCreadoDto será el chat que se guardó de newChat pero con los datos del usuario para respuesta de signalR
             ChatDto? chatCreadoDto = new ChatDto();
             if (typeSolicitante == "Usuario")
             {

@@ -29,6 +29,8 @@ public partial class Tiendum
 
     public virtual ICollection<ComentariosTienda> ComentariosTienda { get; set; } = new List<ComentariosTienda>();
 
+    public virtual ICollection<FavoritosTiendum> FavoritosTienda { get; set; } = new List<FavoritosTiendum>();
+
     public virtual ICollection<Gerente> Gerentes { get; set; } = new List<Gerente>();
 
     public virtual ICollection<Historial> Historials { get; set; } = new List<Historial>();
