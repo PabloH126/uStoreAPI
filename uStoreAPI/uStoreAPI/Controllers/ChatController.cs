@@ -192,7 +192,7 @@ namespace uStoreAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Mensaje?>> CreateMensaje(IFormFile? image, [FromForm] MensajeDto newMensaje, int idChat)
+        public async Task<ActionResult<ChatDto>> CreateMensaje(IFormFile? image, [FromForm] MensajeDto newMensaje, int idChat)
         {
             if (idChat == 0)
             {
@@ -250,6 +250,10 @@ namespace uStoreAPI.Controllers
 
                 await chatService.UpdateMensaje(mensajeCreado);
 
+                var mensajeRespuesta = mapper.Map<MensajeDto>(mensajeCreado);
+                var chatRespuesta = mapper.Map<ChatDto>(chat);
+                chatRespuesta.UltimoMensaje = mensajeCreado.Contenido;
+
                 var gerenteTienda = await gerentesService.GetGerenteTienda(chat.IdTienda);
 
                 if (chat.TypeMiembro1 == "Tienda" || chat.TypeMiembro2 == "Tienda")
@@ -257,19 +261,19 @@ namespace uStoreAPI.Controllers
                     var groupMiembroChat = (chat.TypeMiembro1 == "Tienda") ? $"{chat.IdMiembro2}{chat.TypeMiembro2}Chats" : $"{chat.IdMiembro1}{chat.TypeMiembro1}Chats";
                     if (gerenteTienda is not null)
                     {
-                        await hubContext.Clients.Group($"{gerenteTienda!.IdGerente}GerenteChats").SendAsync("NewMessage", mapper.Map<MensajeDto>(mensajeCreado), mapper.Map<ChatDto>(chat));
+                        await hubContext.Clients.Group($"{gerenteTienda!.IdGerente}GerenteChats").SendAsync("NewMessage", mensajeRespuesta, chatRespuesta);
                     }
-                    await hubContext.Clients.Group($"{tiendaChat!.IdAdministrador}AdministradorChats").SendAsync("NewMessage", mapper.Map<MensajeDto>(mensajeCreado), mapper.Map<ChatDto>(chat));
-                    await hubContext.Clients.Group(groupMiembroChat).SendAsync("NewMessage", mapper.Map<MensajeDto>(mensajeCreado), mapper.Map<ChatDto>(chat));
-                    await hubContext.Clients.Group($"Chat{idChat}").SendAsync("RecieveMessage", mapper.Map<MensajeDto>(mensajeCreado), mapper.Map<ChatDto>(chat));
+                    await hubContext.Clients.Group($"{tiendaChat!.IdAdministrador}AdministradorChats").SendAsync("NewMessage", mensajeRespuesta, chatRespuesta);
+                    await hubContext.Clients.Group(groupMiembroChat).SendAsync("NewMessage", mensajeRespuesta, chatRespuesta);
+                    await hubContext.Clients.Group($"Chat{idChat}").SendAsync("RecieveMessage", mensajeRespuesta, chatRespuesta);
                 }
                 else
                 {
-                    await hubContext.Clients.Group($"{chat.IdMiembro1}{chat.TypeMiembro1}Chats").SendAsync("NewMessage", mapper.Map<MensajeDto>(mensajeCreado), mapper.Map<ChatDto>(chat));
-                    await hubContext.Clients.Group($"{chat.IdMiembro2}{chat.TypeMiembro2}Chats").SendAsync("NewMessage", mapper.Map<MensajeDto>(mensajeCreado), mapper.Map<ChatDto>(chat));
-                    await hubContext.Clients.Group($"Chat{idChat}").SendAsync("RecieveMessage", mapper.Map<MensajeDto>(mensajeCreado), mapper.Map<ChatDto>(chat));
+                    await hubContext.Clients.Group($"{chat.IdMiembro1}{chat.TypeMiembro1}Chats").SendAsync("NewMessage", mensajeRespuesta, chatRespuesta);
+                    await hubContext.Clients.Group($"{chat.IdMiembro2}{chat.TypeMiembro2}Chats").SendAsync("NewMessage", mensajeRespuesta, chatRespuesta);
+                    await hubContext.Clients.Group($"Chat{idChat}").SendAsync("RecieveMessage", mensajeRespuesta, chatRespuesta);
                 }
-                return Ok(mapper.Map<MensajeDto>(mensajeCreado));
+                return Ok(chatRespuesta);
             }
             catch(Exception ex)
             {

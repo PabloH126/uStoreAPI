@@ -41,6 +41,7 @@ namespace uStoreAPI
             CreateMap<PenalizacionUsuario, PenalizacionUsuarioDto>().ReverseMap();
             CreateMap<FavoritosProducto, FavoritoProductoDto>().ReverseMap();
             CreateMap<FavoritosTiendum, FavoritoTiendaDto>().ReverseMap();
+            CreateMap<ConfiguracionAppUsuario, ConfiguracionAppUsuarioDto>().ReverseMap();
         }
     }
 }

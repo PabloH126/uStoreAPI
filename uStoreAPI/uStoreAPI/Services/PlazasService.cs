@@ -60,7 +60,7 @@ namespace uStoreAPI.Services
             foreach (var productoPopular in listaProductosPopulares)
             {
                 var producto = mapper.Map<ListaProductosAppDto>(await context.Productos.FindAsync(productoPopular.IdProductos));
-                producto.ImageProducto = await context.ImagenesProductos.Where(p => p.IdProductos == producto.IdProductos).Select(p => p.ImagenProducto).FirstOrDefaultAsync();
+                producto.ImageProducto = await context.ImagenesProductos.Where(p => p.IdProductos == producto.IdProductos).Select(p => p.ImagenProductoThumbNail).FirstOrDefaultAsync();
                 var tiendaProducto = await context.Tienda.FindAsync(producto.IdTienda);
                 producto.NumeroSolicitudes = productoPopular.CantidadSolicitudes;
                 producto.NombreTienda = tiendaProducto!.NombreTienda;
@@ -71,7 +71,7 @@ namespace uStoreAPI.Services
             return productosPopulares;
         }
 
-        public async Task<CentroComercial?> CreateMall(CentroComercial mall)
+        public async Task<CentroComercial> CreateMall(CentroComercial mall)
         {
             await context.CentroComercials.AddAsync(mall);
             await context.SaveChangesAsync();

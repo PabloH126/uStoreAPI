@@ -17,7 +17,11 @@ public partial class Publicacione
 
     public string? Imagen { get; set; }
 
+    public string? ImagenThumbNail { get; set; }
+
     public virtual CentroComercial? IdCentroComercialNavigation { get; set; }
 
     public virtual Tiendum? IdTiendaNavigation { get; set; }
+
+    public virtual ICollection<NotificacionUsuario> NotificacionUsuarios { get; set; } = new List<NotificacionUsuario>();
 }

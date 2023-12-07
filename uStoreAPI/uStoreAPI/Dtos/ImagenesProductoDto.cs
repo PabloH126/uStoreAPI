@@ -7,5 +7,7 @@
         public string? ImagenProducto { get; set; }
 
         public int? IdProductos { get; set; }
+
+        public string? ImagenProductoThumbNail { get; set; }
     }
 }

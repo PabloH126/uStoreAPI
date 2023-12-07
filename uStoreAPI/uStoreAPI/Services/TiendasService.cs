@@ -65,7 +65,14 @@ namespace uStoreAPI.Services
 
         public async Task<IEnumerable<ImagenesTienda>> GetImagenesTienda(int idTienda)
         {
-            return await context.ImagenesTiendas.Where(p => p.IdTienda == idTienda).AsNoTracking().ToListAsync();
+            var imagenesTienda = await context.ImagenesTiendas.Where(p => p.IdTienda == idTienda).OrderBy(p => p.ImagenTienda).AsNoTracking().ToListAsync();
+            var imagenesTiendaListaCompleta = new List<ImagenesTienda>();
+            for (int i = 0; i < 3; i++)
+            {
+                var imagenTienda = imagenesTienda.Find(p => p.ImagenTienda.Contains($"{idTienda}/{i + 1}"));
+                imagenesTiendaListaCompleta.Add(imagenTienda!);
+            }
+            return imagenesTiendaListaCompleta;
         }
 
         public async Task<ImagenesTienda?> GetImagenTienda(int idImagenTienda)
@@ -118,7 +125,7 @@ namespace uStoreAPI.Services
             foreach(var usuario in listaProductosPopulares)
             {
                 var producto = mapper.Map<ProductoDto>(await context.Productos.FindAsync(usuario.Id));
-                producto.ImageProducto = await context.ImagenesProductos.Where(p => p.IdProductos == producto.IdProductos).Select(p => p.ImagenProducto).FirstOrDefaultAsync();
+                producto.ImageProducto = await context.ImagenesProductos.Where(p => p.IdProductos == producto.IdProductos).Select(p => p.ImagenProductoThumbNail).FirstOrDefaultAsync();
                 productosPopulares.Add(producto);
             }
             tiendaAppDto.ProductosPopularesTienda = productosPopulares;
@@ -141,6 +148,7 @@ namespace uStoreAPI.Services
                 IdTienda = tienda.IdTienda,
                 NombreTienda = tienda.NombreTienda,
                 LogoTienda = tienda.LogoTienda,
+                LogoTiendaThumbNail = tienda.LogoTiendaThumbNail,
                 IdChatUsuario = await context.Chats.Where(p => p.IdTienda == idTienda && p.TypeMiembro2 == "Usuario" && p.IdMiembro2 == idUser).Select(p => p.IdChat).FirstOrDefaultAsync()
             };
             return tiendaDto;
@@ -202,6 +210,11 @@ namespace uStoreAPI.Services
                 context.ImagenesTiendas.Remove(imagen);
             }
             await context.SaveChangesAsync();
+        }
+
+        public async Task<ImagenesTienda?> VerifyImagenTienda(string nombreImagen)
+        {
+            return await context.ImagenesTiendas.FirstOrDefaultAsync(p => p.ImagenTienda.Contains(nombreImagen));
         }
     }
 }

@@ -11,5 +11,7 @@ public partial class ImagenesProducto
 
     public int? IdProductos { get; set; }
 
+    public string? ImagenProductoThumbNail { get; set; }
+
     public virtual Producto? IdProductosNavigation { get; set; }
 }

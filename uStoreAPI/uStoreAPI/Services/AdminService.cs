@@ -127,13 +127,14 @@ namespace uStoreAPI.Services
            await context.SaveChangesAsync();
         }
 
-        public async Task PatchAdminImage(string adminImageUrl, int id)
+        public async Task PatchAdminImage(string adminImageUrl, string adminImageThumbNailUrl, int id)
         {
             var admin = await context.CuentaAdministradors.FirstOrDefaultAsync(p => p.IdAdministrador == id);
             var detallesAdmin = await context.DetallesCuentaAdministradors.FindAsync(admin!.IdDetallesCuentaAdministrador);
             var imageAdmin = await context.ImagenPerfils.FindAsync(detallesAdmin!.IdImagenPerfil);
 
             imageAdmin!.IconoPerfil = adminImageUrl;
+            imageAdmin!.IconoPerfilThumbNail = adminImageThumbNailUrl;
             await context.SaveChangesAsync();
         }
 

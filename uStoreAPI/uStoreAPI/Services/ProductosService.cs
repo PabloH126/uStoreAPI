@@ -48,7 +48,7 @@ namespace uStoreAPI.Services
             foreach (var producto in allProductsList)
             {
                 var productoDto = mapper.Map<ListaProductosAppDto>(await context.Productos.FindAsync(producto.IdProductos));
-                productoDto.ImageProducto = await context.ImagenesProductos.Where(p => p.IdProductos == producto.IdProductos).Select(p => p.ImagenProducto).FirstOrDefaultAsync();
+                productoDto.ImageProducto = await context.ImagenesProductos.Where(p => p.IdProductos == producto.IdProductos).Select(p => p.ImagenProductoThumbNail).FirstOrDefaultAsync();
                 productoDto.NumeroSolicitudes = 0;
                 listaProductosTiendaApp.Add(productoDto);
             }
@@ -78,7 +78,7 @@ namespace uStoreAPI.Services
             productoAppDto.CalificacionesProducto = mapper.Map<IEnumerable<CalificacionProductoDto>>(await context.CalificacionProductos.Where(p => p.IdProductos == producto.IdProductos).AsNoTracking().ToListAsync());
             productoAppDto.ComentariosProducto = mapper.Map<IEnumerable<ComentariosProductoDto>>(await context.ComentariosProductos.Where(p => p.IdProducto == producto.IdProductos).AsNoTracking().ToListAsync());
             productoAppDto.ImagenesProducto = mapper.Map<IEnumerable<ImagenesProductoDto>>(await context.ImagenesProductos.Where(p => p.IdProductos == producto.IdProductos).AsNoTracking().ToListAsync());
-            productoAppDto.ImageProducto = productoAppDto.ImagenesProducto.First().ImagenProducto;
+            productoAppDto.ImageProducto = productoAppDto.ImagenesProducto.First().ImagenProductoThumbNail;
 
             var categoriasProducto = productoAppDto.CategoriasProducto.Select(p => p.IdCategoria).ToList();
             
@@ -120,7 +120,14 @@ namespace uStoreAPI.Services
 
         public async Task<IEnumerable<ImagenesProducto>> GetImagenesProducto(int? idProducto)
         {
-            return await context.ImagenesProductos.Where(p => p.IdProductos == idProducto).AsNoTracking().ToListAsync();
+            var imagenesProducto = await context.ImagenesProductos.Where(p => p.IdProductos == idProducto).OrderBy(p => p.ImagenProducto).AsNoTracking().ToListAsync();
+            var imagenesProductoListaCompleta = new List<ImagenesProducto>();
+            for (int i = 0; i < 5; i++)
+            {
+                var imagenTienda = imagenesProducto.Find(p => p.ImagenProducto.Contains($"{idProducto}/{i + 1}"));
+                imagenesProductoListaCompleta.Add(imagenTienda);
+            }
+            return imagenesProductoListaCompleta;
         }
 
         public async Task<ImagenesProducto?> GetImagenProducto(int? idImagenProducto)
@@ -190,6 +197,11 @@ namespace uStoreAPI.Services
             {
                 return true;
             }
+        }
+
+        public async Task<ImagenesProducto?> VerifyImagenProducto(string nombreImagen)
+        {
+            return await context.ImagenesProductos.FirstOrDefaultAsync(p => p.ImagenProducto.Contains(nombreImagen));
         }
     }
 }

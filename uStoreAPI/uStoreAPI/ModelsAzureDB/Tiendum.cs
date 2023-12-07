@@ -21,6 +21,8 @@ public partial class Tiendum
 
     public string? LogoTienda { get; set; }
 
+    public string? LogoTiendaThumbNail { get; set; }
+
     public virtual ICollection<CalificacionTiendum> CalificacionTienda { get; set; } = new List<CalificacionTiendum>();
 
     public virtual ICollection<CategoriasTienda> CategoriasTienda { get; set; } = new List<CategoriasTienda>();

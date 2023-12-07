@@ -67,5 +67,30 @@ namespace uStoreAPI.Services
                 return false;
             }
         }
+
+        public async Task<bool> SendEmailNotificacionApp(string toEmail, string subject, Dictionary<string, string> templateData)
+        {
+            templateId = "d-018214066b7d401f965a271dd1dd520b";
+            var to = new EmailAddress(toEmail);
+            var msg = new SendGridMessage
+            {
+                From = fromAddress,
+                TemplateId = templateId,
+                Subject = subject
+            };
+
+            msg.AddTo(to);
+            msg.SetTemplateData(templateData);
+            var response = await client.SendEmailAsync(msg);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 }

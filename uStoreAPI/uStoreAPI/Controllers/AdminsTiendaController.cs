@@ -111,9 +111,9 @@ namespace uStoreAPI.Controllers
             var user = HttpContext.User;
             var idUser = user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier);
 
-            var imageUrl = await uploadService.UploadImageAdmin(image, $"{idUser!.Value}.png");
+            var imageUrl = await uploadService.UploadImageAdmin(image, $"{idUser!.Value}");
 
-            await service.PatchAdminImage(imageUrl, int.Parse(idUser!.Value));
+            await service.PatchAdminImage(imageUrl[0], imageUrl[1], int.Parse(idUser!.Value));
 
             return Ok(new { ImageUrl = imageUrl });
         }

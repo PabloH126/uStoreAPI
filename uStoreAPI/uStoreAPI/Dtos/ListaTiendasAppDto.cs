@@ -14,6 +14,7 @@ namespace uStoreAPI.Dtos
         public int? Apartados { get; set; }
         public int? Vistas { get; set; }
         public string? LogoTienda { get; set; }
+        public string? LogoTiendaThumbNail { get; set; }
         public IEnumerable<CategoriasTiendaDto>? CategoriasTienda { get; set; }
         public IEnumerable<HorarioDto>? Horario { get; set;}
         public string? HorarioDiaTienda { get; set; }

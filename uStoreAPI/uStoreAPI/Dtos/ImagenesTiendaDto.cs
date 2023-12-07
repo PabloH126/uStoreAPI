@@ -9,5 +9,6 @@ namespace uStoreAPI.Dtos
         public string? ImagenTienda { get; set; }
         [Required]
         public int? IdTienda { get; set; }
+        public string? ImagenTiendaThumbNail { get; set; }
     }
 }

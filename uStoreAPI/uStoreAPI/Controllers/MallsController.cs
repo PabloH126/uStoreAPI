@@ -91,15 +91,18 @@ namespace uStoreAPI.Controllers
                 var user = HttpContext.User;
                 var idUser = user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier);
 
-                var iconoUrl = await uploadService.UploadImagePlazas(iconoMall, "iconos", $"{datosMall.DireccionCentroComercial}.png");
-                var imagenUrl = await uploadService.UploadImagePlazas(imagenMall, "imagenes", $"{datosMall.DireccionCentroComercial}.png");
-
                 CentroComercial mall = mapper.Map<CentroComercial>(datosMall);
 
-                mall.IconoCentroComercial = iconoUrl;
-                mall.ImagenCentroComercial = imagenUrl;
+                var mallCreado = await plazasService.CreateMall(mall);
 
-                await plazasService.CreateMall(mall);
+                var iconosUrl = await uploadService.UploadImagePlazas(iconoMall, "iconos", $"{mallCreado.IdCentroComercial}");
+                var imagenesUrl = await uploadService.UploadImagePlazas(imagenMall, "imagenes", $"{mallCreado.IdCentroComercial}");
+                mallCreado.IconoCentroComercial = iconosUrl[0];
+                mallCreado.IconoCentroComercialThumbNail = iconosUrl[1];
+                mallCreado.ImagenCentroComercial = imagenesUrl[0];
+                mallCreado.ImagenCentroComercialThumbNail = imagenesUrl[1];
+
+                await plazasService.UpdateMall(mallCreado);
 
                 return CreatedAtRoute("GetMall", new { id = mall.IdCentroComercial }, mall);
             }
@@ -125,8 +128,8 @@ namespace uStoreAPI.Controllers
                 return NotFound("Mall no encontrado");
             }
 
-            await uploadService.DeleteImagesPlazas("iconos", $"{mall.DireccionCentroComercial}.png");
-            await uploadService.DeleteImagesPlazas("imagenes", $"{mall.DireccionCentroComercial}.png");
+            await uploadService.DeleteImagesPlazas("iconos", $"{mall.DireccionCentroComercial}");
+            await uploadService.DeleteImagesPlazas("imagenes", $"{mall.DireccionCentroComercial}");
             await plazasService.DeleteMall(mall);
 
             return NoContent();

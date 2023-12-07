@@ -39,6 +39,8 @@ public partial class UstoreContext : DbContext
 
     public virtual DbSet<ComentariosTienda> ComentariosTiendas { get; set; }
 
+    public virtual DbSet<ConfiguracionAppUsuario> ConfiguracionAppUsuarios { get; set; }
+
     public virtual DbSet<Counter> Counters { get; set; }
 
     public virtual DbSet<CuentaAdministrador> CuentaAdministradors { get; set; }
@@ -86,6 +88,8 @@ public partial class UstoreContext : DbContext
     public virtual DbSet<List> Lists { get; set; }
 
     public virtual DbSet<Mensaje> Mensajes { get; set; }
+
+    public virtual DbSet<NotificacionUsuario> NotificacionUsuarios { get; set; }
 
     public virtual DbSet<PenalizacionUsuario> PenalizacionUsuarios { get; set; }
 
@@ -248,7 +252,13 @@ public partial class UstoreContext : DbContext
             entity.Property(e => e.IconoCentroComercial)
                 .HasMaxLength(255)
                 .IsUnicode(false);
+            entity.Property(e => e.IconoCentroComercialThumbNail)
+                .HasMaxLength(255)
+                .IsUnicode(false);
             entity.Property(e => e.ImagenCentroComercial)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+            entity.Property(e => e.ImagenCentroComercialThumbNail)
                 .HasMaxLength(255)
                 .IsUnicode(false);
             entity.Property(e => e.NombreCentroComercial)
@@ -319,6 +329,18 @@ public partial class UstoreContext : DbContext
                 .HasForeignKey(d => d.IdUsuario)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Comentarios_tiendas_usuarios");
+        });
+
+        modelBuilder.Entity<ConfiguracionAppUsuario>(entity =>
+        {
+            entity.HasKey(e => e.IdConfiguracion).HasName("PK__configur__F6E145D05076909F");
+
+            entity.ToTable("configuracion_app_usuario");
+
+            entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.ConfiguracionAppUsuarios)
+                .HasForeignKey(d => d.IdUsuario)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__configura__Suger__269AB60B");
         });
 
         modelBuilder.Entity<Counter>(entity =>
@@ -595,6 +617,9 @@ public partial class UstoreContext : DbContext
             entity.Property(e => e.IconoPerfil)
                 .HasMaxLength(255)
                 .IsUnicode(false);
+            entity.Property(e => e.IconoPerfilThumbNail)
+                .HasMaxLength(255)
+                .IsUnicode(false);
         });
 
         modelBuilder.Entity<ImagenesProducto>(entity =>
@@ -604,6 +629,9 @@ public partial class UstoreContext : DbContext
             entity.ToTable("imagenes_productos");
 
             entity.Property(e => e.ImagenProducto)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+            entity.Property(e => e.ImagenProductoThumbNail)
                 .HasMaxLength(255)
                 .IsUnicode(false);
 
@@ -619,6 +647,9 @@ public partial class UstoreContext : DbContext
             entity.ToTable("imagenes_tiendas");
 
             entity.Property(e => e.ImagenTienda)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+            entity.Property(e => e.ImagenTiendaThumbNail)
                 .HasMaxLength(255)
                 .IsUnicode(false);
 
@@ -696,6 +727,25 @@ public partial class UstoreContext : DbContext
                 .HasConstraintName("FK_IdChat");
         });
 
+        modelBuilder.Entity<NotificacionUsuario>(entity =>
+        {
+            entity.HasKey(e => e.IdNotificacion).HasName("PK__Notifica__F6CA0A859760980F");
+
+            entity.ToTable("notificacion_usuario");
+
+            entity.Property(e => e.FechaNotificacion).HasColumnType("datetime");
+
+            entity.HasOne(d => d.IdPublicacionNavigation).WithMany(p => p.NotificacionUsuarios)
+                .HasForeignKey(d => d.IdPublicacion)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Notificac__IdPub__2A6B46EF");
+
+            entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.NotificacionUsuarios)
+                .HasForeignKey(d => d.IdUsuario)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Notificac__Fecha__297722B6");
+        });
+
         modelBuilder.Entity<PenalizacionUsuario>(entity =>
         {
             entity.HasKey(e => e.IdPenalizacion).HasName("PK__penaliza__85528AEABB18061B");
@@ -752,6 +802,9 @@ public partial class UstoreContext : DbContext
             entity.Property(e => e.Contenido).HasColumnType("text");
             entity.Property(e => e.FechaPublicacion).HasColumnType("date");
             entity.Property(e => e.Imagen)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+            entity.Property(e => e.ImagenThumbNail)
                 .HasMaxLength(255)
                 .IsUnicode(false);
 
@@ -870,6 +923,9 @@ public partial class UstoreContext : DbContext
             entity.ToTable("tienda");
 
             entity.Property(e => e.LogoTienda)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+            entity.Property(e => e.LogoTiendaThumbNail)
                 .HasMaxLength(255)
                 .IsUnicode(false);
             entity.Property(e => e.NombreTienda)

@@ -19,6 +19,8 @@ public partial class Usuario
 
     public virtual ICollection<ComentariosTienda> ComentariosTienda { get; set; } = new List<ComentariosTienda>();
 
+    public virtual ICollection<ConfiguracionAppUsuario> ConfiguracionAppUsuarios { get; set; } = new List<ConfiguracionAppUsuario>();
+
     public virtual ICollection<CuentaUsuario> CuentaUsuarios { get; set; } = new List<CuentaUsuario>();
 
     public virtual ICollection<FavoritosProducto> FavoritosProductos { get; set; } = new List<FavoritosProducto>();
@@ -28,6 +30,8 @@ public partial class Usuario
     public virtual ICollection<Historial> Historials { get; set; } = new List<Historial>();
 
     public virtual DetallesUsuario? IdDetallesUsuarioNavigation { get; set; }
+
+    public virtual ICollection<NotificacionUsuario> NotificacionUsuarios { get; set; } = new List<NotificacionUsuario>();
 
     public virtual ICollection<PenalizacionUsuario> PenalizacionUsuarios { get; set; } = new List<PenalizacionUsuario>();
 

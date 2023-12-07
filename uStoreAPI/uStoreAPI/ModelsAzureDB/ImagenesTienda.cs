@@ -11,5 +11,7 @@ public partial class ImagenesTienda
 
     public int? IdTienda { get; set; }
 
+    public string? ImagenTiendaThumbNail { get; set; }
+
     public virtual Tiendum? IdTiendaNavigation { get; set; }
 }

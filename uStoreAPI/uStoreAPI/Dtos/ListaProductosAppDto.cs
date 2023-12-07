@@ -17,6 +17,7 @@ namespace uStoreAPI.Dtos
         [Required]
         public int? IdTienda { get; set; }
         public string? ImageProducto { get; set; }
+        public string? ImageProductoThumbNail { get; set; }
         public DateTime? FechaCreacion { get; set; }
         public int NumeroSolicitudes {  get; set; } 
         public string? NombreTienda { get; set; }

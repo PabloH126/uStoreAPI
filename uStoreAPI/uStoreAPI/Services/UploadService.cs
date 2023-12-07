@@ -2,6 +2,8 @@
 using Azure.Storage.Blobs.Models;
 using System.IO;
 using System.Security.Cryptography;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 
 namespace uStoreAPI.Services
 {
@@ -13,7 +15,7 @@ namespace uStoreAPI.Services
             blobServiceClient = _blobServiceClient;
         }
 
-        public async Task<string> UploadImageAdmin(IFormFile image, string imageFileName = null!)
+        public async Task<string[]> UploadImageAdmin(IFormFile image, string imageFileName = null!)
         {
             var containerClient = blobServiceClient.GetBlobContainerClient("admins");
             var finalImageName = string.IsNullOrEmpty(imageFileName) ? image.FileName : imageFileName;
@@ -25,16 +27,38 @@ namespace uStoreAPI.Services
             {
                 HttpHeaders = new BlobHttpHeaders
                 {
-                    ContentType = image.ContentType
+                    ContentType = "image/png"
                 }
             };
 
             await blobClient.UploadAsync(stream, blobUploadOptions);
 
-            return blobClient.Uri.AbsoluteUri;
+            var thumbNailName = $"{finalImageName}thumb.png";
+            var thumbNailBlobClient = containerClient.GetBlobClient(thumbNailName);
+
+            await using (var thumbNailStream = new MemoryStream())
+            {
+                await using (var imageStream = image.OpenReadStream())
+                {
+                    using var thumbNail = await Image.LoadAsync(imageStream);
+                    thumbNail.Mutate(x => x.Resize(new ResizeOptions
+                    {
+                        Mode = ResizeMode.Max,
+                        Size = new Size(50, 50)
+                    }));
+
+                    await thumbNail.SaveAsPngAsync(thumbNailStream);
+                }
+
+                thumbNailStream.Seek(0, SeekOrigin.Begin);
+                await thumbNailBlobClient.UploadAsync(thumbNailStream, blobUploadOptions);
+            }
+           
+
+            return new string[] { blobClient.Uri.AbsoluteUri, thumbNailBlobClient.Uri.AbsoluteUri};
         }
 
-        public async Task<string> UploadImageGerente(IFormFile image, string imageFileName = null!)
+        public async Task<string[]> UploadImageGerente(IFormFile image, string imageFileName = null!)
         {
             var containerClient = blobServiceClient.GetBlobContainerClient("gerentes");
             var finalImageName = string.IsNullOrEmpty(imageFileName) ? image.FileName : imageFileName;
@@ -46,16 +70,38 @@ namespace uStoreAPI.Services
             {
                 HttpHeaders = new BlobHttpHeaders
                 {
-                    ContentType = image.ContentType
+                    ContentType = "image/png"
                 }
             };
 
             await blobClient.UploadAsync(stream, blobUploadOptions);
 
-            return blobClient.Uri.AbsoluteUri;
+            var thumbNailName = $"{finalImageName}thumb.png";
+            var thumbNailBlobClient = containerClient.GetBlobClient(thumbNailName);
+
+            await using (var thumbNailStream = new MemoryStream())
+            {
+                await using (var imageStream = image.OpenReadStream())
+                {
+                    using var thumbNail = await Image.LoadAsync(imageStream);
+                    thumbNail.Mutate(x => x.Resize(new ResizeOptions
+                    {
+                        Mode = ResizeMode.Max,
+                        Size = new Size(50, 50)
+                    }));
+
+                    await thumbNail.SaveAsPngAsync(thumbNailStream);
+                }
+
+                thumbNailStream.Seek(0, SeekOrigin.Begin);
+                await thumbNailBlobClient.UploadAsync(thumbNailStream, blobUploadOptions);
+            }
+
+
+            return new string[] { blobClient.Uri.AbsoluteUri, thumbNailBlobClient.Uri.AbsoluteUri };
         }
 
-        public async Task<string> UploadImageUser(IFormFile image, string imageFileName = null!)
+        public async Task<string[]> UploadImageUser(IFormFile image, string imageFileName = null!)
         {
             var containerClient = blobServiceClient.GetBlobContainerClient("users");
             var finalImageName = string.IsNullOrEmpty(imageFileName) ? image.FileName : imageFileName;
@@ -67,19 +113,41 @@ namespace uStoreAPI.Services
             {
                 HttpHeaders = new BlobHttpHeaders
                 {
-                    ContentType = image.ContentType
+                    ContentType = "image/png"
                 }
             };
 
             await blobClient.UploadAsync(stream, blobUploadOptions);
-            return blobClient.Uri.AbsoluteUri;
+            var thumbNailName = $"{finalImageName}thumb.png";
+            var thumbNailBlobClient = containerClient.GetBlobClient(thumbNailName);
+
+            await using (var thumbNailStream = new MemoryStream())
+            {
+                await using (var imageStream = image.OpenReadStream())
+                {
+                    using var thumbNail = await Image.LoadAsync(imageStream);
+                    thumbNail.Mutate(x => x.Resize(new ResizeOptions
+                    {
+                        Mode = ResizeMode.Max,
+                        Size = new Size(50, 50)
+                    }));
+
+                    await thumbNail.SaveAsPngAsync(thumbNailStream);
+                }
+
+                thumbNailStream.Seek(0, SeekOrigin.Begin);
+                await thumbNailBlobClient.UploadAsync(thumbNailStream, blobUploadOptions);
+            }
+
+
+            return new string[] { blobClient.Uri.AbsoluteUri, thumbNailBlobClient.Uri.AbsoluteUri };
         }
 
-        public async Task<string> UploadImagePlazas(IFormFile image, string directorio, string imageName)
+        public async Task<string[]> UploadImagePlazas(IFormFile image, string directorio, string imageName)
         {
             var containerClient = blobServiceClient.GetBlobContainerClient("plazas");
 
-            var blobName = $"{directorio}/{imageName}";
+            var blobName = $"{directorio}/{imageName}.png";
             var blobClient = containerClient.GetBlobClient(blobName);
             
             await using var stream = image.OpenReadStream();
@@ -88,16 +156,38 @@ namespace uStoreAPI.Services
             {
                 HttpHeaders = new BlobHttpHeaders
                 {
-                    ContentType = image.ContentType
+                    ContentType = "image/png"
                 }
             };
 
             await blobClient.UploadAsync(stream, blobUploadOptions);
 
-            return blobClient.Uri.AbsoluteUri;
+            var thumbNailName = $"{directorio}/{imageName}thumb.png";
+            var thumbNailBlobClient = containerClient.GetBlobClient(thumbNailName);
+
+            await using (var thumbNailStream = new MemoryStream())
+            {
+                await using (var imageStream = image.OpenReadStream())
+                {
+                    using var thumbNail = await Image.LoadAsync(imageStream);
+                    thumbNail.Mutate(x => x.Resize(new ResizeOptions
+                    {
+                        Mode = ResizeMode.Max,
+                        Size = new Size(100, 100)
+                    }));
+
+                    await thumbNail.SaveAsPngAsync(thumbNailStream);
+                }
+
+                thumbNailStream.Seek(0, SeekOrigin.Begin);
+                await thumbNailBlobClient.UploadAsync(thumbNailStream, blobUploadOptions);
+            }
+
+
+            return new string[] { blobClient.Uri.AbsoluteUri, thumbNailBlobClient.Uri.AbsoluteUri };
         }
 
-        public async Task<string> UploadImageTiendas(IFormFile image, string imageName)
+        public async Task<string[]> UploadImageTiendas(IFormFile image, string imageName)
         {
             var containerClient = blobServiceClient.GetBlobContainerClient("tiendas");
 
@@ -111,16 +201,38 @@ namespace uStoreAPI.Services
             {
                 HttpHeaders = new BlobHttpHeaders
                 {
-                    ContentType = image.ContentType
+                    ContentType = "image/png"
                 }
             };
 
             await blobClient.UploadAsync(stream , blobUploadOptions);
 
-            return blobClient.Uri.AbsoluteUri;
+            var thumbNailName = $"{imageName}thumb.png";
+            var thumbNailBlobClient = containerClient.GetBlobClient(thumbNailName);
+
+            await using (var thumbNailStream = new MemoryStream())
+            {
+                await using (var imageStream = image.OpenReadStream())
+                {
+                    using var thumbNail = await Image.LoadAsync(imageStream);
+                    thumbNail.Mutate(x => x.Resize(new ResizeOptions
+                    {
+                        Mode = ResizeMode.Max,
+                        Size = new Size(50, 50)
+                    }));
+
+                    await thumbNail.SaveAsPngAsync(thumbNailStream);
+                }
+
+                thumbNailStream.Seek(0, SeekOrigin.Begin);
+                await thumbNailBlobClient.UploadAsync(thumbNailStream, blobUploadOptions);
+            }
+
+
+            return new string[] { blobClient.Uri.AbsoluteUri, thumbNailBlobClient.Uri.AbsoluteUri };
         }
 
-        public async Task<string> UploadImageProductos(IFormFile image, string imageName)
+        public async Task<string[]> UploadImageProductos(IFormFile image, string imageName)
         {
             var containerClient = blobServiceClient.GetBlobContainerClient("productos");
 
@@ -134,13 +246,35 @@ namespace uStoreAPI.Services
             {
                 HttpHeaders = new BlobHttpHeaders
                 {
-                    ContentType = image.ContentType
+                    ContentType = "image/png"
                 }
             };
 
             await blobClient.UploadAsync(stream, blobUploadOptions);
 
-            return blobClient.Uri.AbsoluteUri;
+            var thumbNailName = $"{imageName}thumb.png";
+            var thumbNailBlobClient = containerClient.GetBlobClient(thumbNailName);
+
+            await using (var thumbNailStream = new MemoryStream())
+            {
+                await using (var imageStream = image.OpenReadStream())
+                {
+                    using var thumbNail = await Image.LoadAsync(imageStream);
+                    thumbNail.Mutate(x => x.Resize(new ResizeOptions
+                    {
+                        Mode = ResizeMode.Max,
+                        Size = new Size(50, 50)
+                    }));
+
+                    await thumbNail.SaveAsPngAsync(thumbNailStream);
+                }
+
+                thumbNailStream.Seek(0, SeekOrigin.Begin);
+                await thumbNailBlobClient.UploadAsync(thumbNailStream, blobUploadOptions);
+            }
+
+
+            return new string[] { blobClient.Uri.AbsoluteUri, thumbNailBlobClient.Uri.AbsoluteUri };
         }
 
         public async Task<string> UploadImagePublicacion(IFormFile image, string imageName)
@@ -151,17 +285,31 @@ namespace uStoreAPI.Services
 
             var blobClient = containerClient.GetBlobClient(blobName);
 
-            await using var stream = image.OpenReadStream();
-
             var blobUploadOptions = new BlobUploadOptions
             {
                 HttpHeaders = new BlobHttpHeaders
                 {
-                    ContentType = image.ContentType
+                    ContentType = "image/png"
                 }
             };
 
-            await blobClient.UploadAsync(stream, blobUploadOptions);
+            await using (var thumbNailStream = new MemoryStream())
+            {
+                await using (var imageStream = image.OpenReadStream())
+                {
+                    using var thumbNail = await Image.LoadAsync(imageStream);
+                    thumbNail.Mutate(x => x.Resize(new ResizeOptions
+                    {
+                        Mode = ResizeMode.Max,
+                        Size = new Size(400, 400)
+                    }));
+
+                    await thumbNail.SaveAsPngAsync(thumbNailStream);
+                }
+
+                thumbNailStream.Seek(0, SeekOrigin.Begin);
+                await blobClient.UploadAsync(thumbNailStream, blobUploadOptions);
+            }
 
             return blobClient.Uri.AbsoluteUri;
         }
@@ -180,11 +328,27 @@ namespace uStoreAPI.Services
             {
                 HttpHeaders = new BlobHttpHeaders
                 {
-                    ContentType = image.ContentType
+                    ContentType = "image/png"
                 }
             };
 
-            await blobClient.UploadAsync(stream, blobUploadOptions);
+            await using (var thumbNailStream = new MemoryStream())
+            {
+                await using (var imageStream = image.OpenReadStream())
+                {
+                    using var thumbNail = await Image.LoadAsync(imageStream);
+                    thumbNail.Mutate(x => x.Resize(new ResizeOptions
+                    {
+                        Mode = ResizeMode.Max,
+                        Size = new Size(450, 450)
+                    }));
+
+                    await thumbNail.SaveAsPngAsync(thumbNailStream);
+                }
+
+                thumbNailStream.Seek(0, SeekOrigin.Begin);
+                await blobClient.UploadAsync(thumbNailStream, blobUploadOptions);
+            }
 
             return blobClient.Uri.AbsoluteUri;
         }
@@ -195,8 +359,12 @@ namespace uStoreAPI.Services
 
             var blobName = $"{directorio}/{imageName}.png";
             var blobClient = containerClient.GetBlobClient(blobName);
-
             await blobClient.DeleteIfExistsAsync();
+
+            var blobNameThumb = $"{directorio}/{imageName}thumb.png";
+            var blobClientThumb = containerClient.GetBlobClient(blobNameThumb);
+            await blobClientThumb.DeleteIfExistsAsync();
+            
         }
 
         public async Task DeleteImageProducto(string directorio, string imageName)
@@ -205,8 +373,11 @@ namespace uStoreAPI.Services
 
             var blobName = $"{directorio}/{imageName}.png";
             var blobClient = containerClient.GetBlobClient(blobName);
-
             await blobClient.DeleteIfExistsAsync();
+
+            var blobNameThumb = $"{directorio}/{imageName}thumb.png";
+            var blobClientThumb = containerClient.GetBlobClient(blobNameThumb);
+            await blobClientThumb.DeleteIfExistsAsync();
         }
 
         public async Task DeleteImagePublicacion(string imageName)
@@ -215,7 +386,6 @@ namespace uStoreAPI.Services
 
             var blobName = $"{imageName}.png";
             var blobClient = containerClient.GetBlobClient(blobName);
-
             await blobClient.DeleteIfExistsAsync();
         }
 
@@ -249,8 +419,11 @@ namespace uStoreAPI.Services
 
             var blobName = $"{imageName}.png";
             var blobClient = containerClient.GetBlobClient(blobName);
-
             await blobClient.DeleteIfExistsAsync();
+
+            var blobNameThumb = $"{imageName}thumb.png";
+            var blobClientThumb = containerClient.GetBlobClient(blobNameThumb);
+            await blobClientThumb.DeleteIfExistsAsync();
         }
 
         public async Task DeleteImageGerentes(string imageName)
@@ -259,8 +432,11 @@ namespace uStoreAPI.Services
 
             var blobName = $"{imageName}.png";
             var blobClient = containerClient.GetBlobClient(blobName);
-
             await blobClient.DeleteIfExistsAsync();
+
+            var blobNameThumb = $"{imageName}thumb.png";
+            var blobClientThumb = containerClient.GetBlobClient(blobNameThumb);
+            await blobClientThumb.DeleteIfExistsAsync();
         }
 
         public async Task DeleteImageUser(string imageName)
@@ -269,18 +445,24 @@ namespace uStoreAPI.Services
 
             var blobName = $"{imageName}.png";
             var blobClient = containerClient.GetBlobClient(blobName);
-
             await blobClient.DeleteIfExistsAsync();
+
+            var blobNameThumb = $"{imageName}thumb.png";
+            var blobClientThumb = containerClient.GetBlobClient(blobNameThumb);
+            await blobClientThumb.DeleteIfExistsAsync();
         }
 
         public async Task DeleteImagesPlazas(string directorio, string imageName)
         {
             var containerClient = blobServiceClient.GetBlobContainerClient("plazas");
 
-            var blobName = $"{directorio}/{imageName}";
+            var blobName = $"{directorio}/{imageName}.png";
             var blobClient = containerClient.GetBlobClient(blobName);
-
             await blobClient.DeleteIfExistsAsync();
+
+            var blobNameThumb = $"{directorio}/{imageName}thumb.png";
+            var blobClientThumb = containerClient.GetBlobClient(blobNameThumb);
+            await blobClientThumb.DeleteIfExistsAsync();
         }
 
         public async Task<int> CountBlobs(string container,string directorio)

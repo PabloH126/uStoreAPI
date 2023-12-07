@@ -13,5 +13,7 @@ namespace uStoreAPI.Dtos
         public string? HorarioCentroComercial { get; set; }
         [Required]
         public string? DireccionCentroComercial { get; set; }
+        public string? IconoCentroComercialThumbNail { get; set; }
+        public string? ImagenCentroComercialThumbNail { get; set; }
     }
 }

@@ -106,11 +106,37 @@ namespace uStoreAPI.Controllers
             var user = HttpContext.User;
             var idUser = user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier);
 
-            var imageUrl = await uploadService.UploadImageUser(image, $"{idUser!.Value}.png");
+            var imageUrl = await uploadService.UploadImageUser(image, $"{idUser!.Value}");
 
-            await usersService.PatchUserImage(imageUrl, int.Parse(idUser!.Value));
+            await usersService.PatchUserImage(imageUrl[0], imageUrl[1], int.Parse(idUser!.Value));
 
             return Ok(new { ImageUrl = imageUrl });
+        }
+
+        [Authorize]
+        [HttpPost("SettingsApp")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> SettingsApp(ConfiguracionAppUsuarioDto configuracion)
+        {
+            if (configuracion is null)
+            {
+                return BadRequest("Configuraciones nulas");
+            }
+
+            var user = HttpContext.User;
+            var idUser = user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier);
+            try
+            {
+                await usersService.PatchSettingsAppUsuario(configuracion);
+                return Ok();
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [Authorize]

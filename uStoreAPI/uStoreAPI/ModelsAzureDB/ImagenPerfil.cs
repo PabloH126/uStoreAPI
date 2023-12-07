@@ -9,6 +9,8 @@ public partial class ImagenPerfil
 
     public string? IconoPerfil { get; set; }
 
+    public string? IconoPerfilThumbNail { get; set; }
+
     public virtual ICollection<DetallesCuentaAdministrador> DetallesCuentaAdministradors { get; set; } = new List<DetallesCuentaAdministrador>();
 
     public virtual ICollection<DetallesCuentaGerente> DetallesCuentaGerentes { get; set; } = new List<DetallesCuentaGerente>();

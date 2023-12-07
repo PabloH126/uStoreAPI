@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Azure;
+using Microsoft.IdentityModel.Tokens;
 using System.Threading.Tasks.Dataflow;
 using uStoreAPI.Dtos;
 using uStoreAPI.ModelsAzureDB;
@@ -10,11 +12,13 @@ namespace uStoreAPI.Services
     public class UserService
     {
         private readonly UstoreContext context;
+        private readonly EmailService emailService;
         private IMapper mapper;
-        public UserService(UstoreContext _context, IMapper _mapper) 
+        public UserService(UstoreContext _context, IMapper _mapper, EmailService _emailService) 
         { 
             context = _context;
             mapper = _mapper;
+            emailService = _emailService;
         }
 
         public async Task<PerfilUsuarioDto?> GetPerfilUsuario(int idUsuario)
@@ -40,7 +44,7 @@ namespace uStoreAPI.Services
                                                  where cU.IdUsuario == perfilUsuario.IdUsuario
                                                  select (iP)
                                                  )
-                                                 .Select(p => p.IconoPerfil)
+                                                 .Select(p => p.IconoPerfilThumbNail)
                                                  .FirstOrDefaultAsync();
 
             return perfilUsuario;
@@ -211,6 +215,11 @@ namespace uStoreAPI.Services
             return await context.FavoritosProductos.Where(p => idsProducto.Contains(p.IdProducto) && p.IdUsuario == idUser).Select(p => p.IdProducto).ToListAsync();
         }
 
+        public async Task<IEnumerable<int>> GetUsuariosFavoritosTienda(int idTienda)
+        {
+            return await context.FavoritosTienda.Where(p => p.IdTienda == idTienda).Select(p => p.IdTienda).ToListAsync();
+        }
+
         public async Task<string> GetTiempoPenalizacion(int idUser)
         {
             var penalizacionesUsuario = await context.PenalizacionUsuarios.Where(p => p.IdUsuario == idUser).CountAsync();
@@ -371,6 +380,38 @@ namespace uStoreAPI.Services
             }
         }
 
+        public async Task PatchSettingsAppUsuario(ConfiguracionAppUsuarioDto configuracionDto)
+        {
+            var configuracion = mapper.Map<ConfiguracionAppUsuario>(configuracionDto);
+            var configuracionUsuario = await context.ConfiguracionAppUsuarios.FirstOrDefaultAsync(p => p.IdUsuario == configuracionDto.IdUsuario);
+            if (configuracionUsuario is not null)
+            {
+                configuracionUsuario.Notificaciones = configuracion.Notificaciones;
+                configuracionUsuario.Favoritos = configuracion.Favoritos;
+                configuracionUsuario.Sugerencias = configuracion.Sugerencias;
+                context.ConfiguracionAppUsuarios.Update(configuracionUsuario);
+                await context.SaveChangesAsync();
+            }
+            else
+            {
+                await context.ConfiguracionAppUsuarios.AddAsync(configuracion);
+                await context.SaveChangesAsync();
+            }
+
+            if (configuracion.Notificaciones == true && configuracion.Sugerencias == true)
+            {
+                RecurringJob.AddOrUpdate(
+                $"SugeridasUsuario_{configuracion.IdUsuario}",
+                () => NotificarUsuarioPromocionesSugerencias(configuracion.IdUsuario),
+                Cron.Weekly
+            );
+            }
+            else
+            {
+                RecurringJob.RemoveIfExists($"SugeridasUsuario_{configuracion.IdUsuario}");
+            }
+        }
+
         public async Task PatchPenalizacionUsuario(PenalizacionUsuario penalizacion)
         {
             context.PenalizacionUsuarios.Update(penalizacion);
@@ -389,13 +430,14 @@ namespace uStoreAPI.Services
             await context.SaveChangesAsync();
         }
 
-        public async Task PatchUserImage(string userImageUrl, int id)
+        public async Task PatchUserImage(string userImageUrl, string userImageThumbNailUrl, int id)
         {
             var user = await context.CuentaUsuarios.FindAsync(id);
             var detallesUser = await context.DetallesCuentaUsuarios.FindAsync(user!.IdDetallesCuentaUsuario);
             var imageUser = await context.ImagenPerfils.FindAsync(detallesUser!.IdImagenPerfil);
 
             imageUser!.IconoPerfil = userImageUrl;
+            imageUser!.IconoPerfilThumbNail = userImageThumbNailUrl;
             await context.SaveChangesAsync();
         }
 
@@ -511,6 +553,89 @@ namespace uStoreAPI.Services
             }
 
             return emailExistente;
+        }
+
+        public async Task NotificarUsuarioPromocionesFavoritas(int idUsuario, int idPublicacion)
+        {
+            var ajustesUsuario = await context.ConfiguracionAppUsuarios.FirstOrDefaultAsync(p => p.IdUsuario == idUsuario);
+            var favoritosTiendaUsuario = await context.FavoritosTienda.Where(p => p.IdUsuario == idUsuario).AsNoTracking().ToListAsync();
+
+            if (ajustesUsuario is not null && ajustesUsuario.Notificaciones == true && ajustesUsuario.Favoritos == true)
+            {
+                var notificacionUsuario = new NotificacionUsuario
+                {
+                    IdUsuario = idUsuario,
+                    IdPublicacion = idPublicacion,
+                    FechaNotificacion = DateTime.UtcNow
+                };
+
+                await context.NotificacionUsuarios.AddAsync(notificacionUsuario);
+                await context.SaveChangesAsync();
+
+                BackgroundJob.Schedule(() => EliminarNotificacion(notificacionUsuario.IdNotificacion), DateTime.UtcNow.AddMonths(2));
+            }
+        }
+
+        public async Task<IEnumerable<PublicacionesDto>> NotificarUsuarioPromocionesSugerencias(int idUsuario)
+        {
+            var categoriasUsuario = await (from sU in context.SolicitudesApartados
+                                            join t in context.Tienda on sU.IdTienda equals t.IdTienda
+                                            join cT in context.CategoriasTiendas on t.IdTienda equals cT.IdTienda
+                                            join categorias in context.Categorias on cT.IdCategoria equals categorias.IdCategoria
+                                            where sU.IdUsuario == idUsuario
+                                            select categorias.IdCategoria)
+                                            .Distinct()
+                                            .ToListAsync();
+            var tiendasSolicitudes = await (from sU in context.SolicitudesApartados
+                                            join t in context.Tienda on sU.IdTienda equals t.IdTienda
+                                            where sU.IdUsuario == idUsuario
+                                            select t.IdTienda)
+                                            .Distinct()
+                                            .ToListAsync();
+            var tiendasSugeridas = await (from tienda in context.Tienda
+                                          join cT in context.CategoriasTiendas on tienda.IdTienda equals cT.IdTienda
+                                          join categorias in context.Categorias on cT.IdCategoria equals categorias.IdCategoria
+                                          where categoriasUsuario.Contains(categorias.IdCategoria) && !tiendasSolicitudes.Contains(tienda.IdTienda)
+                                          select tienda.IdTienda)
+                                          .Distinct()
+                                          .Take(5)
+                                          .ToListAsync();
+
+            var publicacionesSugeridas = mapper.Map<IEnumerable<PublicacionesDto>>(await context.Publicaciones.Where(p => tiendasSugeridas.Contains((int)p.IdTienda) && p.FechaPublicacion > DateTime.UtcNow.AddMonths(-1)).ToListAsync());
+            var notificacionesPublicaciones = new List<NotificacionUsuario>();
+            foreach (var publicacion in publicacionesSugeridas)
+            {
+                var tiendaPublicacion = await context.Tienda.FindAsync(publicacion.IdTienda);
+                var notificacion = new NotificacionUsuario
+                {
+                    IdUsuario = idUsuario,
+                    IdPublicacion = publicacion.IdPublicacion,
+                    FechaNotificacion = DateTime.UtcNow
+                };
+                notificacionesPublicaciones.Add(notificacion);
+            }
+
+            if (!notificacionesPublicaciones.IsNullOrEmpty())
+            {
+                await context.NotificacionUsuarios.AddRangeAsync(notificacionesPublicaciones);
+                await context.SaveChangesAsync();
+                foreach (var notificacion in notificacionesPublicaciones)
+                {
+                    BackgroundJob.Schedule(() => EliminarNotificacion(notificacion.IdNotificacion), DateTime.UtcNow.AddMonths(1));
+                }
+            }
+            
+            return publicacionesSugeridas;
+        }
+
+        public async Task EliminarNotificacion(int idNotificacion)
+        {
+            var notificacion = await context.NotificacionUsuarios.FindAsync(idNotificacion);
+            if (notificacion is not null)
+            {
+                context.NotificacionUsuarios.Remove(notificacion);
+                await context.SaveChangesAsync();
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Hangfire;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -17,14 +18,16 @@ namespace uStoreAPI.Controllers
         private readonly TiendasService tiendasService;
         private readonly PlazasService plazasService;
         private readonly UploadService uploadService;
+        private readonly UserService userService;
         private IMapper mapper;
-        public PublicacionesController(UploadService _uploadService, PlazasService _plazasService, PublicacionesService _publicacionesService, TiendasService _tiendasService, IMapper _mapper)
+        public PublicacionesController(UserService _userService, UploadService _uploadService, PlazasService _plazasService, PublicacionesService _publicacionesService, TiendasService _tiendasService, IMapper _mapper)
         {
             publicacionesService = _publicacionesService;
             tiendasService = _tiendasService;
             mapper = _mapper;
             plazasService = _plazasService;
             uploadService = _uploadService;
+            userService = _userService;
         }
 
         [HttpGet("GetPublicacionesRecientesApp")]
@@ -98,6 +101,21 @@ namespace uStoreAPI.Controllers
             return Ok(mapper.Map<PublicacionesDto>(publicacion));
         }
 
+        [HttpGet("GetCategoriasUsuario")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<object>> GetCategoriasSugerencia()
+        {
+            var user = HttpContext.User;
+            var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+            var categorias = await userService.NotificarUsuarioPromocionesSugerencias(idUser);
+
+            return Ok(categorias);
+        }
+
         [HttpPost("CreatePublicacion")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -139,6 +157,12 @@ namespace uStoreAPI.Controllers
                     var urlImagen = await uploadService.UploadImagePublicacion(imagen, publicacionCreada.IdPublicacion.ToString());
                     publicacionCreada.Imagen = urlImagen;
                     await publicacionesService.UpdatePublicacion(publicacionCreada);
+                }
+
+                var idsUsuario = await userService.GetUsuariosFavoritosTienda((int)publicacionCreada.IdTienda!);
+                foreach(var id in idsUsuario)
+                {
+                    BackgroundJob.Enqueue(() => userService.NotificarUsuarioPromocionesFavoritas(id, publicacionCreada.IdPublicacion));
                 }
                 return CreatedAtRoute("GetPublicacion", new { id = publicacionCreada.IdPublicacion }, mapper.Map<PublicacionesDto>(publicacionCreada));
             }

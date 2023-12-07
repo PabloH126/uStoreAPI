@@ -210,7 +210,7 @@ namespace uStoreAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<ImagenesProducto>>> GetImagenesProducto(int idProducto)
+        public async Task<ActionResult<IEnumerable<ImagenesProductoDto>>> GetImagenesProducto(int idProducto)
         {
             var user = HttpContext.User;
             var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
@@ -220,7 +220,7 @@ namespace uStoreAPI.Controllers
                 return BadRequest("No hay una producto registrada con ese id");
             }
 
-            var imagenesProducto = await productosService.GetImagenesProducto(idProducto);
+            var imagenesProducto = mapper.Map<IEnumerable<ImagenesProductoDto>>(await productosService.GetImagenesProducto(idProducto));
 
             if (imagenesProducto.IsNullOrEmpty())
             {
@@ -381,13 +381,25 @@ namespace uStoreAPI.Controllers
                 else if (idImagenProducto == 0)
                 {
                     var imagenesTotal = await productosService.GetImagenesProducto(idProducto);
-                    var imagenesCounter = imagenesTotal.Count();
-
+                    imagenesTotal = imagenesTotal.Where(p => p != null);
+                    var imagenesCounter = imagenesTotal.Count() + 1;
+                    var nombreImagen = $"{producto.IdProductos}/{imagenesCounter}";
+                    if (await productosService.VerifyImagenProducto(nombreImagen) is not null)
+                    {
+                        for (int i = 0; i < 5; i++)
+                        {
+                            nombreImagen = $"{producto.IdProductos}/{i + 1}";
+                            if (await productosService.VerifyImagenProducto(nombreImagen) is null)
+                            {
+                                break;
+                            }
+                        }
+                    }
                     await productosService.CreateImagenesProducto(
                                             await CreateImagenProducto(
                                                         producto.IdProductos,
                                                         imagen,
-                                                        $"{producto.IdProductos}/{imagenesCounter}"
+                                                        nombreImagen
                                                   )
                                             );
                     return NoContent();
@@ -396,6 +408,7 @@ namespace uStoreAPI.Controllers
                 var imagenProducto = await productosService.GetImagenProducto(idImagenProducto);
                 var newImagenProducto = await CreateImagenProducto(producto.IdProductos, imagen, $"{producto.IdProductos}/{uploadService.GetBlobNameFromUrl(imagenProducto!.ImagenProducto)}");
                 imagenProducto.ImagenProducto = newImagenProducto.ImagenProducto;
+                imagenProducto.ImagenProductoThumbNail = newImagenProducto.ImagenProductoThumbNail;
 
                 await productosService.UpdateImagenesProducto(imagenProducto);
 
@@ -511,7 +524,8 @@ namespace uStoreAPI.Controllers
             return new ImagenesProducto
             {
                 IdProductos = idProducto,
-                ImagenProducto = imagenUrl
+                ImagenProducto = imagenUrl[0],
+                ImagenProductoThumbNail = imagenUrl[1]
             };
         }
     }

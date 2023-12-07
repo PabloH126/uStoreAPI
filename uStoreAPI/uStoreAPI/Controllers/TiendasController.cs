@@ -184,7 +184,7 @@ namespace uStoreAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<TiendaDto>>> GetImagenesTienda(int idTienda)
+        public async Task<ActionResult<IEnumerable<ImagenesTiendaDto>>> GetImagenesTienda(int idTienda)
         {
             var user = HttpContext.User;
             var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
@@ -201,7 +201,7 @@ namespace uStoreAPI.Controllers
                 return Unauthorized("Tienda no autorizada");
             }
 
-            var imagenesTienda = await tiendasService.GetImagenesTienda(idTienda);
+            var imagenesTienda = mapper.Map<IEnumerable<ImagenesTiendaDto>>(await tiendasService.GetImagenesTienda(idTienda));
 
             if (imagenesTienda.IsNullOrEmpty())
             {
@@ -236,6 +236,17 @@ namespace uStoreAPI.Controllers
             return Ok(mapper.Map<TiendaDto>(tienda));
         }
 
+        [HttpGet("VerifyImagenTienda")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ImagenesTiendaDto>> Verify(string nombreImagen)
+        {
+            return Ok(mapper.Map<ImagenesTiendaDto>(await tiendasService.VerifyImagenTienda(nombreImagen)));
+        }
+
         [HttpPost("CreateTienda")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -267,7 +278,8 @@ namespace uStoreAPI.Controllers
                 await tiendasService.CreateTienda(tienda);
                 var logoUrl = await uploadService.UploadImageTiendas(logoTienda, $"{tienda.IdTienda}/{tienda.IdTienda}");
                 
-                tienda.LogoTienda = logoUrl;
+                tienda.LogoTienda = logoUrl[0];
+                tienda.LogoTiendaThumbNail = logoUrl[1];
 
                 await tiendasService.UpdateTienda(tienda);
 
@@ -347,13 +359,25 @@ namespace uStoreAPI.Controllers
                 else if(idImagenTienda == 0)
                 {
                     var imagenesTotal = await tiendasService.GetImagenesTienda(idTienda);
+                    imagenesTotal = imagenesTotal.Where(p => p != null);
                     var imagenesCounter = imagenesTotal.Count() + 1;
-
+                    var nombreImagen = $"{tienda.IdTienda}/{imagenesCounter}";
+                    if (await tiendasService.VerifyImagenTienda(nombreImagen) is not null)
+                    {
+                        for (int i = 0; i < 3; i++)
+                        {
+                            nombreImagen = $"{tienda.IdTienda}/{i + 1}";
+                            if (await tiendasService.VerifyImagenTienda(nombreImagen) is null)
+                            {
+                                break;
+                            }
+                        }
+                    }
                     await tiendasService.CreateImagenesTienda(
                                             await CreateImagenTienda(
                                                         tienda.IdTienda,
                                                         imagen,
-                                                        $"{tienda.IdTienda}/{imagenesCounter}"
+                                                        nombreImagen
                                                   )
                                             );
                     return NoContent();
@@ -362,6 +386,7 @@ namespace uStoreAPI.Controllers
                 var imagenTienda = await tiendasService.GetImagenTienda(idImagenTienda);
                 var newImagenTienda = await CreateImagenTienda(tienda.IdTienda, imagen, $"{tienda.IdTienda}/{uploadService.GetBlobNameFromUrl(imagenTienda!.ImagenTienda)}");
                 imagenTienda.ImagenTienda = newImagenTienda.ImagenTienda;
+                imagenTienda.ImagenTiendaThumbNail = newImagenTienda.ImagenTiendaThumbNail;
 
                 await tiendasService.UpdateImagenTienda(imagenTienda);
                                         
@@ -397,7 +422,8 @@ namespace uStoreAPI.Controllers
                 if (logoTienda is not null)
                 {
                     var logoUrl = await uploadService.UploadImageTiendas(logoTienda, $"{tienda.IdTienda}/{tienda.IdTienda}");
-                    tienda.LogoTienda = logoUrl;
+                    tienda.LogoTienda = logoUrl[0];
+                    tienda.LogoTiendaThumbNail = logoUrl[1];
                 }
 
                 tienda.NombreTienda = tiendaDto.NombreTienda;
@@ -495,7 +521,8 @@ namespace uStoreAPI.Controllers
             return new ImagenesTienda
             {
                 IdTienda = idTienda,
-                ImagenTienda = imagenUrl
+                ImagenTienda = imagenUrl[0],
+                ImagenTiendaThumbNail = imagenUrl[1]
             };
         }
     }

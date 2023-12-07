@@ -164,9 +164,9 @@ namespace uStoreAPI.Controllers
                     idUser = idGerente;
                 }
 
-                var imageUrl = await uploadService.UploadImageGerente(image, $"{idUser}.png");
+                var imageUrl = await uploadService.UploadImageGerente(image, $"{idUser}");
 
-                await gerentesService.PatchGerenteImage(imageUrl, idUser);
+                await gerentesService.PatchGerenteImage(imageUrl[0], imageUrl[1], idUser);
 
                 return Ok(new { ImageUrl = imageUrl });
             }
