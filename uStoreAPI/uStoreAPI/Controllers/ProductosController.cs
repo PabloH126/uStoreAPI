@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -326,6 +327,7 @@ namespace uStoreAPI.Controllers
             var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
 
             var producto = await productosService.GetOneProducto(productoDto.IdProductos);
+            var cantidadApartadoInicial = producto.CantidadApartado;
 
             if (producto is null)
             {
@@ -345,6 +347,15 @@ namespace uStoreAPI.Controllers
             producto.Descripcion = productoDto.Descripcion;
 
             await productosService.UpdateProducto(producto);
+            if (producto.CantidadApartado > 0 && cantidadApartadoInicial == 0)
+            {
+                var alertasApartadoProducto = await userService.GetAlertasApartadoProducto(producto.IdProductos);
+                foreach(var alertaApartado in alertasApartadoProducto)
+                {
+                    var alertaApartadoLocal = alertaApartado;
+                    BackgroundJob.Enqueue(() => userService.NotificarExistenciaProducto((int)alertaApartadoLocal.IdUsuario!, (int)alertaApartadoLocal.IdProductos!));
+                }
+            }
 
             return NoContent();
         }

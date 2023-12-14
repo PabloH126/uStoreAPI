@@ -69,7 +69,7 @@ namespace uStoreAPI.Services
             {
                 var tiendaSolicitud = await context.Tienda.FindAsync(solicitud.IdTienda);
                 var productoSolicitud = await context.Productos.FindAsync(solicitud.IdProductos);
-                solicitud.ImageProducto = await context.ImagenesProductos.Where(p => p.IdProductos == productoSolicitud!.IdProductos).Select(p => p.ImagenProducto).FirstOrDefaultAsync();
+                solicitud.ImageProducto = await context.ImagenesProductos.Where(p => p.IdProductos == productoSolicitud!.IdProductos).Select(p => p.ImagenProductoThumbNail).FirstOrDefaultAsync();
                 solicitud.NombreProducto = productoSolicitud.NombreProducto;
                 solicitud.PrecioProducto = productoSolicitud.PrecioProducto;
                 solicitud.NombreTienda = tiendaSolicitud.NombreTienda;

@@ -68,7 +68,7 @@ namespace uStoreAPI.Controllers
             {
                 return NotFound("Plaza no encontrada");
             }
-            return Ok(mall);
+            return Ok(mapper.Map<CentroComercialDto>(mall));
         }
 
         [HttpPost("CreateMall")]
@@ -107,6 +107,58 @@ namespace uStoreAPI.Controllers
                 return CreatedAtRoute("GetMall", new { id = mall.IdCentroComercial }, mall);
             }
             
+        }
+
+        [HttpPut("UpdateMall")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> UpdateMall([FromForm] CentroComercialDto mall, IFormFile iconoMall, IFormFile imagenMall)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            else if (iconoMall == null || iconoMall.Length == 0 || imagenMall == null || imagenMall.Length == 0)
+            {
+                return BadRequest("La imagen es invalida");
+            }
+            else
+            {
+                try
+                {
+                    var user = HttpContext.User;
+                    var idUser = user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier);
+
+                    var mallGuardado = await plazasService.GetOneMall(mall.IdCentroComercial);
+
+                    if (mallGuardado is null)
+                    {
+                        return NotFound("No se encontró el centro comercial con ese id");
+                    }
+
+                    var iconosUrl = await uploadService.UploadImagePlazas(iconoMall, "iconos", $"{mallGuardado.IdCentroComercial}");
+                    var imagenesUrl = await uploadService.UploadImagePlazas(imagenMall, "imagenes", $"{mallGuardado.IdCentroComercial}");
+                    mallGuardado.IconoCentroComercial = iconosUrl[0];
+                    mallGuardado.IconoCentroComercialThumbNail = iconosUrl[1];
+                    mallGuardado.ImagenCentroComercial = imagenesUrl[0];
+                    mallGuardado.ImagenCentroComercialThumbNail = imagenesUrl[1];
+                    mallGuardado.NombreCentroComercial = mall.NombreCentroComercial;
+                    mallGuardado.DireccionCentroComercial = mall.DireccionCentroComercial;
+                    mallGuardado.HorarioCentroComercial = mall.HorarioCentroComercial;
+
+                    await plazasService.UpdateMall(mallGuardado);
+
+                    return NoContent();
+                }
+                catch(Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+                
+            }
+
         }
 
         [HttpDelete("DeleteMall")]

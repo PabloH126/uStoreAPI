@@ -44,7 +44,7 @@ namespace uStoreAPI.Services
                     thumbNail.Mutate(x => x.Resize(new ResizeOptions
                     {
                         Mode = ResizeMode.Max,
-                        Size = new Size(50, 50)
+                        Size = new Size(100, 100)
                     }));
 
                     await thumbNail.SaveAsPngAsync(thumbNailStream);
@@ -87,7 +87,7 @@ namespace uStoreAPI.Services
                     thumbNail.Mutate(x => x.Resize(new ResizeOptions
                     {
                         Mode = ResizeMode.Max,
-                        Size = new Size(50, 50)
+                        Size = new Size(100, 100)
                     }));
 
                     await thumbNail.SaveAsPngAsync(thumbNailStream);
@@ -129,7 +129,7 @@ namespace uStoreAPI.Services
                     thumbNail.Mutate(x => x.Resize(new ResizeOptions
                     {
                         Mode = ResizeMode.Max,
-                        Size = new Size(50, 50)
+                        Size = new Size(100, 100)
                     }));
 
                     await thumbNail.SaveAsPngAsync(thumbNailStream);
@@ -218,7 +218,7 @@ namespace uStoreAPI.Services
                     thumbNail.Mutate(x => x.Resize(new ResizeOptions
                     {
                         Mode = ResizeMode.Max,
-                        Size = new Size(50, 50)
+                        Size = new Size(100, 100)
                     }));
 
                     await thumbNail.SaveAsPngAsync(thumbNailStream);
@@ -263,7 +263,7 @@ namespace uStoreAPI.Services
                     thumbNail.Mutate(x => x.Resize(new ResizeOptions
                     {
                         Mode = ResizeMode.Max,
-                        Size = new Size(50, 50)
+                        Size = new Size(100, 100)
                     }));
 
                     await thumbNail.SaveAsPngAsync(thumbNailStream);

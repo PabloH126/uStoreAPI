@@ -47,7 +47,7 @@ namespace uStoreAPI.Controllers
             {
                 return Ok(mapper.Map<CuentaUsuarioDto>(CuentaUsuario));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
@@ -91,6 +91,58 @@ namespace uStoreAPI.Controllers
         }
 
         [Authorize]
+        [HttpGet("GetNotificaciones")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<IEnumerable<NotificacionUsuarioDto>>> GetNotificacionesUsuario()
+        {
+            var user = HttpContext.User;
+            var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+            var notificacionesUsuario = await usersService.GetNotificacionesUsuario(idUser);
+            return Ok(notificacionesUsuario);
+        }
+
+        [Authorize]
+        [HttpGet("GetAlertaApartado")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<AlertaApartado>> GetAlertaApartado(int idProducto)
+        {
+            var user = HttpContext.User;
+            var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+            var alertaApartadoUsuario = await usersService.GetAlertaApartadoUsuario(idUser, idProducto);
+            return Ok(alertaApartadoUsuario);
+        }
+
+        [Authorize]
+        [HttpGet("GetConfiguracion")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ConfiguracionAppUsuarioDto>> GetConfiguracionApp()
+        {
+            var user = HttpContext.User;
+            var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+            var configuracionUsuario = await usersService.GetConfiguracionAppUsuario(idUser);
+            return Ok(configuracionUsuario);
+        }
+
+        [Authorize]
+        [HttpGet("GetPublicacionesSugeridas")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<object>> GetPublicacionesSugeridas()
+        {
+            var user = HttpContext.User;
+            var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+            var publicacionesSugeridas = await usersService.NotificarUsuarioPromocionesSugerencias(idUser);
+            return Ok(publicacionesSugeridas);
+        }
+
+        [Authorize]
         [HttpPost("UpdateProfileImage")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -119,7 +171,7 @@ namespace uStoreAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> SettingsApp(ConfiguracionAppUsuarioDto configuracion)
+        public async Task<IActionResult> SettingsApp([FromBody] ConfiguracionAppUsuarioDto configuracion)
         {
             if (configuracion is null)
             {
@@ -127,9 +179,10 @@ namespace uStoreAPI.Controllers
             }
 
             var user = HttpContext.User;
-            var idUser = user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier);
+            var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
             try
             {
+                configuracion.IdUsuario = idUser;
                 await usersService.PatchSettingsAppUsuario(configuracion);
                 return Ok();
             }
@@ -160,6 +213,33 @@ namespace uStoreAPI.Controllers
                 await usersService.CreateFavorito(idUser, idTienda, idProducto);
             }
             catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            return Ok();
+        }
+
+        [Authorize]
+        [HttpPost("CreateAlertaApartado")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> CreateAlertaApartado(int idProducto)
+        {
+            var user = HttpContext.User;
+            var idUser = int.Parse(user.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)!.Value);
+
+            if (idProducto == 0)
+            {
+                return BadRequest("El id del producto no puede ser cero");
+            }
+
+            try
+            {
+                await usersService.CreateAlertaApartado(idUser, idProducto);
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }

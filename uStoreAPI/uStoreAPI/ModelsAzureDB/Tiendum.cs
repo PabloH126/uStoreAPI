@@ -45,6 +45,8 @@ public partial class Tiendum
 
     public virtual ICollection<ImagenesTienda> ImagenesTienda { get; set; } = new List<ImagenesTienda>();
 
+    public virtual ICollection<NotificacionUsuario> NotificacionUsuarios { get; set; } = new List<NotificacionUsuario>();
+
     public virtual ICollection<PeriodosPredeterminado> PeriodosPredeterminados { get; set; } = new List<PeriodosPredeterminado>();
 
     public virtual ICollection<Producto> Productos { get; set; } = new List<Producto>();

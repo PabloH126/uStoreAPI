@@ -6,8 +6,7 @@ namespace uStoreAPI.Services
 {
     public class EmailService
     {
-        private readonly string apiKey;
-        private string templateId;
+        private string? templateId;
         private readonly EmailAddress fromAddress;
         private readonly SendGridClient client;
         private IConfiguration configuration;
@@ -68,9 +67,17 @@ namespace uStoreAPI.Services
             }
         }
 
-        public async Task<bool> SendEmailNotificacionApp(string toEmail, string subject, Dictionary<string, string> templateData)
+        public async Task<bool> SendEmailNotificacionApp(string toEmail, string subject, Dictionary<string, string> templateData, bool IsImagenNull = false)
         {
-            templateId = "d-018214066b7d401f965a271dd1dd520b";
+            if (IsImagenNull)
+            {
+                templateId = "d-0d2cb2a09843449ba630e3955f26e504";
+            }
+            else
+            {
+                templateId = "d-577b4ba4168046f89ac520afd7f694c0";
+            }
+            
             var to = new EmailAddress(toEmail);
             var msg = new SendGridMessage
             {
@@ -78,6 +85,62 @@ namespace uStoreAPI.Services
                 TemplateId = templateId,
                 Subject = subject
             };
+
+            templateData["subject"] = subject;
+
+            msg.AddTo(to);
+            msg.SetTemplateData(templateData);
+            var response = await client.SendEmailAsync(msg);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> SendEmailNotificacionApartado(string? toEmail, string subject, Dictionary<string, string> templateData)
+        {
+            templateId = "d-0ae666b883204563bbd1c7690b5f2466";
+            var to = new EmailAddress(toEmail);
+            var msg = new SendGridMessage
+            {
+                From = fromAddress,
+                TemplateId = templateId,
+                Subject = subject
+            };
+
+            templateData["subject"] = subject;
+
+            msg.AddTo(to);
+            msg.SetTemplateData(templateData);
+            var response = await client.SendEmailAsync(msg);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> SendEmailNotificacionSolicitud(string? toEmail, string subject, Dictionary<string, string> templateData)
+        {
+            templateId = "d-081db4e63d3d4770a8bd342ed3cdd1f8";
+            var to = new EmailAddress(toEmail);
+            var msg = new SendGridMessage
+            {
+                From = fromAddress,
+                TemplateId = templateId,
+                Subject = subject
+            };
+
+            templateData["subject"] = subject;
 
             msg.AddTo(to);
             msg.SetTemplateData(templateData);

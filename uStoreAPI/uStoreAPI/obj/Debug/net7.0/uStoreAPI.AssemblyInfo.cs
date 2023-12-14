@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("uStoreAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+70e12798b29038ad0b0f51c42ffeece4d0aa225d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f7846e116579dadf253a007a96794bbdb93bd3ed")]
 [assembly: System.Reflection.AssemblyProductAttribute("uStoreAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("uStoreAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

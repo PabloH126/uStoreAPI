@@ -13,7 +13,13 @@ public partial class NotificacionUsuario
 
     public DateTime FechaNotificacion { get; set; }
 
+    public bool IsSugerida { get; set; }
+
+    public int IdTienda { get; set; }
+
     public virtual Publicacione IdPublicacionNavigation { get; set; } = null!;
+
+    public virtual Tiendum IdTiendaNavigation { get; set; } = null!;
 
     public virtual Usuario IdUsuarioNavigation { get; set; } = null!;
 }

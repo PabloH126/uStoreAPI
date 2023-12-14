@@ -115,6 +115,10 @@ public partial class UstoreContext : DbContext
 
     public virtual DbSet<Usuario> Usuarios { get; set; }
 
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Server=tcp:ustoreserver.database.windows.net,1433;Initial Catalog=ustore;Persist Security Info=False;User ID=adminUstore;Password=ProyectoTitulo2023;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.UseCollation("Modern_Spanish_CI_AS");
@@ -739,6 +743,11 @@ public partial class UstoreContext : DbContext
                 .HasForeignKey(d => d.IdPublicacion)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Notificac__IdPub__2A6B46EF");
+
+            entity.HasOne(d => d.IdTiendaNavigation).WithMany(p => p.NotificacionUsuarios)
+                .HasForeignKey(d => d.IdTienda)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__notificac__IdTie__2B5F6B28");
 
             entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.NotificacionUsuarios)
                 .HasForeignKey(d => d.IdUsuario)

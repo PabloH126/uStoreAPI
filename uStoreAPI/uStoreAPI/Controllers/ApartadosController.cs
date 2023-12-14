@@ -445,7 +445,8 @@ namespace uStoreAPI.Controllers
                 var jobId = BackgroundJob.Schedule(() => solicitudesApartadoService.MarcarComoVencida(solicitudApartado.IdSolicitud), fechaVencimiento);
 
                 solicitudApartado.IdJob = jobId;
-                
+
+                await userService.NotificarSolicitudUsuario((int)solicitudApartado.IdUsuario, solicitudApartado);
             }
             else if (solicitud.StatusSolicitud == "completada")
             {
