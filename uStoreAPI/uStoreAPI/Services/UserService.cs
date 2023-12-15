@@ -476,7 +476,7 @@ namespace uStoreAPI.Services
                 RecurringJob.AddOrUpdate(
                 $"SugeridasUsuario_{configuracion.IdUsuario}",
                 () => NotificarUsuarioPromocionesSugerenciasSincrono(configuracion.IdUsuario),
-                "*/5 * * * *"
+                Cron.Weekly
             );
             }
             else
