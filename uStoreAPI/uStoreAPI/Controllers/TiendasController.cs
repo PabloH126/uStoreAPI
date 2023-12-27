@@ -143,7 +143,7 @@ namespace uStoreAPI.Controllers
                 {
                     return NotFound("Tienda no encontrada");
                 }
-                else if (typeUser != "Usuario")
+                else if (typeUser != "Usuario" && typeUser != "Invitado")
                 {
                     return Unauthorized("Tienda no autorizada");
                 }
