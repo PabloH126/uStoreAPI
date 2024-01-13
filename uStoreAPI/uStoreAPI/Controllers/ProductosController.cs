@@ -299,6 +299,7 @@ namespace uStoreAPI.Controllers
             }
 
             var imagenesTotal = await productosService.GetImagenesProducto(producto.IdProductos);
+            imagenesTotal = imagenesTotal.Where(p => p != null);
             var imagenesCounter = imagenesTotal.Count() + 1;
 
             await productosService.CreateImagenesProducto(

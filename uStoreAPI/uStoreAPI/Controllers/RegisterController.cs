@@ -59,6 +59,27 @@ namespace uStoreAPI.Controllers
 
         }
 
+        [HttpGet("VerifyEmail")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        public async Task<IActionResult> VerifyEmailExistente(string email)
+        {
+            if (email is null)
+            {
+                return BadRequest("Se requiere un email para verificar");
+            }
+
+            if (await adminService.VerifyEmail(email))
+            {
+                return Conflict("Email existente");
+            }
+            else
+            {
+                return Ok();
+            }
+        }
+
         [Authorize]
         //Crear gerentes de tienda y cuenta de gerentes
         [HttpPost("RegisterGerente")]
