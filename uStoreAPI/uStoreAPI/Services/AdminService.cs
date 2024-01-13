@@ -1,11 +1,6 @@
 ﻿using uStoreAPI.ModelsAzureDB;
 using uStoreAPI.Dtos;
-using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc;
-using Azure;
-using Microsoft.AspNetCore.JsonPatch;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace uStoreAPI.Services
 {

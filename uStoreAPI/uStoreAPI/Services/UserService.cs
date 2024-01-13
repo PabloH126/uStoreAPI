@@ -1,12 +1,7 @@
 ﻿using AutoMapper;
 using Hangfire;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Azure;
-using Microsoft.IdentityModel.Tokens;
-using System.Threading.Tasks.Dataflow;
 using uStoreAPI.Dtos;
-using uStoreAPI.Hubs;
 using uStoreAPI.ModelsAzureDB;
 
 namespace uStoreAPI.Services

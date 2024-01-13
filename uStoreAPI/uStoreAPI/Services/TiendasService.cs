@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using AutoMapper.Configuration.Conventions;
 using Microsoft.EntityFrameworkCore;
 using uStoreAPI.Dtos;
 using uStoreAPI.ModelsAzureDB;

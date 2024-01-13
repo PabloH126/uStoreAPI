@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-using uStoreAPI.Dtos;
+﻿using Microsoft.EntityFrameworkCore;
 using uStoreAPI.ModelsAzureDB;
 
 namespace uStoreAPI.Services

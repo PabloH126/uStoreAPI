@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using uStoreAPI.Dtos;
 using uStoreAPI.ModelsAzureDB;
 
