@@ -348,6 +348,8 @@ namespace uStoreAPI.Controllers
             producto.Descripcion = productoDto.Descripcion;
 
             await productosService.UpdateProducto(producto);
+            await tiendasService.UpdateRangoPrecio(tienda);
+
             if (producto.CantidadApartado > 0 && cantidadApartadoInicial == 0)
             {
                 var alertasApartadoProducto = await userService.GetAlertasApartadoProducto(producto.IdProductos);
