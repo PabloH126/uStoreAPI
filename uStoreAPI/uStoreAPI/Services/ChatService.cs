@@ -210,7 +210,7 @@ namespace uStoreAPI.Services
                                    ImagenTienda = t.LogoTienda,
                                    TiendaNameChat = t.NombreTienda
                                }
-                                   ).ToListAsync();
+                              ).ToListAsync();
 
             foreach (var chat in chats)
             {
@@ -371,6 +371,21 @@ namespace uStoreAPI.Services
                     context.Mensajes.RemoveRange(mensajesChat);
                 }
                 context.Chats.RemoveRange(chats);
+                await context.SaveChangesAsync();
+            }
+        }
+        public async Task DeleteChatGerente(int idGerente)
+        {
+            var gerente = await context.Gerentes.FindAsync(idGerente);
+            var chatGerente = await context.Chats.FirstOrDefaultAsync(p =>
+                                                            (p.IdMiembro1 == gerente.IdGerente && p.TypeMiembro1 == "Gerente" && p.IdMiembro2 == gerente.IdAdministrador && p.TypeMiembro2 == "Administrador") ||
+                                                            (p.IdMiembro2 == gerente.IdGerente && p.TypeMiembro2 == "Gerente" && p.IdMiembro1 == gerente.IdAdministrador && p.TypeMiembro1 == "Administrador"));
+            
+            if (chatGerente is not null)
+            {
+                var mensajesChats = await context.Mensajes.Where(p => p.IdChat == chatGerente.IdChat).ToListAsync();
+                context.Mensajes.RemoveRange(mensajesChats);
+                context.Chats.Remove(chatGerente);
                 await context.SaveChangesAsync();
             }
         }

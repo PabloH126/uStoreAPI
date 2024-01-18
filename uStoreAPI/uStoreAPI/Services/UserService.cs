@@ -781,7 +781,7 @@ namespace uStoreAPI.Services
             NotificarExistenciaProducto(idUsuario, idProducto).GetAwaiter().GetResult();
         }
 
-        public async Task NotificarSolicitudUsuario(int idUsuario, SolicitudesApartado solicitud)
+        public async Task NotificarSolicitudUsuario(int idUsuario, SolicitudesApartado solicitud, string tipoNotificacionSolicitud)
         {
             var emailUsuario = await context.CuentaUsuarios.Where(p => p.IdUsuario == idUsuario).Select(p => p.Email).FirstOrDefaultAsync();
             var datosUsuario = await (from u in context.Usuarios
@@ -793,6 +793,32 @@ namespace uStoreAPI.Services
             var imagenProducto = await context.ImagenesProductos.Where(p => p.IdProductos == productoSolicitud.IdProductos).Select(p => p.ImagenProducto).FirstOrDefaultAsync();
             var tiendaSolicitud = await context.Tienda.FindAsync(solicitud.IdTienda);
 
+            var penalizacionUsuario = await context.PenalizacionUsuarios.Where(p => p.IdUsuario == idUsuario).AsNoTracking().ToListAsync();
+            var cantidadPenalizaciones = penalizacionUsuario.Count();
+            string? cantidadPenalizacionesString = null;
+
+            switch (cantidadPenalizaciones)
+            {
+                case 0: 
+                    cantidadPenalizacionesString = "0 días";
+                    break;
+                case 1: 
+                    cantidadPenalizacionesString = "24 horas";
+                    break;
+                case 2:
+                    cantidadPenalizacionesString = "1 semana";
+                    break;
+                case 3:
+                    cantidadPenalizacionesString = "1 mes";
+                    break;
+                case 4:
+                    cantidadPenalizacionesString = "6 meses";
+                    break;
+                case 5:
+                    cantidadPenalizacionesString = "indefinida";
+                    break;
+            }
+
             TimeZoneInfo zonaHoraria = TimeZoneInfo.FindSystemTimeZoneById("Central America Standard Time"); // GMT-6 
             string fechaVencimiento = TimeZoneInfo.ConvertTimeFromUtc(solicitud.FechaVencimiento.Value, zonaHoraria).ToString("dd/MM/yyyy");
 
@@ -801,12 +827,36 @@ namespace uStoreAPI.Services
                 {"producto", productoSolicitud.NombreProducto },
                 {"tienda", tiendaSolicitud.NombreTienda },
                 {"precio", $"${productoSolicitud.PrecioProducto}" },
+                {"cantidad", solicitud.UnidadesProducto.ToString()! },
                 {"imagen", imagenProducto },
                 {"nombre", $"{datosUsuario.PrimerNombre} {datosUsuario.PrimerApellido}" },
-                {"vencimiento", fechaVencimiento }
+                {"vencimiento", fechaVencimiento },
+                {"tiempoSolicitud", solicitud.PeriodoApartado! },
+                {"penalizacion", cantidadPenalizacionesString! },
+                {"fechaVencimiento", fechaVencimiento }
             };
 
-            await emailService.SendEmailNotificacionSolicitud(emailUsuario, $"¡Tu solicitud de apartado de {productoSolicitud.NombreProducto} ha sido aceptada!", templateData);
+            string subject = "Notificacion de uStore";
+
+            switch (tipoNotificacionSolicitud)
+            {
+                case "aceptada":
+                    subject = $"¡Tu solicitud de apartado de {productoSolicitud.NombreProducto} ha sido aceptada!";
+                    break;
+                case "vencida":
+                    subject = $"Tu solicitud de apartado de {productoSolicitud.NombreProducto} ha vencido";
+                    break;
+                case "rechazada":
+                    subject = $"Tu solicitud de apartado de {productoSolicitud.NombreProducto} ha sido rechazada";
+                    break;
+                case "cancelada":
+                    subject = $"Tu solicitud de apartado de {productoSolicitud.NombreProducto} ha sido cancelada";
+                    break;
+            }
+
+            await emailService.SendEmailNotificacionSolicitud(emailUsuario, subject, templateData, tipoNotificacionSolicitud);
+
+
         }
 
         public async Task EliminarNotificacion(int idNotificacion)
