@@ -157,6 +157,7 @@ namespace uStoreAPI.Services
                 
                 penalizacionNueva.IdJob = jobId;
                 await userService.PatchPenalizacionUsuario(penalizacionNueva);
+                await userService.NotificarSolicitudUsuario((int)solicitud.IdUsuario, solicitud, "vencida");
             }
         }
     }

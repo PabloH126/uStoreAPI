@@ -7,9 +7,11 @@ namespace uStoreAPI.Services
     public class GerentesService
     {
         private readonly UstoreContext context;
-        public GerentesService(UstoreContext _context)
+        private readonly ChatService chatService;
+        public GerentesService(UstoreContext _context, ChatService _chatService)
         {
             context = _context;
+            chatService = _chatService;
         }
 
         public async Task<PerfilDto?> GetPerfilGerente(int? id)
@@ -208,6 +210,7 @@ namespace uStoreAPI.Services
 
             if(gerente is not null)
             {
+                await chatService.DeleteChatGerente(gerente.IdGerente);
                 var cuentaGerente = await context.CuentaGerentes.FirstOrDefaultAsync(p => p.IdGerente == gerente!.IdGerente);
                 var detallesCuentaGerente = await context.DetallesCuentaGerentes.FindAsync(cuentaGerente!.IdDetallesCuentaGerente);
                 var imagenGerente = await context.ImagenPerfils.FindAsync(detallesCuentaGerente!.IdImagenPerfil);

@@ -819,9 +819,6 @@ namespace uStoreAPI.Services
                     break;
             }
 
-            TimeZoneInfo zonaHoraria = TimeZoneInfo.FindSystemTimeZoneById("Central America Standard Time"); // GMT-6 
-            string fechaVencimiento = TimeZoneInfo.ConvertTimeFromUtc(solicitud.FechaVencimiento.Value, zonaHoraria).ToString("dd/MM/yyyy");
-
             Dictionary<string, string> templateData = new Dictionary<string, string>
             {
                 {"producto", productoSolicitud.NombreProducto },
@@ -830,11 +827,17 @@ namespace uStoreAPI.Services
                 {"cantidad", solicitud.UnidadesProducto.ToString()! },
                 {"imagen", imagenProducto },
                 {"nombre", $"{datosUsuario.PrimerNombre} {datosUsuario.PrimerApellido}" },
-                {"vencimiento", fechaVencimiento },
                 {"tiempoSolicitud", solicitud.PeriodoApartado! },
-                {"penalizacion", cantidadPenalizacionesString! },
-                {"fechaVencimiento", fechaVencimiento }
+                {"penalizacion", cantidadPenalizacionesString! }
             };
+
+            if (solicitud.FechaVencimiento is not null)
+            {
+                TimeZoneInfo zonaHoraria = TimeZoneInfo.FindSystemTimeZoneById("Central America Standard Time"); // GMT-6 
+                string fechaVencimiento = TimeZoneInfo.ConvertTimeFromUtc(solicitud.FechaVencimiento.Value, zonaHoraria).ToString("dd/MM/yyyy");
+                templateData.Add("vencimiento", fechaVencimiento);
+                templateData.Add("fechaVencimiento", fechaVencimiento);
+            }
 
             string subject = "Notificacion de uStore";
 

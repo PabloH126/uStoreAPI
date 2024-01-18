@@ -128,9 +128,21 @@ namespace uStoreAPI.Services
             }
         }
 
-        public async Task<bool> SendEmailNotificacionSolicitud(string? toEmail, string subject, Dictionary<string, string> templateData)
+        public async Task<bool> SendEmailNotificacionSolicitud(string? toEmail, string subject, Dictionary<string, string> templateData, string tipoNotificacionSolicitud)
         {
-            templateId = "d-081db4e63d3d4770a8bd342ed3cdd1f8";
+            switch (tipoNotificacionSolicitud)
+            {
+                case "aceptada": templateId = "d-081db4e63d3d4770a8bd342ed3cdd1f8";
+                    break;
+                case "vencida": templateId = "d-3f09c5a63459453b9ea88b7a35c399af";
+                    break;
+                case "rechazada": templateId = "d-d778c8c64aac4f64a9eb0a22f63cb09f";
+                    break;
+                case "cancelada": templateId = "d-a40b0675552a40268004442948310d40";
+                    break;
+            }
+
+            
             var to = new EmailAddress(toEmail);
             var msg = new SendGridMessage
             {

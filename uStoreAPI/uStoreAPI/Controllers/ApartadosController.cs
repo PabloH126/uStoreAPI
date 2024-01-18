@@ -446,7 +446,7 @@ namespace uStoreAPI.Controllers
 
                 solicitudApartado.IdJob = jobId;
 
-                await userService.NotificarSolicitudUsuario((int)solicitudApartado.IdUsuario, solicitudApartado);
+                await userService.NotificarSolicitudUsuario((int)solicitudApartado.IdUsuario, solicitudApartado, "aceptada");
             }
             else if (solicitud.StatusSolicitud == "completada")
             {
@@ -479,6 +479,7 @@ namespace uStoreAPI.Controllers
 
                 productoSolicitado!.CantidadApartado += solicitudApartado.UnidadesProducto;
                 await productosService.UpdateProducto(productoSolicitado);
+                await userService.NotificarSolicitudUsuario((int)solicitudApartado.IdUsuario, solicitudApartado, "rechazada");
             }
             else if (solicitud.StatusSolicitud == "cancelada")
             {
@@ -521,6 +522,7 @@ namespace uStoreAPI.Controllers
 
                 productoSolicitado!.CantidadApartado += solicitudApartado.UnidadesProducto;
                 await productosService.UpdateProducto(productoSolicitado);
+                await userService.NotificarSolicitudUsuario((int)solicitudApartado.IdUsuario, solicitudApartado, "cancelada");
             }
             if (solicitud.StatusSolicitud == "recogida")
             {

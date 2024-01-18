@@ -272,11 +272,18 @@ namespace uStoreAPI.Controllers
             {
                 return NotFound("No hay gerente registrado con ese id");
             }
+            try
+            {
+                await gerentesService.DeleteAccountGerente(idGerente, null);
+                await uploadService.DeleteImageGerentes(idGerente.ToString());
 
-            await gerentesService.DeleteAccountGerente(idGerente, null);
-            await uploadService.DeleteImageGerentes(idGerente.ToString());
-
-            return NoContent();
+                return NoContent();
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+            
         }
 
         [Authorize]
