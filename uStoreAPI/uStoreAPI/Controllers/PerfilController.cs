@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using uStoreAPI.Dtos;
@@ -12,20 +10,16 @@ namespace uStoreAPI.Controllers
     [ApiController]
     public class PerfilController : ControllerBase
     {
-        private readonly TendenciasService tendenciasService;
         private readonly AdminService adminService;
         private readonly UserService userService;
         private readonly GerentesService gerentesService;
         private readonly SolicitudesApartadoService solicitudesService;
-        private IMapper mapper;
-        public PerfilController(IMapper _mapper, SolicitudesApartadoService _sS, TendenciasService _ts, AdminService _as, UserService _us, GerentesService _gs)
+        public PerfilController(SolicitudesApartadoService _sS, AdminService _as, UserService _us, GerentesService _gs)
         {
-            tendenciasService = _ts;
             adminService = _as;
             userService = _us;
             gerentesService = _gs;
             solicitudesService = _sS;
-            mapper = _mapper;
         }
 
         [Authorize]

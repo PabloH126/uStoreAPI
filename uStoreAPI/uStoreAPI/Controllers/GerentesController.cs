@@ -1,11 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
-using NuGet.Packaging.Signing;
 using System.Security.Claims;
 using uStoreAPI.Dtos;
 using uStoreAPI.ModelsAzureDB;
@@ -18,13 +15,11 @@ namespace uStoreAPI.Controllers
     public class GerentesController : ControllerBase
     {
         private readonly GerentesService gerentesService;
-        private readonly TiendasService tiendasService;
         private readonly UploadService uploadService;
         private IMapper mapper;
-        public GerentesController(IMapper _mapper, UploadService _uploadService ,GerentesService _gerentesService, TiendasService _tiendasService)
+        public GerentesController(IMapper _mapper, UploadService _uploadService ,GerentesService _gerentesService)
         {
             gerentesService = _gerentesService;
-            tiendasService = _tiendasService;
             uploadService = _uploadService;
             mapper = _mapper;
         }

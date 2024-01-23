@@ -1,13 +1,7 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using uStoreAPI.Dtos;
 using uStoreAPI.Services;
 using System.Security.Claims;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Text;
-using uStoreAPI.ModelsAzureDB;
 using Microsoft.AspNetCore.Authorization;
 
 namespace uStoreAPI.Controllers
@@ -21,11 +15,9 @@ namespace uStoreAPI.Controllers
         private readonly GerentesService gerentesService;
         private readonly LoginService loginService;
         private readonly TokenService tokenService;
-        private readonly IMapper mapper;
-        public LoginController(LoginService _loginService, AdminService _adminService,TokenService _tokenService, IMapper _mapper, UserService _userService, GerentesService _gerentesService)
+        public LoginController(LoginService _loginService, AdminService _adminService,TokenService _tokenService, UserService _userService, GerentesService _gerentesService)
         {
             loginService = _loginService;
-            mapper = _mapper;
             adminService = _adminService;
             userService = _userService;
             gerentesService = _gerentesService;

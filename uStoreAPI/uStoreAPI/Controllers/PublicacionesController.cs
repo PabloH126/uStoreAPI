@@ -1,12 +1,9 @@
 ﻿using AutoMapper;
 using Hangfire;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
 using System.Security.Claims;
-using System.Text;
 using uStoreAPI.Dtos;
 using uStoreAPI.ModelsAzureDB;
 using uStoreAPI.Services;

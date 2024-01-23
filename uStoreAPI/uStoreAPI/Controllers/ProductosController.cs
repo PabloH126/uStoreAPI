@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Hangfire;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.IdentityModel.Tokens;

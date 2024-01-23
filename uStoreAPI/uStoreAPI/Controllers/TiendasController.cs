@@ -1,9 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using NuGet.Versioning;
 using System.Security.Claims;
 using uStoreAPI.Dtos;
 using uStoreAPI.ModelsAzureDB;

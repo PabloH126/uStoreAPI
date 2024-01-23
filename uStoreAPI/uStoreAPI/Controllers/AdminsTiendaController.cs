@@ -1,18 +1,12 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.EntityFrameworkCore;
-using System.Runtime.ExceptionServices;
 using uStoreAPI.Dtos;
 using uStoreAPI.ModelsAzureDB;
 using System.Security.Cryptography;
 using uStoreAPI.Services;
 using Microsoft.AspNetCore.Authorization;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.AspNetCore.JsonPatch;
-using Microsoft.OpenApi.Validations;
 
 namespace uStoreAPI.Controllers
 {
@@ -20,14 +14,12 @@ namespace uStoreAPI.Controllers
     [ApiController]
     public class AdminsTiendaController : ControllerBase
     {
-        private readonly ILogger<AdminsTiendaController> logger;
         private readonly AdminService service;
         private readonly TiendasService tiendasService;
         private readonly UploadService uploadService;
         private readonly IMapper mapper;
-        public AdminsTiendaController(TiendasService _tiendasService, ILogger<AdminsTiendaController> _logger, AdminService _service, UploadService _uploadService, IMapper _mapper)
+        public AdminsTiendaController(TiendasService _tiendasService, AdminService _service, UploadService _uploadService, IMapper _mapper)
         {
-            logger = _logger;
             service = _service;
             mapper = _mapper;
             uploadService = _uploadService;

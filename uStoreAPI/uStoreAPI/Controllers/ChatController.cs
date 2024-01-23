@@ -1,11 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Azure;
-using Microsoft.VisualBasic;
-using System;
 using System.Security.Claims;
 using uStoreAPI.Dtos;
 using uStoreAPI.Hubs;

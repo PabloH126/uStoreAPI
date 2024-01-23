@@ -1,10 +1,7 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using uStoreAPI.Dtos;
-using uStoreAPI.ModelsAzureDB;
 using uStoreAPI.Services;
 
 namespace uStoreAPI.Controllers
@@ -14,19 +11,11 @@ namespace uStoreAPI.Controllers
     [ApiController]
     public class TendenciasVentaController : ControllerBase
     {
-        private readonly ProductosService productosService;
-        private readonly TiendasService tiendasService;
         private readonly TendenciasService tendenciasService;
-        private readonly SolicitudesApartadoService solicitudesApartadoService;
-        private IMapper mapper;
 
-        public TendenciasVentaController(TendenciasService _tendenciasService, ProductosService _productosService, TiendasService _tiendasService, SolicitudesApartadoService _solicitudesApartadoService, IMapper _mapper)
+        public TendenciasVentaController(TendenciasService _tendenciasService)
         {
-            productosService = _productosService;
-            tiendasService = _tiendasService;
-            solicitudesApartadoService = _solicitudesApartadoService;
             tendenciasService = _tendenciasService;
-            mapper = _mapper;
         }
 
         [HttpPost("GetTendencias")]
