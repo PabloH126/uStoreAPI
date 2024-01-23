@@ -7,6 +7,7 @@ namespace uStoreAPI.Dtos
         public bool isTienda { get; set; }
         public List<int> categorias { get; set; }
         public string periodoTiempo {  get; set; }
+        public int idCentroComercial { get; set; }
 
     }
 }

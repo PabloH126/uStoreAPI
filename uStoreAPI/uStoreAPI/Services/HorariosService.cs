@@ -24,19 +24,6 @@ namespace uStoreAPI.Services
             return await context.Horarios.FindAsync(idHorario);
         }
 
-        public async Task<Horario?> GetHorarioTiendaWithDay(int? idTienda, string? dia)
-        {
-            return await context.Horarios.FirstOrDefaultAsync(p =>  p.IdTienda == idTienda && p.Dia == dia);
-        }
-
-        public async Task<Horario> CreateHorario(Horario horario)
-        {
-            await context.Horarios.AddAsync(horario);
-            await context.SaveChangesAsync();
-
-            return horario;
-        }
-
         public async Task<IEnumerable<Horario>> CreateAllHorarios(IEnumerable<Horario> horarios)
         {
             foreach (var horario in horarios)
@@ -46,12 +33,6 @@ namespace uStoreAPI.Services
             }
 
             return horarios;
-        }
-
-        public async Task UpdateHorario(Horario horario)
-        {
-            context.Horarios.Update(horario);
-            await context.SaveChangesAsync();
         }
 
         public async Task UpdateAllHorarios(IEnumerable<Horario> horarios)
@@ -66,12 +47,6 @@ namespace uStoreAPI.Services
                     context.Horarios.Update(horarioDia);
                 }
             }
-            await context.SaveChangesAsync();
-        }
-
-        public async Task DeleteHorario(Horario horario)
-        {
-            context.Horarios.Remove(horario);
             await context.SaveChangesAsync();
         }
 

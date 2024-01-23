@@ -776,11 +776,6 @@ namespace uStoreAPI.Services
             }
         }
 
-        public void NotificarExistenciaProductoSincrono(int idUsuario, int idProducto)
-        {
-            NotificarExistenciaProducto(idUsuario, idProducto).GetAwaiter().GetResult();
-        }
-
         public async Task NotificarSolicitudUsuario(int idUsuario, SolicitudesApartado solicitud, string tipoNotificacionSolicitud)
         {
             var emailUsuario = await context.CuentaUsuarios.Where(p => p.IdUsuario == idUsuario).Select(p => p.Email).FirstOrDefaultAsync();

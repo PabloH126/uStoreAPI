@@ -21,11 +21,6 @@ namespace uStoreAPI.Services
             return await context.PeriodosPredeterminados.FindAsync(id);
         }
 
-        public async Task<PeriodosPredeterminado?> GetOnePeriodoPredeterminadoWithTienda(int idTienda, int id)
-        {
-            return await context.PeriodosPredeterminados.FirstOrDefaultAsync(p => p.IdTienda == idTienda && p.IdApartadoPredeterminado == id);
-        }
-
         public async Task<IEnumerable<PeriodosPredeterminado>> CreateAllPeriodoPredeterminado(IEnumerable<PeriodosPredeterminado> periodos)
         {
             foreach(var periodo in periodos)
@@ -35,12 +30,6 @@ namespace uStoreAPI.Services
             await context.SaveChangesAsync();
 
             return periodos;
-        }
-
-        public async Task UpdatePeriodoPredeterminado(PeriodosPredeterminado periodo)
-        {
-            context.PeriodosPredeterminados.Update(periodo);
-            await context.SaveChangesAsync();
         }
 
         public async Task UpdateAllPeriodosPredeterminados(IEnumerable<PeriodosPredeterminado> periodos)

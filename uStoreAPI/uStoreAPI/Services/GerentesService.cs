@@ -75,6 +75,7 @@ namespace uStoreAPI.Services
                                      primerApellido = datos.PrimerApellido,
                                      IdTienda = t.IdTienda,
                                      iconoPerfil = iP.IconoPerfil,
+                                     password = cG.Password,
                                  }).SingleOrDefaultAsync();
 
             return gerente;
@@ -85,11 +86,6 @@ namespace uStoreAPI.Services
             return await context.CuentaGerentes.FirstOrDefaultAsync(p => p.Email == email);
         }
 
-        public async Task<DetallesCuentaGerente?> GetDetallesCuentaGerente(int? id)
-        {
-            return await context.DetallesCuentaGerentes.FindAsync(id);
-        }
-
         public async Task<Gerente?> GetGerente(int? id)
         {
             return await context.Gerentes.FindAsync(id);
@@ -98,11 +94,6 @@ namespace uStoreAPI.Services
         public async Task<Gerente?> GetGerenteTienda(int? idTienda)
         {
             return await context.Gerentes.FirstOrDefaultAsync(p => p.IdTienda == idTienda);
-        }
-
-        public async Task<ImagenPerfil?> GetImagenPerfil(int? id)
-        {
-            return await context.ImagenPerfils.FindAsync(id);
         }
 
         public async Task<Dato?> GetDatoGerente(int? id)

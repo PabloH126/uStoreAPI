@@ -464,19 +464,6 @@ namespace uStoreAPI.Services
             await blobClientThumb.DeleteIfExistsAsync();
         }
 
-        public async Task<int> CountBlobs(string container,string directorio)
-        {
-            var containerClient = blobServiceClient.GetBlobContainerClient($"{container}");
-            var blobs = containerClient.GetBlobsAsync(BlobTraits.None, BlobStates.None, directorio);
-            int counter = 0;
-            await foreach (var blob in blobs)
-            {
-                counter++;
-            }
-
-            return counter;
-        }
-
         public string GetBlobNameFromUrl(string? url)
         {
             if(string.IsNullOrEmpty(url))
@@ -488,17 +475,6 @@ namespace uStoreAPI.Services
             string blobName = uri.Segments.Last();
             string blobNameNoExt = Path.GetFileNameWithoutExtension(blobName);
             return blobNameNoExt;
-        }
-
-        private string GetKeyImage()
-        {
-            byte[] secretKey = new byte[4];
-            using (var generator = RandomNumberGenerator.Create())
-            {
-                generator.GetBytes(secretKey);
-            }
-
-            return Convert.ToBase64String(secretKey);
         }
     }
 }

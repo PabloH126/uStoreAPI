@@ -31,16 +31,6 @@ namespace uStoreAPI.Services
             return solicitudes;
         }
 
-        public async Task<IEnumerable<SolicitudesApartado>> GetSolicitudesApartado(int idProducto)
-        {
-            return await context.SolicitudesApartados.Where(p => p.IdProductos == idProducto).AsNoTracking().ToListAsync();
-        }
-
-        public async Task<IEnumerable<SolicitudesApartado>> GetSolicitudesApartadoWithIdTienda(int idTienda)
-        {
-            return await context.SolicitudesApartados.Where(p => p.IdTienda == idTienda).AsNoTracking().ToListAsync();
-        }
-
         public async Task<IEnumerable<SolicitudesApartado>> GetSolicitudesApartadoPendientesWithIdTienda(int idTienda)
         {
             return await context.SolicitudesApartados.Where(p => p.IdTienda == idTienda && p.StatusSolicitud == "pendiente").AsNoTracking().ToListAsync();

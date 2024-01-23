@@ -31,19 +31,24 @@ namespace uStoreAPI.Services
                 default : throw new ArgumentException("No se especifico ningun periodo");
             }
 
-            IQueryable<int> productosFiltrados = context.Productos.Select(p => p.IdProductos);
-            IQueryable<int> tiendasFiltradas = context.Tienda.Select(t => t.IdTienda);
+            IQueryable<int> productosFiltrados = from p in context.Productos
+                                                 join t in context.Tienda on p.IdTienda equals t.IdTienda
+                                                 where t.IdCentroComercial == filtros.idCentroComercial
+                                                 select p.IdProductos;
+
+            IQueryable<int> tiendasFiltradas = context.Tienda.Where(t => t.IdCentroComercial == filtros.idCentroComercial).Select(t => t.IdTienda);
 
             if (filtros.categorias != null && filtros.categorias.Any())
             {
                 productosFiltrados = from p in context.Productos
                                      join cp in context.CategoriasProductos on p.IdProductos equals cp.IdProductos
-                                     where filtros.categorias.Contains((int)cp.IdCategoria!)
+                                     join t in context.Tienda on p.IdTienda equals t.IdTienda
+                                     where filtros.categorias.Contains((int)cp.IdCategoria!) && t.IdCentroComercial == filtros.idCentroComercial
                                      select p.IdProductos;
 
                 tiendasFiltradas = from t in context.Tienda
                                    join ct in context.CategoriasTiendas on t.IdTienda equals ct.IdTienda
-                                   where filtros.categorias.Contains((int)ct.IdCategoria!)
+                                   where filtros.categorias.Contains((int)ct.IdCategoria!) && t.IdCentroComercial == filtros.idCentroComercial
                                    select t.IdTienda;
             }
 
